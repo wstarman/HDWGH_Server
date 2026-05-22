@@ -8,8 +8,9 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://myuser:mypassword@postgres:5432/game?schema=public
     volumes:
-      - .:/app
-      - /app/node_modules
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - api_node_modules:/app/node_modules
     command: npm run dev
     depends_on:
       - postgres
@@ -30,3 +31,4 @@ services:
 
 volumes:
   postgres_data:
+  api_node_modules:
