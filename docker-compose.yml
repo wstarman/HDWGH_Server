@@ -3,8 +3,10 @@ services:
     build: .
     ports:
       - "3000:3000"
+      - "5555:5555"
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=postgresql://myuser:mypassword@postgres:5432/game?schema=public
     volumes:
       - .:/app
       - /app/node_modules
