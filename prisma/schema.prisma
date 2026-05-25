@@ -17,3 +17,8 @@ model Character{
   id  Int  @id  @default(autoincrement())
   name  String?
 }
+
+model Test{
+  name  String @id
+  key String
+}
