@@ -1,13 +1,21 @@
 import express from "express";
 import { PrismaClient } from '@prisma/client';
 
-
 const app = express();
 const prisma = new PrismaClient();
 
 app.use(express.json());
 
 app.get("/", (_, res) => {
+  const animationData = {
+    time: 10,
+    attacker: 0,
+    damage: {
+      type: "fire",
+      amount: 20
+    },
+    receiver: 1
+  }
   res.send("hello");
 });
 
