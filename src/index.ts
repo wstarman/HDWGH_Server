@@ -16,7 +16,7 @@ app.get("/", (_, res) => {
     },
     receiver: 1
   }
-  res.send("hello");
+  res.json(animationData);
 });
 
 app.get("/Character/:id", async (req, res) => {
