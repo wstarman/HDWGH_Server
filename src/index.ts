@@ -8,11 +8,11 @@ app.use(express.json());
 
 app.get("/", (_, res) => {
   const animationData = {
-    time: 10,
+    time: 67,
     attacker: 0,
     damage: {
       type: "fire",
-      amount: 20
+      amount: 67
     },
     receiver: 1
   }
