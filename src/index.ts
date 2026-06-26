@@ -1,5 +1,7 @@
 import express from "express";
 import { PrismaClient } from '@prisma/client';
+import { BattleManager } from "./BattleManager.js";
+import type { CharacterData } from "./BattleManager.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -7,16 +9,19 @@ const prisma = new PrismaClient();
 app.use(express.json());
 
 app.get("/", (_, res) => {
-  const animationData = {
-    time: 10,
-    attacker: 0,
-    damage: {
-      type: "fire",
-      amount: 20
-    },
-    receiver: 1
-  }
-  res.json(animationData);
+  // Test data
+  let testdata: CharacterData = JSON.parse(`{"weaponid": "sword"}`);
+
+  let bm: BattleManager = new BattleManager(testdata);
+  bm.run();
+
+
+
+  res.json({
+    message: "Battle simulation successfully initialized.",
+    playerhp: bm.Player.HP,
+    enemyhp: bm.Enemy.HP
+  })
 });
 
 app.get("/Character/:id", async (req, res) => {

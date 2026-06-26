@@ -1,0 +1,17 @@
+[
+    {
+        "id": "barehand",
+        "damage": 1,
+        "cooldown": 1000
+    },
+    {
+        "id": "sword",
+        "damage": 10,
+        "cooldown": 1000
+    },
+    {
+        "id": "claymore",
+        "damage": 30,
+        "cooldown": 2000
+    }
+]
