@@ -2,8 +2,8 @@
 
 ## 開發
 
-1. 初次使用：npm install
-2. 之後要執行時：npm run dev
+1. 初次使用：docker compose build --no-cache
+2. 之後要執行時：docker compose watch
 3. 聯繫翁世承如果這不管用
 
 ## 執行
