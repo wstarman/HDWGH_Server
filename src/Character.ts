@@ -1,7 +1,9 @@
 import { Weapon } from "./Weapon.js";
+import { Status } from "./Status.js";
 
 export class Character{
     WieldWeapon: Weapon = new Weapon();
+    CurrentStatus: Status = new Status();
 
     // Combat Stat
     MaxHP: number = 100.0;
@@ -9,8 +11,9 @@ export class Character{
     Physical_Res: number = 0.0;
     Fire_Res: number = 0.0;
 
-    constructor(id: string = "barehand") {
-        this.WieldWeapon = Weapon.Weapons[id]?.clone() ?? new Weapon();
+    constructor(weaponid: string = "barehand", statusid: string = "") {
+        this.WieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
+        this.CurrentStatus = new Status(statusid);
 
         this.MaxHP = 100.0;
         this.HP = 100.0;
