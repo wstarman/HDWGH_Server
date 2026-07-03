@@ -2,6 +2,7 @@ import { Character } from "./Character.js"
 
 export interface CharacterData {
 	weaponid: string;
+	statusid: string;
 }
 
 export interface BattleLog {
@@ -25,7 +26,7 @@ export class BattleManager{
 	running: boolean = true
 
 	constructor(player: CharacterData){
-		this.Player = new Character(player.weaponid);
+		this.Player = new Character(player.weaponid, player.statusid);
 	}
 
 	run(): void {
@@ -36,6 +37,10 @@ export class BattleManager{
 
 			if(elapsedTime % this.Player.WieldWeapon.WeaponCooldown == 0){
 				this.record_attack(elapsedTime, 0, 1, this.Player, this.Enemy);
+			}
+
+			if(elapsedTime % this.Player.CurrentStatus.StatusCooldown == 0){
+				this.Player.CurrentStatus.StatusFunction(this.Player, this.Enemy);
 			}
 
 			//for Status in Player.CurrentStatus:
