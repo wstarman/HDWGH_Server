@@ -20,7 +20,8 @@ app.get("/", (_, res) => {
   res.json({
     message: "Battle simulation successfully initialized.",
     playerhp: bm.Player.HP,
-    enemyhp: bm.Enemy.HP
+    enemyhp: bm.Enemy.HP,
+    battlelog: bm.BattleLog
   })
 });
 
@@ -66,6 +67,8 @@ app.post("/post", async (req, res) => {
 });
 
 
-app.listen(3000, () => {
+const port = Number(process.env.PORT ?? 3000);
+
+app.listen(port, () => {
   console.log("Hello World!");
 });

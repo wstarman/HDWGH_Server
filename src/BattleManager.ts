@@ -4,9 +4,19 @@ export interface CharacterData {
 	weaponid: string;
 }
 
+export interface BattleLog {
+	time: number;
+	attacker: number;
+	receiver: number;
+	damage: number;
+	weaponName: string;
+	damageType: string;
+}
+
 export class BattleManager{
  	Player: Character = new Character();
 	Enemy: Character = new Character();
+	BattleLog: BattleLog[] = [];
 	TickTime: number = 0.001
 
 	currentTick: number = 0
@@ -25,7 +35,7 @@ export class BattleManager{
 			elapsedTime++;
 
 			if(elapsedTime % this.Player.WieldWeapon.WeaponCooldown == 0){
-				this.Player.NormalAttack(this.Enemy);
+				this.record_attack(elapsedTime, 0, 1, this.Player, this.Enemy);
 			}
 
 			//for Status in Player.CurrentStatus:
@@ -36,7 +46,7 @@ export class BattleManager{
 			}
 			
 			if(elapsedTime % this.Enemy.WieldWeapon.WeaponCooldown == 0){
-				this.Enemy.NormalAttack(this.Player);
+				this.record_attack(elapsedTime, 1, 0, this.Enemy, this.Player);
 			}
 
 			if(this.check_ending()){
@@ -45,10 +55,27 @@ export class BattleManager{
 		}
 	}
 
-	check_ending(){
+	record_attack(elapsedTime: number, attackerIndex: number, receiverIndex: number, attacker: Character, receiver: Character): void {
+		const weapon = attacker.WieldWeapon;
+
+		this.BattleLog.push({
+			time: elapsedTime * this.TickTime,
+			attacker: attackerIndex,
+			receiver: receiverIndex,
+			damage: weapon.WeaponDamage,
+			weaponName: weapon.WeaponId,
+			damageType: "physical",
+		});
+
+		attacker.NormalAttack(receiver);
+	}
+
+	check_ending(): boolean {
 		if(this.Player.HP <= 0.0 || this.Enemy.HP <= 0.0){
 			return true;
 		}
+
+		return false;
 	}
 }
 
