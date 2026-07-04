@@ -1,17 +1,24 @@
 import type { Character } from "./Character.js";
 
-type StatusFn = (caster: Character, target: Character) => void;
+export interface StatusEffectResult {
+    receiver: "statusHolder" | "target";
+    damage: number;
+    damageType: string;
+    sourceName: string;
+}
+
+type StatusFn = (statusHolder: Character, target: Character) => StatusEffectResult | null;
 
 export class Status{
     StatusId: string = ""
     StatusCooldown: number = 100
     CurrentCooldown: number = 0
-    StatusFunction: (caster: Character, target: Character) => void;
+    StatusFunction: (statusHolder: Character, target: Character) => StatusEffectResult | null;
 
     constructor(id: string = "", cd: number = 100){
         this.StatusId = id;
         this.StatusCooldown = Math.ceil(cd);
-        this.StatusFunction = StatusFns[id] ?? (() => {});
+        this.StatusFunction = StatusFns[id] ?? (() => null);
     }
     
     clone(): Status {
@@ -23,7 +30,15 @@ export class Status{
 
 
 const StatusFns: Record<string, StatusFn> = {
-    "burning": (caster, target) =>{
-        caster.TakeDamage(10);
+    "burning": (statusHolder, target) =>{
+        const damage = 10;
+        statusHolder.TakeDamage(damage);
+
+        return {
+            receiver: "statusHolder",
+            damage,
+            damageType: "fire",
+            sourceName: "burning",
+        };
     }
 };

@@ -1,4 +1,5 @@
 import { Character } from "./Character.js"
+import type { StatusEffectResult } from "./Status.js";
 
 export interface CharacterData {
 	weaponid: string;
@@ -40,7 +41,8 @@ export class BattleManager{
 			}
 
 			if(elapsedTime % this.Player.CurrentStatus.StatusCooldown == 0){
-				this.Player.CurrentStatus.StatusFunction(this.Player, this.Enemy);
+				const statusEffect = this.Player.CurrentStatus.StatusFunction(this.Player, this.Enemy);
+				this.record_status_effect(elapsedTime, 0, 1, statusEffect);
 			}
 
 			//for Status in Player.CurrentStatus:
@@ -64,7 +66,7 @@ export class BattleManager{
 		const weapon = attacker.WieldWeapon;
 
 		this.BattleLog.push({
-			time: elapsedTime * this.TickTime,
+			time: this.get_battle_time(elapsedTime),
 			attacker: attackerIndex,
 			receiver: receiverIndex,
 			damage: weapon.WeaponDamage,
@@ -73,6 +75,25 @@ export class BattleManager{
 		});
 
 		attacker.NormalAttack(receiver);
+	}
+
+	record_status_effect(elapsedTime: number, statusHolderIndex: number, targetIndex: number, effect: StatusEffectResult | null): void {
+		if(effect == null){
+			return;
+		}
+
+		this.BattleLog.push({
+			time: this.get_battle_time(elapsedTime),
+			attacker: statusHolderIndex,
+			receiver: effect.receiver == "statusHolder" ? statusHolderIndex : targetIndex,
+			damage: effect.damage,
+			weaponName: effect.sourceName,
+			damageType: effect.damageType,
+		});
+	}
+
+	get_battle_time(elapsedTime: number): number {
+		return Number((elapsedTime * this.TickTime).toFixed(6));
 	}
 
 	check_ending(): boolean {
