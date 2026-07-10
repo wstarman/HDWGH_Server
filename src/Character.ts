@@ -13,7 +13,7 @@ export class Character{
 
     constructor(weaponid: string = "barehand", statusid: string = "") {
         this.WieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
-        this.CurrentStatus = new Status(statusid);
+        this.CurrentStatus = new Status(statusid, 5);
 
         this.MaxHP = 100.0;
         this.HP = 100.0;

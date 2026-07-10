@@ -41,7 +41,7 @@ export class BattleManager{
 			}
 
 			if(elapsedTime % this.Player.CurrentStatus.StatusCooldown == 0){
-				const statusEffect = this.Player.CurrentStatus.StatusFunction(this.Player, this.Enemy);
+				const statusEffect = this.Player.CurrentStatus.StatusFunction(this.Player.CurrentStatus, this.Player, this.Enemy);
 				this.record_status_effect(elapsedTime, 0, 1, statusEffect);
 			}
 
