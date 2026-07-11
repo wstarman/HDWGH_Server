@@ -40,13 +40,18 @@ export class BattleManager{
 				this.record_attack(elapsedTime, 0, 1, this.Player, this.Enemy);
 			}
 
-			if(elapsedTime % this.Player.CurrentStatus.StatusCooldown == 0){
+
+			/*if(elapsedTime % this.Player.CurrentStatus.StatusCooldown == 0){
 				const statusEffect = this.Player.CurrentStatus.StatusFunction(this.Player.CurrentStatus, this.Player, this.Enemy);
 				this.record_status_effect(elapsedTime, 0, 1, statusEffect);
-			}
+			}*/
 
-			//for Status in Player.CurrentStatus:
-			//	Status.process(Player)
+			this.Player.CurrentStatus.forEach(status => {
+				const statusEffect = status.process(this.Player, this.Enemy);
+				
+				this.record_status_effect(elapsedTime, 0, 1, statusEffect);
+			});
+
 				
 			if(this.check_ending()){
 				break;

@@ -31,6 +31,22 @@ export class Status{
         return new Status(this.StatusId, this.StatusStack);
     }
 
+    process(statusHolder: Character, target: Character): StatusEffectResult | null {
+        this.CurrentCooldown++;
+        if (this.CurrentCooldown == this.StatusCooldown){
+            this.CurrentCooldown = 0;
+
+            if (this.StatusFunction === null){
+                return null;
+            }
+
+			const statusEffect = this.StatusFunction(this, statusHolder, target);
+            return statusEffect;
+		}
+
+        return null;
+    }
+
     
 }
 

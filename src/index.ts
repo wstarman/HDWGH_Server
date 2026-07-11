@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.get("/", (_, res) => {
   // Test data
-  let testdata: CharacterData = JSON.parse(`{"weaponid": "sword", "statusid":"burning"}`);
+  let testdata: CharacterData = JSON.parse(`{"weaponid": "sword", "statusid":"poisoning"}`);
 
   let bm: BattleManager = new BattleManager(testdata);
   bm.run();
