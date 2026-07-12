@@ -1,91 +1,119 @@
+import { DamageType } from "./enum/DamageType.js";
+import { DamageSystem, type DamageEvent } from "./Damage.js";
+
 import type { Character } from "./Character.js";
 
+
 export interface StatusEffectResult {
-    receiver: "statusHolder" | "target";
+    receiver: Character;
     damage: number;
     damageType: string;
     sourceName: string;
 }
 
-type StatusFn = (status: Status, statusHolder: Character, target: Character) => StatusEffectResult | null;
+export interface StatusContext {
+    holder: Character,
+    target?: Character
+}
+
+interface StatusDef {
+    tickInterval?: number;
+    onTick?: (status: Status, ctx: StatusContext) => DamageEvent;
+    //onAttack?: (status: Status, ctx: StatusContext) => void;
+    //onDamageTaken?: (status: Status, ctx: StatusContext) => void;
+    //onDeath?: (status: Status, ctx: StatusContext) => void;
+}
+
+//type StatusFn = (status: Status, statusHolder: Character, target: Character) => StatusEffectResult | null;
 
 export class Status{
-    StatusId: string = "";
-    StatusStack: number = 1;
-    StatusCooldown: number = 100;
-    CurrentCooldown: number = 0;
-    StatusFunction: (status: Status, statusHolder: Character, target: Character) => StatusEffectResult | null;
+    Id: string = "";
+    Stack: number = 1;
 
-    constructor(id: string = "", stack: number = 1){
-        this.StatusId = id;
-        this.StatusStack = stack;
-        this.StatusCooldown = Math.ceil(StatusFns[id]?.cooldown ?? 100);
-        this.StatusFunction = StatusFns[id]?.effect ?? (() => null);
+    Timer: number = 0;
+    
+    StatusDefinition: StatusDef;
+
+    constructor(id: string, stack: number = 1){
+        this.Id = id;
+        this.Stack = stack;
+
+        const def = StatusDefs[id];
+
+        if(!def){
+            throw new Error(`Unknown status: ${id}`);
+        }
+
+        this.StatusDefinition = def;
+    }
+
+    processOnTick(ctx: StatusContext): DamageEvent | null{
+        if(!this.StatusDefinition.onTick){
+            return null;
+        }
+
+        if(!this.StatusDefinition.tickInterval){
+            throw new Error(`Status ${this.Id} has no tick interval`)
+        }
+
+        this.Timer++;
+
+        if(this.Timer < this.StatusDefinition.tickInterval){
+            return null;
+        }
+
+        this.Timer = 0;
+
+        const event = this.StatusDefinition.onTick(this, ctx);
+
+        return event;
     }
 
     decreaseStack(loss: number){
-        this.StatusStack = Math.max(0, this.StatusStack - loss);
+        this.Stack = Math.max(0, this.Stack - loss);
     }
 
     clone(): Status {
-        return new Status(this.StatusId, this.StatusStack);
+        return new Status(this.Id, this.Stack);
     }
-
-    process(statusHolder: Character, target: Character): StatusEffectResult | null {
-        this.CurrentCooldown++;
-        if (this.CurrentCooldown == this.StatusCooldown){
-            this.CurrentCooldown = 0;
-
-            if (this.StatusFunction === null){
-                return null;
-            }
-
-			const statusEffect = this.StatusFunction(this, statusHolder, target);
-            return statusEffect;
-		}
-
-        return null;
-    }
-
-    
 }
 
-interface StatusDefinition {
-    cooldown: number;
-    effect: StatusFn;
-}
-
-const StatusFns: Record<string, StatusDefinition> = {
+const StatusDefs: Record<string, StatusDef> = {
     "burning": {
-        cooldown: 100,
-        effect: (status, statusHolder, target) =>{
-            const basedamage = 10;
-            let damage = basedamage * status.StatusStack
-            statusHolder.TakeDamage(damage);
-
+        tickInterval: 1000,
+        onTick: (status, ctx) =>{
+            const damage = 10 * status.Stack
             status.decreaseStack(1);
 
-            return {
-                receiver: "statusHolder",
-                damage,
-                damageType: "fire",
-                sourceName: "burning",
-            };
+            const event: DamageEvent = {
+                attacker: ctx.holder,
+                receiver: ctx.holder,
+                amount: damage,
+                type: DamageType.Fire,
+                sourceType: "status",
+                sourceObjectType: "status",
+                sourceId: "burning"
+            }
+
+            return event;
         }
     },
     "poisoning": {
-        cooldown: 200,
-        effect: (status, statusHolder, target) =>{
-            const basedamage = 10;
-            let damage = basedamage * status.StatusStack
-            statusHolder.TakeDamage(damage);
+        tickInterval: 2000,
+        onTick: (status, ctx) =>{
+            const damage = 10 * status.Stack
 
-            return {
-                receiver: "statusHolder",
-                damage,
-                damageType: "fire",
-                sourceName: "poisoning",
-            };
+            const event: DamageEvent = {
+                attacker: ctx.holder,
+                receiver: ctx.holder,
+                amount: damage,
+                type: DamageType.Poison,
+                sourceType: "status",
+                sourceObjectType: "status",
+                sourceId: "poisoning"
+            }
+
+            return event;
         }
-    },
+    }
 };

@@ -1,9 +1,15 @@
 import { Weapon } from "./Weapon.js";
 import { Status } from "./Status.js";
+import { Passive } from "./Passive.js";
+import type { DamageEvent } from "./Damage.js";
 
 export class Character{
+    Index: number;
+
     WieldWeapon: Weapon = new Weapon();
     CurrentStatus: Status[] = [];
+
+    Passive: Passive[] = [];
 
     // Combat Stat
     MaxHP: number = 100.0;
@@ -11,9 +17,17 @@ export class Character{
     Physical_Res: number = 0.0;
     Fire_Res: number = 0.0;
 
-    constructor(weaponid: string = "barehand", statusid: string = "") {
+    constructor(index: number, weaponid: string = "barehand", statusid: string[] = [], passiveid: string[] = []) {
+        this.Index = index;
+
         this.WieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
-        this.CurrentStatus.push(new Status(statusid, 5));
+        statusid.forEach(id => {
+            this.CurrentStatus.push(new Status(id, 1));
+        });
+
+        passiveid.forEach(id => {
+            this.Passive.push(new Passive(id));
+        });
 
         this.MaxHP = 100.0;
         this.HP = 100.0;
@@ -22,10 +36,10 @@ export class Character{
     }
     
     NormalAttack(Enemy: Character): void {
-        Enemy.TakeDamage(this.WieldWeapon.WeaponDamage);
+        //Enemy.TakeDamage(this.WieldWeapon.WeaponDamage);
     }
 
-    TakeDamage(damage: number/*, type: DamageType*/): void {
+    TakeDamage(damage: number): void {
         this.HP -= Math.max(damage, 0);
     }
 		/*Physical_Damage_Type:

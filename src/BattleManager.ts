@@ -1,55 +1,70 @@
 import { Character } from "./Character.js"
-import type { StatusEffectResult } from "./Status.js";
+import { DamageSystem, type DamageEvent } from "./Damage.js";
+import { DamageType } from "./enum/DamageType.js";
+import type { StatusContext, StatusEffectResult } from "./Status.js";
 
 export interface CharacterData {
 	weaponid: string;
-	statusid: string;
+	statusid: string[];
+	passiveid: string[];
 }
 
 export interface BattleLog {
 	time: number;
+	eventType: string;
+	sourceType: string;
+	sourceObjectType: string;
 	attacker: number;
 	receiver: number;
+	sourceId: string;
+	equipmentSlot?: number;
 	damage: number;
-	weaponName: string;
 	damageType: string;
 }
 
 export class BattleManager{
- 	Player: Character = new Character();
-	Enemy: Character = new Character();
+ 	Player: Character;
+	Enemy: Character;
 	BattleLog: BattleLog[] = [];
 	TickTime: number = 0.001
 
 	currentTick: number = 0
 	remainderTime: number = 0.0
 
+	elapsedTime: number = 0
+
 	running: boolean = true
 
 	constructor(player: CharacterData){
-		this.Player = new Character(player.weaponid, player.statusid);
+		this.Player = new Character(0, player.weaponid, player.statusid, player.passiveid);
+		this.Enemy = new Character(1);
 	}
 
 	run(): void {
-		let elapsedTime: number = 0
+
+		let ctx: StatusContext = {
+				holder: this.Player,
+			}
+		
 
 		while(true){
-			elapsedTime++;
+			this.elapsedTime++;
 
-			if(elapsedTime % this.Player.WieldWeapon.WeaponCooldown == 0){
+			/*if(this.elapsedTime % this.Player.WieldWeapon.WeaponCooldown == 0){
 				this.record_attack(elapsedTime, 0, 1, this.Player, this.Enemy);
-			}
-
-
-			/*if(elapsedTime % this.Player.CurrentStatus.StatusCooldown == 0){
-				const statusEffect = this.Player.CurrentStatus.StatusFunction(this.Player.CurrentStatus, this.Player, this.Enemy);
-				this.record_status_effect(elapsedTime, 0, 1, statusEffect);
 			}*/
 
+			
+
+			// Checking OnTick Status
 			this.Player.CurrentStatus.forEach(status => {
-				const statusEffect = status.process(this.Player, this.Enemy);
+				const damageEvent = status.processOnTick(ctx);
+
+				if (damageEvent){
+					this.dealDamage(damageEvent);
+				}
 				
-				this.record_status_effect(elapsedTime, 0, 1, statusEffect);
+				//this.record_status_effect(elapsedTime, 0, 1, statusEffect);
 			});
 
 				
@@ -57,9 +72,9 @@ export class BattleManager{
 				break;
 			}
 			
-			if(elapsedTime % this.Enemy.WieldWeapon.WeaponCooldown == 0){
+			/*if(elapsedTime % this.Enemy.WieldWeapon.WeaponCooldown == 0){
 				this.record_attack(elapsedTime, 1, 0, this.Enemy, this.Player);
-			}
+			}*/
 
 			if(this.check_ending()){
 				break;
@@ -67,7 +82,23 @@ export class BattleManager{
 		}
 	}
 
-	record_attack(elapsedTime: number, attackerIndex: number, receiverIndex: number, attacker: Character, receiver: Character): void {
+	dealDamage(event: DamageEvent){
+        let final = DamageSystem.deal(event);
+	
+		this.BattleLog.push({
+			time: this.get_battle_time(this.elapsedTime),
+			eventType: "damage",
+			sourceType: event.sourceType,
+			sourceObjectType: event.sourceObjectType,
+			attacker: event.attacker.Index,
+			receiver: event.receiver.Index,
+			sourceId: event.sourceId,
+			damage: final,
+			damageType: event.type
+		});
+    }
+
+	/*record_attack(elapsedTime: number, attackerIndex: number, receiverIndex: number, attacker: Character, receiver: Character): void {
 		const weapon = attacker.WieldWeapon;
 
 		this.BattleLog.push({
@@ -95,7 +126,7 @@ export class BattleManager{
 			weaponName: effect.sourceName,
 			damageType: effect.damageType,
 		});
-	}
+	}*/
 
 	get_battle_time(elapsedTime: number): number {
 		return Number((elapsedTime * this.TickTime).toFixed(6));
