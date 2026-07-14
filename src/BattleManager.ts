@@ -43,9 +43,10 @@ export class BattleManager{
 	run(): void {
 
 		let ctx: StatusContext = {
-				holder: this.Player,
-			}
-		
+			holder: this.Player,
+		}
+		this.Player.onStart();
+		this.Enemy.onStart();
 
 		while(true){
 			this.elapsedTime++;

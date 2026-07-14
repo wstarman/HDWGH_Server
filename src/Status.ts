@@ -19,24 +19,48 @@ export interface StatusContext {
 interface StatusDef {
     tickInterval?: number;
     onTick?: (status: Status, ctx: StatusContext) => DamageEvent;
+    natureDecrease: (status: Status) => void;
     //onAttack?: (status: Status, ctx: StatusContext) => void;
     //onDamageTaken?: (status: Status, ctx: StatusContext) => void;
     //onDeath?: (status: Status, ctx: StatusContext) => void;
+}
+
+export interface StatusChangeEvent{
+    holder: Character,
+    status: Status,
+    originalStack: number,
+    newStack: number
+}
+
+export interface StatusAddEvent{
+    holder: Character,
+    status: Status,
+    stack: number
 }
 
 //type StatusFn = (status: Status, statusHolder: Character, target: Character) => StatusEffectResult | null;
 
 export class Status{
     Id: string = "";
-    Stack: number = 1;
+    private _Stack: number = 1;
+    get Stack(): number {return this._Stack;}
+    set Stack(value: number) {
+        if(value != this._Stack){
+            let original = this._Stack;
+            this._Stack = value;
+            this.holder.onStatusChange({holder: this.holder, status:this, originalStack: original, newStack: value})
+        }
+    }
 
     Timer: number = 0;
+    holder: Character;
     
     StatusDefinition: StatusDef;
 
-    constructor(id: string, stack: number = 1){
+    constructor(id: string, holder: Character, stack: number = 1){
         this.Id = id;
         this.Stack = stack;
+        this.holder = holder
 
         const def = StatusDefs[id];
 
@@ -69,21 +93,17 @@ export class Status{
         return event;
     }
 
-    decreaseStack(loss: number){
-        this.Stack = Math.max(0, this.Stack - loss);
-    }
-
     clone(): Status {
-        return new Status(this.Id, this.Stack);
+        return new Status(this.Id, this.holder, this.Stack);
     }
 }
 
 const StatusDefs: Record<string, StatusDef> = {
     "burning": {
         tickInterval: 1000,
-        onTick: (status, ctx) =>{
+        onTick: (status, ctx) => {
             const damage = 10 * status.Stack
-            status.decreaseStack(1);
+            status.StatusDefinition.natureDecrease(status);
 
             const event: DamageEvent = {
                 attacker: ctx.holder,
@@ -96,13 +116,17 @@ const StatusDefs: Record<string, StatusDef> = {
             }
 
             return event;
+        },
+        natureDecrease(status) {
+            status.Stack = Math.max(0,status.Stack-1);
         }
     },
     "poisoning": {
         tickInterval: 2000,
         onTick: (status, ctx) =>{
             const damage = 10 * status.Stack
-
+            status.StatusDefinition.natureDecrease(status);
+            
             const event: DamageEvent = {
                 attacker: ctx.holder,
                 receiver: ctx.holder,
@@ -114,6 +138,9 @@ const StatusDefs: Record<string, StatusDef> = {
             }
 
             return event;
+        },
+        natureDecrease(status) {
+            status.Stack = Math.max(0,status.Stack-1);
         }
     }
 };

@@ -1,5 +1,5 @@
 import { Weapon } from "./Weapon.js";
-import { Status } from "./Status.js";
+import { Status, type StatusChangeEvent } from "./Status.js";
 import { Passive } from "./Passive.js";
 import type { DamageEvent } from "./Damage.js";
 
@@ -22,7 +22,7 @@ export class Character{
 
         this.WieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
         statusid.forEach(id => {
-            this.CurrentStatus.push(new Status(id, 1));
+            this.CurrentStatus.push(new Status(id, this, 1));
         });
 
         passiveid.forEach(id => {
@@ -49,6 +49,31 @@ export class Character{
 			
 		_:
 			pass*/
+
+    AddStatus(id: string, stack: number){
+        for (let status of this.CurrentStatus){
+            if(status.Id==id){
+                status.Stack += stack;
+                return
+            }
+        }
+        this.CurrentStatus.push(new Status(id, this, stack));
+    }
+
+    onStart(){
+        this.Passive.forEach(p => {p.PassiveDefinition.onStart?.(this)});
+    }
+
+    onStatusChange(event: StatusChangeEvent){
+        this.Passive.forEach(p => {p.PassiveDefinition.onStatusChange?.(event)});
+    }
+    /* TODOS:
+    onStart?: (character: Character) => void;
+    onAttack?: (event: DamageEvent) => void;
+    onDamageTaken?: (event: DamageEvent) => DamageModifier | null;
+    onDeath?: (event: DamageEvent) => void;
+    onStatusAdd?: (event: StatusAddEvent) => void;
+    */
 }
 
 
