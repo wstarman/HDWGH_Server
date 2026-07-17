@@ -1,7 +1,9 @@
 import { Character } from "./Character.js"
-import { DamageSystem, type DamageEvent } from "./Damage.js";
+import { DamageSystem } from "./Damage.js";
 import { DamageType } from "./enum/DamageType.js";
-import type { StatusContext, StatusEffectResult } from "./Status.js";
+import { EventType } from "./enum/EventType.js";
+import type { DamageEvent, Events } from "./Event.js";
+import type { StatusContext } from "./Status.js";
 
 export interface CharacterData {
 	weaponid: string;
@@ -12,14 +14,25 @@ export interface CharacterData {
 export interface BattleLog {
 	time: number;
 	eventType: string;
-	sourceType: string;
-	sourceObjectType: string;
-	attacker: number;
-	receiver: number;
-	sourceId: string;
+
+	attacker?: number;
+	receiver?: number;
+	damage?: number;
+	damageType?: string;
+
+	owner?: number;
+	statusId?: string;
+	beforeStack?: number;
+	afterStack?: number;
+	delta?: number;
+	reason?: string;
+
+	
+
+	sourceType?: string;
+	sourceObjectType?: string;
+	sourceId?: string;
 	equipmentSlot?: number;
-	damage: number;
-	damageType: string;
 }
 
 export class BattleManager{
@@ -59,15 +72,30 @@ export class BattleManager{
 
 			// Checking OnTick Status
 			this.Player.CurrentStatus.forEach(status => {
-				const damageEvent = status.processOnTick(ctx);
+				const events: Events[] = status.processOnTick(ctx) ?? [];
 
-				if (damageEvent){
-					this.dealDamage(damageEvent);
-				}
-				
+				events.forEach(event => {
+					if (event.eventType == EventType.DamageEvent){
+						this.dealDamage(event);
+					}
+					else if (event.eventType == EventType.StatusChangeEvent){
+						this.BattleLog.push({
+							time: this.get_battle_time(this.elapsedTime),
+							eventType: "status_stack_change",
+							owner: event.holder.Index,
+							statusId: event.status.Id,
+							beforeStack: event.originalStack,
+							afterStack: event.newStack,
+							delta: event.newStack - event.originalStack,
+							reason: "tick",
+							sourceType: "status",
+							sourceObjectType: "status",
+							sourceId: event.status.Id,
+						});
+					}
+				})
 				//this.record_status_effect(elapsedTime, 0, 1, statusEffect);
 			});
-
 				
 			if(this.check_ending()){
 				break;

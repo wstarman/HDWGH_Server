@@ -1,7 +1,8 @@
 import { DamageType } from "./enum/DamageType.js";
-import { type DamageEvent, type DamageModifier } from "./Damage.js";
+import { type DamageModifier } from "./Damage.js";
 import type { Character } from "./Character.js";
-import type { StatusAddEvent, StatusChangeEvent } from "./Status.js";
+import type { StatusAddEvent } from "./Status.js";
+import type { DamageEvent, StatusChangeEvent } from "./Event.js";
 
 interface PassiveDef {
     onStart?: (character: Character) => void;
@@ -12,16 +13,16 @@ interface PassiveDef {
     onStatusAdd?: (event: StatusAddEvent) => void;
 }
 
-export class Passive{
+export class Passive {
     Id: string = "";
-    
+
     PassiveDefinition: PassiveDef;
 
-    constructor(id: string){
+    constructor(id: string) {
         this.Id = id;
         const def = PassiveDefs[id];
 
-        if(!def){
+        if (!def) {
             throw new Error(`Unknown passive: ${id}`);
         }
 
@@ -32,12 +33,12 @@ export class Passive{
 
 const PassiveDefs: Record<string, PassiveDef> = {
     "drug_resistance": {
-        onDamageTaken: (damageEvent) =>{
-            if(damageEvent.sourceType == "status" && damageEvent.sourceId == "poisoning"){
-                    return {
-                        flat: 0,
-                        multiplier: 0.75
-                    }
+        onDamageTaken: (damageEvent) => {
+            if (damageEvent.sourceType == "status" && damageEvent.sourceId == "poisoning") {
+                return {
+                    flat: 0,
+                    multiplier: 0.75
+                }
             }
 
             return null;
@@ -55,7 +56,7 @@ const PassiveDefs: Record<string, PassiveDef> = {
     },
     "drug_withdrawal": {
         onStatusChange(event) {
-            if(event.newStack==0){
+            if (event.newStack == 0) {
                 // TODO: add the debuff
             }
         },

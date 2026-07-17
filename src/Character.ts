@@ -1,7 +1,7 @@
 import { Weapon } from "./Weapon.js";
-import { Status, type StatusChangeEvent } from "./Status.js";
+import { Status } from "./Status.js";
 import { Passive } from "./Passive.js";
-import type { DamageEvent } from "./Damage.js";
+import type { StatusChangeEvent } from "./Event.js";
 
 export class Character{
     Index: number;
@@ -22,7 +22,7 @@ export class Character{
 
         this.WieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
         statusid.forEach(id => {
-            this.CurrentStatus.push(new Status(id, this, 1));
+            this.CurrentStatus.push(new Status(id, this, 5));
         });
 
         passiveid.forEach(id => {

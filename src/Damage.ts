@@ -1,15 +1,4 @@
-import { Character } from "./Character.js";
-import type { DamageType } from "./enum/DamageType.js";
-
-export interface DamageEvent{
-    attacker: Character,
-    receiver: Character,
-    amount: number,
-    type: DamageType
-    sourceType: string,
-    sourceObjectType: string;
-    sourceId: string
-}
+import type { DamageEvent } from "./Event.js";
 
 export interface DamageModifier{
     flat: number,

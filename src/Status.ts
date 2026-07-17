@@ -1,15 +1,9 @@
 import { DamageType } from "./enum/DamageType.js";
-import { DamageSystem, type DamageEvent } from "./Damage.js";
 
 import type { Character } from "./Character.js";
+import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
+import { EventType } from "./enum/EventType.js";
 
-
-export interface StatusEffectResult {
-    receiver: Character;
-    damage: number;
-    damageType: string;
-    sourceName: string;
-}
 
 export interface StatusContext {
     holder: Character,
@@ -18,27 +12,19 @@ export interface StatusContext {
 
 interface StatusDef {
     tickInterval?: number;
-    onTick?: (status: Status, ctx: StatusContext) => DamageEvent;
-    natureDecrease: (status: Status) => void;
+    onTick?: (status: Status, ctx: StatusContext) => Events[];
+    natureDecrease: (status: Status, ctx: StatusContext) => StatusChangeEvent | void;
     //onAttack?: (status: Status, ctx: StatusContext) => void;
     //onDamageTaken?: (status: Status, ctx: StatusContext) => void;
     //onDeath?: (status: Status, ctx: StatusContext) => void;
 }
 
-export interface StatusChangeEvent{
-    holder: Character,
-    status: Status,
-    originalStack: number,
-    newStack: number
-}
 
 export interface StatusAddEvent{
     holder: Character,
     status: Status,
     stack: number
 }
-
-//type StatusFn = (status: Status, statusHolder: Character, target: Character) => StatusEffectResult | null;
 
 export class Status{
     Id: string = "";
@@ -48,7 +34,7 @@ export class Status{
         if(value != this._Stack){
             let original = this._Stack;
             this._Stack = value;
-            this.holder.onStatusChange({holder: this.holder, status:this, originalStack: original, newStack: value})
+            //this.holder.onStatusChange({eventType: EventType.StatusChangeEvent, holder: this.holder, status:this, originalStack: original, newStack: value})
         }
     }
 
@@ -71,7 +57,7 @@ export class Status{
         this.StatusDefinition = def;
     }
 
-    processOnTick(ctx: StatusContext): DamageEvent | null{
+    processOnTick(ctx: StatusContext): Events[] | null{
         if(!this.StatusDefinition.onTick){
             return null;
         }
@@ -102,10 +88,17 @@ const StatusDefs: Record<string, StatusDef> = {
     "burning": {
         tickInterval: 1000,
         onTick: (status, ctx) => {
-            const damage = 10 * status.Stack
-            status.StatusDefinition.natureDecrease(status);
+            let events: Events[] = []
 
-            const event: DamageEvent = {
+            const damage = 10 * status.Stack
+            
+            const stackChange = status.StatusDefinition.natureDecrease(status, ctx)
+            if (stackChange){
+                events.push(stackChange);
+            }
+
+            const damageEvent: DamageEvent = {
+                eventType: EventType.DamageEvent,
                 attacker: ctx.holder,
                 receiver: ctx.holder,
                 amount: damage,
@@ -115,19 +108,39 @@ const StatusDefs: Record<string, StatusDef> = {
                 sourceId: "burning"
             }
 
-            return event;
+            events.push(damageEvent);
+
+            return events;
         },
-        natureDecrease(status) {
+        natureDecrease: (status, ctx) => {
+            const before = status.Stack;
             status.Stack = Math.max(0,status.Stack-1);
+
+            if (status.Stack != before) {
+                return {
+                    eventType: EventType.StatusChangeEvent,
+                    holder: ctx.holder,
+                    status: status,
+                    originalStack: before,
+                    newStack: status.Stack
+                }
+            }
         }
     },
     "poisoning": {
         tickInterval: 2000,
         onTick: (status, ctx) =>{
+            let events: Events[] = []
+
             const damage = 10 * status.Stack
-            status.StatusDefinition.natureDecrease(status);
+
+            const stackChange = status.StatusDefinition.natureDecrease(status, ctx)
+            if (stackChange){
+                events.push(stackChange);
+            }
             
-            const event: DamageEvent = {
+            const damageEvent: DamageEvent = {
+                eventType: EventType.DamageEvent,
                 attacker: ctx.holder,
                 receiver: ctx.holder,
                 amount: damage,
@@ -137,10 +150,23 @@ const StatusDefs: Record<string, StatusDef> = {
                 sourceId: "poisoning"
             }
 
-            return event;
+            events.push(damageEvent);
+
+            return events;
         },
-        natureDecrease(status) {
+        natureDecrease: (status, ctx) => {
+            const before = status.Stack;
             status.Stack = Math.max(0,status.Stack-1);
+
+            if (status.Stack != before) {
+                return {
+                    eventType: EventType.StatusChangeEvent,
+                    holder: ctx.holder,
+                    status: status,
+                    originalStack: before,
+                    newStack: status.Stack
+                }
+            }
         }
     }
 };
