@@ -49,8 +49,8 @@ const PassiveDefs: Record<string, PassiveDef> = {
             character.AddStatus("poisoning", 5);
         },
         onStatusAdd(event) {
-            event.status.StatusDefinition.natureDecrease = () => {
-                // do nothing
+            if(event.status.Id=="poisoning"){
+                event.status.StatusDefinition.tickInterval = Infinity
             }
         }
     },
