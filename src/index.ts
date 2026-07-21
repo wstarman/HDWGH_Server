@@ -21,7 +21,7 @@ app.get("/", (_, res) => {
     message: "Battle simulation successfully initialized.",
     playerhp: bm.Player.HP,
     enemyhp: bm.Enemy.HP,
-    battlelog: bm.BattleLog
+    battlelog: bm.BattleLogger.BattleLog
   })
 });
 

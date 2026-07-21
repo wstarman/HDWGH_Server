@@ -1,13 +1,12 @@
 import { DamageType } from "./enum/DamageType.js";
-import { type DamageModifier } from "./Damage.js";
 import type { Character } from "./Character.js";
-import type { StatusAddEvent } from "./Status.js";
+import { Status, type StatusAddEvent } from "./Status.js";
 import type { DamageEvent, StatusChangeEvent } from "./Event.js";
 
 interface PassiveDef {
     onStart?: (character: Character) => void;
     onAttack?: (event: DamageEvent) => void;
-    onDamageTaken?: (event: DamageEvent) => DamageModifier | null;
+    onDamageTaken?: (event: DamageEvent) => void;
     onDeath?: (event: DamageEvent) => void;
     onStatusChange?: (event: StatusChangeEvent) => void;
     onStatusAdd?: (event: StatusAddEvent) => void;
@@ -34,31 +33,24 @@ export class Passive {
 const PassiveDefs: Record<string, PassiveDef> = {
     "drug_resistance": {
         onDamageTaken: (damageEvent) => {
-            if (damageEvent.sourceType == "status" && damageEvent.sourceId == "poisoning") {
-                return {
-                    flat: 0,
-                    multiplier: 0.75
-                }
+            if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.Id == "poisoning") {
+                damageEvent.modifier.multiplier *= 0.8  ;
             }
+        },
+        onStatusChange: (statusChangeEvent) => {
 
-            return null;
         }
     },
     "drug_residues": {
         onStart(character) {
             character.AddStatus("poisoning", 5);
-        },
-        onStatusAdd(event) {
-            if(event.status.Id=="poisoning"){
-                event.status.StatusDefinition.tickInterval = Infinity
-            }
         }
     },
-    "drug_withdrawal": {
+    "drug_sobriety": {
         onStatusChange(event) {
             if (event.newStack == 0) {
                 // TODO: add the debuff
             }
-        },
+        }
     }
 };

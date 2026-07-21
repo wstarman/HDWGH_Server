@@ -1,7 +1,7 @@
 import { DamageType } from "./enum/DamageType.js";
 
 import type { Character } from "./Character.js";
-import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
+import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { EventType } from "./enum/EventType.js";
 
 
@@ -12,7 +12,7 @@ export interface StatusContext {
 
 interface StatusDef {
     tickInterval?: number;
-    onTick?: (status: Status, ctx: StatusContext) => Events[];
+    onTick?: (status: Status, ctx: StatusContext) => void;
     natureDecrease: (status: Status, ctx: StatusContext) => StatusChangeEvent | void;
     //onAttack?: (status: Status, ctx: StatusContext) => void;
     //onDamageTaken?: (status: Status, ctx: StatusContext) => void;
@@ -57,26 +57,28 @@ export class Status{
         this.StatusDefinition = def;
     }
 
-    processOnTick(ctx: StatusContext): Events[] | null{
+    processOnTick(ctx: StatusContext): void{
         if(!this.StatusDefinition.onTick){
-            return null;
+            return;
         }
 
         if(!this.StatusDefinition.tickInterval){
             throw new Error(`Status ${this.Id} has no tick interval`)
         }
 
+        if(this.Stack == 0){
+            return;
+        }
+
         this.Timer++;
 
         if(this.Timer < this.StatusDefinition.tickInterval){
-            return null;
+            return;
         }
 
         this.Timer = 0;
 
-        const event = this.StatusDefinition.onTick(this, ctx);
-
-        return event;
+        this.StatusDefinition.onTick(this, ctx);
     }
 
     clone(): Status {
@@ -88,29 +90,19 @@ const StatusDefs: Record<string, StatusDef> = {
     "burning": {
         tickInterval: 1000,
         onTick: (status, ctx) => {
-            let events: Events[] = []
-
             const damage = 10 * status.Stack
             
             const stackChange = status.StatusDefinition.natureDecrease(status, ctx)
-            if (stackChange){
-                events.push(stackChange);
-            }
 
-            const damageEvent: DamageEvent = {
-                eventType: EventType.DamageEvent,
+            const damageEvent = Events.damage({
                 attacker: ctx.holder,
                 receiver: ctx.holder,
                 amount: damage,
                 type: DamageType.Fire,
-                sourceType: "status",
-                sourceObjectType: "status",
-                sourceId: "burning"
-            }
+                damageSource: status
+            })
 
-            events.push(damageEvent);
-
-            return events;
+            damageEvent.receiver.onDamageTaken(damageEvent);
         },
         natureDecrease: (status, ctx) => {
             const before = status.Stack;
@@ -130,29 +122,19 @@ const StatusDefs: Record<string, StatusDef> = {
     "poisoning": {
         tickInterval: 2000,
         onTick: (status, ctx) =>{
-            let events: Events[] = []
-
             const damage = 10 * status.Stack
 
             const stackChange = status.StatusDefinition.natureDecrease(status, ctx)
-            if (stackChange){
-                events.push(stackChange);
-            }
             
-            const damageEvent: DamageEvent = {
-                eventType: EventType.DamageEvent,
+            const damageEvent = Events.damage({
                 attacker: ctx.holder,
                 receiver: ctx.holder,
                 amount: damage,
                 type: DamageType.Poison,
-                sourceType: "status",
-                sourceObjectType: "status",
-                sourceId: "poisoning"
-            }
+                damageSource: status
+            })
 
-            events.push(damageEvent);
-
-            return events;
+            damageEvent.receiver.onDamageTaken(damageEvent);
         },
         natureDecrease: (status, ctx) => {
             const before = status.Stack;
