@@ -32,13 +32,13 @@ export class Passive {
 
 const PassiveDefs: Record<string, PassiveDef> = {
     "drug_resistance": {
+        onStart(character) {
+            character.AddStatus("drug_resistance", 1);
+        },
         onDamageTaken: (damageEvent) => {
             if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.Id == "poisoning") {
-                damageEvent.modifier.multiplier *= 0.8  ;
+                damageEvent.modifier.multiplier *= 0.8;
             }
-        },
-        onStatusChange: (statusChangeEvent) => {
-
         }
     },
     "drug_residues": {
@@ -47,10 +47,10 @@ const PassiveDefs: Record<string, PassiveDef> = {
         }
     },
     "drug_sobriety": {
-        onStatusChange(event) {
+        /*onStatusChange(event) {
             if (event.newStack == 0) {
                 // TODO: add the debuff
             }
-        }
+        }*/
     }
 };

@@ -1,5 +1,5 @@
 import { Weapon } from "./Weapon.js";
-import { Status } from "./Status.js";
+import { Status, type StatusContext } from "./Status.js";
 import { Passive } from "./Passive.js";
 import type { DamageEvent, StatusChangeEvent } from "./Event.js";
 import { DamageType } from "./enum/DamageType.js";
@@ -33,7 +33,7 @@ export class Character{
 
         this.WieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
         statusid.forEach(id => {
-            this.CurrentStatus.push(new Status(id, this, 5));
+            this.CurrentStatus.push(new Status(id, this, 10));
         });
 
         passiveid.forEach(id => {
@@ -46,6 +46,17 @@ export class Character{
     
     NormalAttack(Enemy: Character): void {
         //Enemy.TakeDamage(this.WieldWeapon.WeaponDamage);
+    }
+
+    GetStatus(id: string): Status | undefined {
+        return this.CurrentStatus.find(s => s.Id === id);
+    }
+
+    Update(ctx: StatusContext): void {
+        // Checking OnTick Status
+		this.CurrentStatus.forEach(status => {
+			status.processOnTick(ctx);
+		});
     }
 
     ApplyResistance(damage: DamageEvent){
@@ -89,6 +100,15 @@ export class Character{
 
     onStatusChange(event: StatusChangeEvent){
         this.Passive.forEach(p => {p.PassiveDefinition.onStatusChange?.(event)});
+
+        const beforeStack = event.status.Stack;
+        const afterStack = Math.max(0, beforeStack + event.amount);
+
+        const change = afterStack - beforeStack;
+
+        event.status.Stack = afterStack;
+
+        this.BattleCtx.logger.recordStatusChangeEvent(event, beforeStack, afterStack);
     }
     /* TODOS:
     onStart?: (character: Character) => void;

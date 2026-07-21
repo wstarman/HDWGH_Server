@@ -1,7 +1,7 @@
 import { Character } from "./Character.js"
 import { DamageType } from "./enum/DamageType.js";
 import { EventType } from "./enum/EventType.js";
-import type { DamageEvent, Events } from "./Event.js";
+import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
 import { Status, type StatusContext } from "./Status.js";
 
 export interface CharacterData {
@@ -69,6 +69,35 @@ export class BattleLogger {
 
 		this.BattleLog.push(log);
 	}
+
+	recordStatusChangeEvent(event: StatusChangeEvent, before: number, after: number){
+
+		let srcType: string = "error";
+		let srcOT: string = "error";
+		let srcId: string = "error";
+
+		if (event.changeSource instanceof Status){
+			srcType = "status";
+			srcOT = "status";
+			srcId = event.changeSource.Id;
+		}
+
+		const log: BattleLog = {
+			time: this.getTime(),
+			eventType: "status_stack_change",
+			owner: event.holder.Index,
+			statusId: event.status.Id,
+			beforeStack: before,
+			afterStack: after,
+			delta: after - before,
+			reason: event.reason,
+			sourceType: srcType,
+			sourceObjectType: srcOT,
+			sourceId: srcId,
+		}
+
+		this.BattleLog.push(log);
+	}
 }
 
 export class BattleManager{
@@ -110,27 +139,7 @@ export class BattleManager{
 				this.record_attack(elapsedTime, 0, 1, this.Player, this.Enemy);
 			}*/
 
-			
-
-			// Checking OnTick Status
-			this.Player.CurrentStatus.forEach(status => {
-				status.processOnTick(ctx);
-
-				/*this.BattleLog.push({
-					time: this.get_battle_time(this.elapsedTime),
-					eventType: "status_stack_change",
-					owner: event.holder.Index,
-					statusId: event.status.Id,
-					beforeStack: event.originalStack,
-					afterStack: event.newStack,
-					delta: event.newStack - event.originalStack,
-					reason: "tick",
-					sourceType: "status",
-					sourceObjectType: "status",
-					sourceId: event.status.Id,
-				});*/
-				//this.record_status_effect(elapsedTime, 0, 1, statusEffect);
-			});
+			this.Player.Update(ctx);
 				
 			if(this.check_ending()){
 				break;
