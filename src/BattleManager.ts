@@ -2,7 +2,8 @@ import { Character } from "./Character.js"
 import { DamageType } from "./enum/DamageType.js";
 import { EventType } from "./enum/EventType.js";
 import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
-import { Status, type StatusContext } from "./Status.js";
+import { Passive } from "./Passive.js";
+import { Status, type EffectContext } from "./Status.js";
 
 export interface CharacterData {
 	weaponid: string;
@@ -81,6 +82,11 @@ export class BattleLogger {
 			srcOT = "status";
 			srcId = event.changeSource.Id;
 		}
+		else if (event.changeSource instanceof Passive){
+			srcType = "passive";
+			srcOT = "passive";
+			srcId = event.changeSource.Id;
+		}
 
 		const log: BattleLog = {
 			time: this.getTime(),
@@ -126,7 +132,7 @@ export class BattleManager{
 
 	run(): void {
 
-		let ctx: StatusContext = {
+		let ctx: EffectContext = {
 			holder: this.Player,
 		}
 		this.Player.onStart();

@@ -1,5 +1,5 @@
 import { Weapon } from "./Weapon.js";
-import { Status, type StatusContext } from "./Status.js";
+import { Status, type EffectContext } from "./Status.js";
 import { Passive } from "./Passive.js";
 import type { DamageEvent, StatusChangeEvent } from "./Event.js";
 import { DamageType } from "./enum/DamageType.js";
@@ -52,11 +52,15 @@ export class Character{
         return this.CurrentStatus.find(s => s.Id === id);
     }
 
-    Update(ctx: StatusContext): void {
+    Update(ctx: EffectContext): void {
         // Checking OnTick Status
 		this.CurrentStatus.forEach(status => {
 			status.processOnTick(ctx);
 		});
+
+        this.Passive.forEach(passive => {
+            passive.triggerEffect(ctx);
+        });
     }
 
     ApplyResistance(damage: DamageEvent){

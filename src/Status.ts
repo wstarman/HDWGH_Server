@@ -4,17 +4,18 @@ import type { Character } from "./Character.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { EventType } from "./enum/EventType.js";
 import { StatusChangeReason } from "./enum/StatusChange.js";
+import { BaseEffect } from "./BaseEffect.js";
 
 
-export interface StatusContext {
+export interface EffectContext {
     holder: Character,
     target?: Character
 }
 
 interface StatusDef {
     tickInterval?: number;
-    onTick?: (status: Status, ctx: StatusContext) => void;
-    natureDecrease: (status: Status, ctx: StatusContext) => void;
+    onTick?: (status: Status, ctx: EffectContext) => void;
+    natureDecrease: (status: Status, ctx: EffectContext) => void;
     //onAttack?: (status: Status, ctx: StatusContext) => void;
     //onDamageTaken?: (status: Status, ctx: StatusContext) => void;
     //onDeath?: (status: Status, ctx: StatusContext) => void;
@@ -27,7 +28,7 @@ export interface StatusAddEvent {
     stack: number
 }
 
-export class Status {
+export class Status extends BaseEffect {
     Id: string = "";
     private _Stack: number = 1;
     get Stack(): number { return this._Stack; }
@@ -39,12 +40,13 @@ export class Status {
         }
     }
 
-    Timer: number = 0;
     holder: Character;
 
     StatusDefinition: StatusDef;
 
     constructor(id: string, holder: Character, stack: number = 1) {
+        super();
+    
         this.Id = id;
         this.Stack = stack;
         this.holder = holder
@@ -58,29 +60,13 @@ export class Status {
         this.StatusDefinition = def;
     }
 
-    processOnTick(ctx: StatusContext): void {
-        if (!this.StatusDefinition.onTick) {
-            return;
-        }
+    processOnTick(ctx: EffectContext): void {
+        if (this.Stack == 0) return;
 
-        if (!this.StatusDefinition.tickInterval) {
-            throw new Error(`Status ${this.Id} has no tick interval`)
-        }
+        if(!this.shouldTick(this.StatusDefinition.tickInterval)) return;
 
-        if (this.Stack == 0) {
-            return;
-        }
 
-        this.Timer++;
-
-        if (this.Timer < this.StatusDefinition.tickInterval) {
-            return;
-        }
-
-        this.Timer = 0;
-
-        this.StatusDefinition.onTick(this, ctx);
-
+        this.StatusDefinition.onTick?.(this, ctx);
         this.StatusDefinition.natureDecrease(this, ctx);
     }
 
@@ -131,25 +117,6 @@ const StatusDefs: Record<string, StatusDef> = {
             })
 
             damageEvent.receiver.onDamageTaken(damageEvent);
-        },
-        natureDecrease: (status, ctx) => { }
-    },
-    "drug_resistance": {
-        tickInterval: 1000,
-        onTick: (status, ctx) => {
-            const poisoningStatus = ctx.holder.GetStatus("poisoning");
-
-            if (poisoningStatus !== undefined) {
-                const statusChangeEvent = Events.statusChange({
-                    holder: ctx.holder,
-                    status: poisoningStatus,
-                    amount: -1,
-                    reason: StatusChangeReason.Cleanse,
-                    changeSource: status
-                })
-
-                ctx.holder.onStatusChange(statusChangeEvent);
-            }
         },
         natureDecrease: (status, ctx) => { }
     }
