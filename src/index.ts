@@ -43,29 +43,65 @@ app.get("/Character/:id", async (req, res) => {
   }
 });
 
-app.post("/post", async (req, res) => {
-  const { name, key } = req.body;
+app.post("/new_game", async (req, res) => {
+  const {data} = req.body;
+  const {character_id} = data;
 
-  if (!name) {
-    return res.status(400).json({ error: "Name is required" });
+  if (!character_id){
+    return res.status(400).json({error: "character_id is required."});
   }
 
   try {
-    const newTest = await prisma.test.create({
-      data: {
-        name: name,
-        key: key
+    const newChar = await prisma.game.create({
+      data: { 
+        character_id: character_id,
+        round: 1,
+        hp: 3,
+        money: 100
       }
     });
+    
+    console.log(1);
 
-    // Respond with the newly created character (status 201 Created)
-    res.status(201).json(newTest);
-  } catch (error) {
+    res.json({data:{
+      uuid: newChar.game_id
+    }});
+  }
+  catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error failed to create test' });
+    res.status(500).json({ error: 'Internal server error failed to create character' });
   } 
 });
 
+app.get("/shop", async (req, res) => {
+  const { uuid } = req.query;
+
+    const game = await prisma.game.findUnique({
+    where: {
+      game_id: uuid,
+    },
+  });
+
+  if (!game) {
+    return res.status(404).json({ error: "Game data not found" });
+  }
+
+  res.json({
+    data: {
+        money: game.money,
+        curses: [
+            [
+            { id: "c1" },
+            ],
+        ],
+        goods: [	
+          [
+              { id: "g1" },
+          ],
+        ]
+    }
+});
+});
 
 const port = Number(process.env.PORT ?? 3000);
 

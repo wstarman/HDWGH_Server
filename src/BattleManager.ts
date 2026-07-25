@@ -158,6 +158,10 @@ export class BattleManager{
 			if(this.check_ending()){
 				break;
 			}
+
+			if(this.elapsedTime >= 30000){
+				break;
+			}
 		}
 	}
 

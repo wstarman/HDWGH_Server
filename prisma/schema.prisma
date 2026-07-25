@@ -13,12 +13,16 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-model Character{
-  id  Int  @id  @default(autoincrement())
-  name  String?
+model Game {
+  game_id String @id @default(uuid())
+  character_id String
+  round Int
+  hp Int
+  money Int @default(0)
 }
 
-model Test{
-  name  String @id
-  key String
+model Character {
+  id   String  @id @default(uuid())
+  character_id String
+  name String?
 }
