@@ -1,6 +1,6 @@
 import { Character } from "./Character.js"
-import { DamageType } from "./enum/DamageType.js";
-import { EventType } from "./enum/EventType.js";
+import { DamageType } from "../enum/DamageType.js";
+import { EventType } from "../enum/EventType.js";
 import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
 import { Passive } from "./Passive.js";
 import { Status, type EffectContext } from "./Status.js";
@@ -30,8 +30,6 @@ export interface BattleLog {
     afterStack?: number;
     delta?: number;
     reason?: string;
-
-
 
     sourceType?: string;
     sourceObjectType?: string;

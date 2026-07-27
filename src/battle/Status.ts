@@ -1,9 +1,9 @@
-import { DamageType } from "./enum/DamageType.js";
+import { DamageType } from "../enum/DamageType.js";
 
 import type { Character } from "./Character.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
-import { EventType } from "./enum/EventType.js";
-import { StatusChangeReason } from "./enum/StatusChange.js";
+import { EventType } from "../enum/EventType.js";
+import { StatusChangeReason } from "../enum/StatusChange.js";
 import { BaseEffect } from "./BaseEffect.js";
 
 export interface EffectContext {

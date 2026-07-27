@@ -2,7 +2,7 @@ import { Weapon } from "./Weapon.js";
 import { Status, type EffectContext } from "./Status.js";
 import { Passive } from "./Passive.js";
 import type { DamageEvent, StatusChangeEvent } from "./Event.js";
-import { DamageType } from "./enum/DamageType.js";
+import { DamageType } from "../enum/DamageType.js";
 import type { BattleContext } from "./BattleManager.js";
 
 export class Character {

@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from '@prisma/client';
-import { BattleManager } from "./BattleManager.js";
-import type { CharacterData } from "./BattleManager.js";
+import { BattleManager } from "./battle/BattleManager.js";
+import type { CharacterData } from "./battle/BattleManager.js";
 import { Shop } from "./Shop.js";
 
 const app = express();

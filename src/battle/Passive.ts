@@ -1,9 +1,9 @@
-import { DamageType } from "./enum/DamageType.js";
+import { DamageType } from "../enum/DamageType.js";
 import type { Character } from "./Character.js";
 import { Status, type EffectContext, type StatusAddEvent } from "./Status.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { BaseEffect } from "./BaseEffect.js";
-import { StatusChangeReason } from "./enum/StatusChange.js";
+import { StatusChangeReason } from "../enum/StatusChange.js";
 
 interface PassiveDef {
     onStart?: (character: Character) => void;
@@ -44,7 +44,12 @@ export class Passive extends BaseEffect {
 }
 
 const PassiveDefs: Record<string, PassiveDef> = {
-    "drug_resistance": {
+    "drug_residue": {
+        onStart(character) {
+            character.AddStatus("poisoning", 5);
+        }
+    },
+    "drug_tolerance": {
         onDamageTaken: (damageEvent) => {
             if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.id == "poisoning") {
                 damageEvent.modifier.multiplier *= 0.8;
@@ -67,12 +72,7 @@ const PassiveDefs: Record<string, PassiveDef> = {
         },
         effectInterval: 1000
     },
-    "drug_residues": {
-        onStart(character) {
-            character.AddStatus("poisoning", 5);
-        }
-    },
-    "drug_sobriety": {
+    "sobriety": {
         /*onStatusChange(event) {
             if (event.newStack == 0) {
                 // TODO: add the debuff
