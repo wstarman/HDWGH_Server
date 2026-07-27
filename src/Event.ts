@@ -9,14 +9,14 @@ import type { Passive } from "./Passive.js";
 type DamageSource =
     | Character
     | Status;
-    //| Skill
-    //| Projectile;
+//| Skill
+//| Projectile;
 
-type ChangeSource = 
+type ChangeSource =
     | Status
     | Passive;
 
-export interface DamageModifier{
+export interface DamageModifier {
     flat: number,
     multiplier: number;
 }
@@ -41,7 +41,7 @@ export interface StatusChangeEvent {
 
 export const Events = {
     damage(info: Omit<DamageEvent, "modifier">): DamageEvent {
-        return{
+        return {
             modifier: {
                 flat: 0,
                 multiplier: 1.0
@@ -49,7 +49,7 @@ export const Events = {
             ...info
         }
     },
-    
+
     statusChange(info: Omit<StatusChangeEvent, "modifier">): StatusChangeEvent {
         return {
             ...info,

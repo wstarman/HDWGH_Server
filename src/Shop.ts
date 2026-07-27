@@ -24,7 +24,7 @@ export class Shop {
 
             const selected = this.EQUIPMENT_TABLE[tier][EqRoll];
             if (selected) {
-                EqSelected.push({id: selected});
+                EqSelected.push({ id: selected });
             }
         }
 

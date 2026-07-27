@@ -1,5 +1,5 @@
-export enum DamageType{
-    Physical = "DT_Physical",
-    Fire = "DT_Fire",
-    Poison = "DT_Poison"
+export enum DamageType {
+    Physical = "physical",
+    Fire = "fire",
+    Poison = "poison"
 }
