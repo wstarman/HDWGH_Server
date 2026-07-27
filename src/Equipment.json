@@ -1,11 +1,26 @@
 {
     "basic": [
-        "pills"
+        "pills",
+        "bitter_syrup",
+        "night_pill",
+        "expired_vitamin",
+        "recovery_note",
+        "withdrawal_patch"
     ],
     "mid": [
-        "night_pill"
+        "black_market_prescription",
+        "neon_inhaler",
+        "dream_dust",
+        "low_grade_serum",
+        "life_monitor_bracelet",
+        "routine_pillbox"
     ],
     "advanced":[
-        
+        "black_adrenal",
+        "overclock_ampoule",
+        "white_sun",
+        "deadman_protocol",
+        "ward_access_card",
+        "detox_strap"
     ]
 }
