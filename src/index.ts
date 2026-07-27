@@ -89,21 +89,13 @@ app.get("/shop", async (req, res) => {
         return res.status(404).json({ error: "Game data not found" });
     }
 
-    const drawnGoods = Shop.draw(game.round);
+    const drawnItems = Shop.draw(game.round);
 
     res.json({
         data: {
             money: game.money,
-            curses: [
-                [
-                    { id: "phantom_dose" },
-                    { id: "overbright_eyes" },
-                    { id: "hollow_vessel" },
-                ],
-            ],
-            goods: [
-                drawnGoods
-            ]
+            curses: drawnItems.curses,
+            goods: drawnItems.goods
         }
     });
 });
