@@ -6,7 +6,6 @@ import { EventType } from "./enum/EventType.js";
 import { StatusChangeReason } from "./enum/StatusChange.js";
 import { BaseEffect } from "./BaseEffect.js";
 
-
 export interface EffectContext {
     holder: Character,
     target?: Character
@@ -21,7 +20,6 @@ interface StatusDef {
     //onDeath?: (status: Status, ctx: StatusContext) => void;
 }
 
-
 export interface StatusAddEvent {
     holder: Character,
     status: Status,
@@ -29,26 +27,26 @@ export interface StatusAddEvent {
 }
 
 export class Status extends BaseEffect {
-    Id: string = "";
-    private _Stack: number = 1;
-    get Stack(): number { return this._Stack; }
-    set Stack(value: number) {
-        if (value != this._Stack) {
+    id: string = "";
+    private _stack: number = 1;
+    get stack(): number { return this._stack; }
+    set stack(value: number) {
+        if (value != this._stack) {
             //let original = this._Stack;
-            this._Stack = value;
+            this._stack = value;
             //this.holder.onStatusChange({holder: this.holder, status:this, originalStack: original, newStack: value})
         }
     }
 
     holder: Character;
 
-    StatusDefinition: StatusDef;
+    statusDefinition: StatusDef;
 
     constructor(id: string, holder: Character, stack: number = 1) {
         super();
-    
-        this.Id = id;
-        this.Stack = stack;
+
+        this.id = id;
+        this.stack = stack;
         this.holder = holder
 
         const def = StatusDefs[id];
@@ -57,21 +55,20 @@ export class Status extends BaseEffect {
             throw new Error(`Unknown status: ${id}`);
         }
 
-        this.StatusDefinition = def;
+        this.statusDefinition = def;
     }
 
     processOnTick(ctx: EffectContext): void {
-        if (this.Stack == 0) return;
+        if (this.stack == 0) return;
 
-        if(!this.shouldTick(this.StatusDefinition.tickInterval)) return;
+        if (!this.shouldTick(this.statusDefinition.tickInterval)) return;
 
-
-        this.StatusDefinition.onTick?.(this, ctx);
-        this.StatusDefinition.natureDecrease(this, ctx);
+        this.statusDefinition.onTick?.(this, ctx);
+        this.statusDefinition.natureDecrease(this, ctx);
     }
 
     clone(): Status {
-        return new Status(this.Id, this.holder, this.Stack);
+        return new Status(this.id, this.holder, this.stack);
     }
 }
 
@@ -79,7 +76,7 @@ const StatusDefs: Record<string, StatusDef> = {
     "burning": {
         tickInterval: 1000,
         onTick: (status, ctx) => {
-            const damage = 10 * status.Stack
+            const damage = 10 * status.stack
 
             const damageEvent = Events.damage({
                 attacker: ctx.holder,
@@ -106,7 +103,7 @@ const StatusDefs: Record<string, StatusDef> = {
     "poisoning": {
         tickInterval: 2000,
         onTick: (status, ctx) => {
-            const damage = 10 * status.Stack
+            const damage = 10 * status.stack
 
             const damageEvent = Events.damage({
                 attacker: ctx.holder,

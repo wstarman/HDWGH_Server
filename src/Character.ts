@@ -5,114 +5,114 @@ import type { DamageEvent, StatusChangeEvent } from "./Event.js";
 import { DamageType } from "./enum/DamageType.js";
 import type { BattleContext } from "./BattleManager.js";
 
-export class Character{
-    Index: number;
+export class Character {
+    index: number;
 
-    WieldWeapon: Weapon = new Weapon();
-    CurrentStatus: Status[] = [];
+    wieldWeapon: Weapon = new Weapon();
+    currentStatus: Status[] = [];
 
-    Passive: Passive[] = [];
+    passives: Passive[] = [];
 
     // Combat Stat
-    MaxHP: number = 100.0;
-    HP: number = 100.0;
-    Shield: number = 0.0;
-    Resistance: Record<DamageType, number> = {
-        [DamageType.Physical]:  0.0,
-        [DamageType.Fire]:      0.0,
-        [DamageType.Poison]:    0.0
+    maxHp: number = 100.0;
+    hp: number = 100.0;
+    shield: number = 0.0;
+    resistance: Record<DamageType, number> = {
+        [DamageType.Physical]: 0.0,
+        [DamageType.Fire]: 0.0,
+        [DamageType.Poison]: 0.0
     };
 
     // Dependancy
-    BattleCtx: BattleContext
+    battleCtx: BattleContext
 
     constructor(ctx: BattleContext, index: number, weaponid: string = "barehand", statusid: string[] = [], passiveid: string[] = []) {
-        this.BattleCtx = ctx;
-        
-        this.Index = index;
+        this.battleCtx = ctx;
 
-        this.WieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
+        this.index = index;
+
+        this.wieldWeapon = Weapon.Weapons[weaponid]?.clone() ?? new Weapon();
         statusid.forEach(id => {
-            this.CurrentStatus.push(new Status(id, this, 10));
+            this.currentStatus.push(new Status(id, this, 10));
         });
 
         passiveid.forEach(id => {
-            this.Passive.push(new Passive(id));
+            this.passives.push(new Passive(id));
         });
 
-        this.MaxHP = 100.0;
-        this.HP = 100.0;
+        this.maxHp = 100.0;
+        this.hp = 100.0;
     }
-    
+
     NormalAttack(Enemy: Character): void {
         //Enemy.TakeDamage(this.WieldWeapon.WeaponDamage);
     }
 
     GetStatus(id: string): Status | undefined {
-        return this.CurrentStatus.find(s => s.Id === id);
+        return this.currentStatus.find(s => s.id === id);
     }
 
     Update(ctx: EffectContext): void {
         // Checking OnTick Status
-		this.CurrentStatus.forEach(status => {
-			status.processOnTick(ctx);
-		});
+        this.currentStatus.forEach(status => {
+            status.processOnTick(ctx);
+        });
 
-        this.Passive.forEach(passive => {
+        this.passives.forEach(passive => {
             passive.triggerEffect(ctx);
         });
     }
 
-    ApplyResistance(damage: DamageEvent){
-        const resistance = this.Resistance[damage.type];
+    ApplyResistance(damage: DamageEvent) {
+        const resistance = this.resistance[damage.type];
 
-        if (resistance !== undefined){
-            damage.modifier.multiplier *= (100.0 - this.Resistance[damage.type]) / 100.0;
+        if (resistance !== undefined) {
+            damage.modifier.multiplier *= (100.0 - this.resistance[damage.type]) / 100.0;
         }
     }
 
     TakeDamage(damage: number): void {
-        this.HP -= Math.max(damage, 0);
+        this.hp -= Math.max(damage, 0);
     }
 
-    AddStatus(id: string, stack: number){
-        for (let status of this.CurrentStatus){
-            if(status.Id==id){
-                status.Stack += stack;
+    AddStatus(id: string, stack: number) {
+        for (let status of this.currentStatus) {
+            if (status.id == id) {
+                status.stack += stack;
                 return
             }
         }
-        this.CurrentStatus.push(new Status(id, this, stack));
+        this.currentStatus.push(new Status(id, this, stack));
     }
 
-    onStart(){
-        this.Passive.forEach(p => {p.PassiveDefinition.onStart?.(this)});
+    onStart() {
+        this.passives.forEach(p => { p.passiveDefinition.onStart?.(this) });
     }
 
-    onDamageTaken(event: DamageEvent){
-        this.Passive.forEach(p => {p.PassiveDefinition.onDamageTaken?.(event)});
+    onDamageTaken(event: DamageEvent) {
+        this.passives.forEach(p => { p.passiveDefinition.onDamageTaken?.(event) });
 
         this.ApplyResistance(event);
 
 
         const final = (event.amount + event.modifier.flat) * event.modifier.multiplier
 
-        this.BattleCtx.logger.recordDamageEvent(event, final);
+        this.battleCtx.logger.recordDamageEvent(event, final);
 
         this.TakeDamage(final);
     }
 
-    onStatusChange(event: StatusChangeEvent){
-        this.Passive.forEach(p => {p.PassiveDefinition.onStatusChange?.(event)});
+    onStatusChange(event: StatusChangeEvent) {
+        this.passives.forEach(p => { p.passiveDefinition.onStatusChange?.(event) });
 
-        const beforeStack = event.status.Stack;
+        const beforeStack = event.status.stack;
         const afterStack = Math.max(0, beforeStack + event.amount);
 
         const change = afterStack - beforeStack;
 
-        event.status.Stack = afterStack;
+        event.status.stack = afterStack;
 
-        this.BattleCtx.logger.recordStatusChangeEvent(event, beforeStack, afterStack);
+        this.battleCtx.logger.recordStatusChangeEvent(event, beforeStack, afterStack);
     }
     /* TODOS:
     onStart?: (character: Character) => void;

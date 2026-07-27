@@ -17,28 +17,28 @@ interface PassiveDef {
 }
 
 export class Passive extends BaseEffect {
-    Id: string = "";
+    id: string = "";
 
-    PassiveDefinition: PassiveDef;
+    passiveDefinition: PassiveDef;
 
     constructor(id: string) {
         super();
 
-        this.Id = id;
+        this.id = id;
         const def = PassiveDefs[id];
 
         if (!def) {
             throw new Error(`Unknown passive: ${id}`);
         }
 
-        this.PassiveDefinition = def;
+        this.passiveDefinition = def;
     }
 
-    triggerEffect(ctx: EffectContext){
-        if(!this.shouldTick(this.PassiveDefinition.effectInterval)) return;
+    triggerEffect(ctx: EffectContext) {
+        if (!this.shouldTick(this.passiveDefinition.effectInterval)) return;
 
 
-        this.PassiveDefinition.onEffectTrigger?.(this, ctx);
+        this.passiveDefinition.onEffectTrigger?.(this, ctx);
     }
 
 }
@@ -46,11 +46,11 @@ export class Passive extends BaseEffect {
 const PassiveDefs: Record<string, PassiveDef> = {
     "drug_resistance": {
         onDamageTaken: (damageEvent) => {
-            if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.Id == "poisoning") {
+            if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.id == "poisoning") {
                 damageEvent.modifier.multiplier *= 0.8;
             }
         },
-        onEffectTrigger(passive, ctx){
+        onEffectTrigger(passive, ctx) {
             const poisoningStatus = ctx.holder.GetStatus("poisoning");
 
             if (poisoningStatus !== undefined) {
@@ -59,7 +59,7 @@ const PassiveDefs: Record<string, PassiveDef> = {
                     status: poisoningStatus,
                     amount: -1,
                     reason: StatusChangeReason.Cleanse,
-                    changeSource: passive 
+                    changeSource: passive
                 })
 
                 ctx.holder.onStatusChange(statusChangeEvent);

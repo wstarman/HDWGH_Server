@@ -1,4 +1,4 @@
-export enum StatusChangeReason{
+export enum StatusChangeReason {
     Apply = "SCR_Apply",
     Tick = "SCR_Tick",
     Expire = "SCR_Expire",
