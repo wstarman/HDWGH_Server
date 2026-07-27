@@ -26,8 +26,9 @@ export interface StatusAddEvent {
     stack: number
 }
 
-export class Status extends BaseEffect {
+export class Status {
     id: string = "";
+    timer: number = 0
     private _stack: number = 1;
     get stack(): number { return this._stack; }
     set stack(value: number) {
@@ -43,8 +44,6 @@ export class Status extends BaseEffect {
     statusDefinition: StatusDef;
 
     constructor(id: string, holder: Character, stack: number = 1) {
-        super();
-
         this.id = id;
         this.stack = stack;
         this.holder = holder
@@ -56,6 +55,14 @@ export class Status extends BaseEffect {
         }
 
         this.statusDefinition = def;
+    }
+
+    protected shouldTick(interval?: number): boolean {
+        if (!interval) return false;
+        this.timer++;
+        if (this.timer < interval) return false;
+        this.timer = 0;
+        return true;
     }
 
     processOnTick(ctx: EffectContext): void {
@@ -93,8 +100,6 @@ const StatusDefs: Record<string, StatusDef> = {
                 holder: ctx.holder,
                 status: status,
                 amount: -1,
-                reason: StatusChangeReason.Tick,
-                changeSource: status
             })
 
             ctx.holder.onStatusChange(statusChangeEvent);

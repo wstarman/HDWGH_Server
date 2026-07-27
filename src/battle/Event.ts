@@ -12,10 +12,6 @@ type DamageSource =
 //| Skill
 //| Projectile;
 
-type ChangeSource =
-    | Status
-    | Passive;
-
 export interface DamageModifier {
     flat: number,
     multiplier: number;
@@ -34,9 +30,7 @@ export interface DamageEvent {
 export interface StatusChangeEvent {
     holder: Character,
     status: Status,
-    amount: number,
-    reason: StatusChangeReason,
-    changeSource: ChangeSource
+    amount: number
 }
 
 export const Events = {

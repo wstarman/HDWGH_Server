@@ -1,4 +1,4 @@
-import WeaponsData from "../Weapon.json" with {type: "json"}
+import WeaponsData from "./Weapon.json" with {type: "json"}
 
 type WeaponId = string
 
