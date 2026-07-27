@@ -2,6 +2,7 @@ import express from "express";
 import { PrismaClient } from '@prisma/client';
 import { BattleManager } from "./BattleManager.js";
 import type { CharacterData } from "./BattleManager.js";
+import { Shop } from "./Shop.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -86,18 +87,20 @@ app.get("/shop", async (req, res) => {
     return res.status(404).json({ error: "Game data not found" });
   }
 
+  const drawnGoods = Shop.draw(game.round);
+
   res.json({
     data: {
         money: game.money,
         curses: [
             [
-            { id: "c1" },
+            { id: "phantom_dose" },
+            { id: "overbright_eyes" },
+            { id: "hollow_vessel" },
             ],
         ],
         goods: [	
-          [
-              { id: "g1" },
-          ],
+          drawnGoods
         ]
     }
 });
