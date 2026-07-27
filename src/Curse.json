@@ -1,0 +1,15 @@
+{
+    "basic": [
+	    "phantom_dose",
+        "overbright_eyes",
+        "hollow_vessel"
+    ],
+    "mid": [
+        "dirty_blood",
+        "glass_nerves"
+    ],
+    "advanced":[
+        "organ_failure",
+        "white_rooms"
+    ]
+}
