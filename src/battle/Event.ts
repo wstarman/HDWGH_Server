@@ -5,12 +5,11 @@ import type { DamageType } from "../enum/DamageType.js";
 import type { Status } from "./Status.js";
 import type { StatusChangeReason } from "../enum/StatusChange.js";
 import type { Passive } from "./Passive.js";
+import type { BaseEffect } from "./BaseEffect.js";
 
 type DamageSource =
-    | BattleCharacter
+    | BaseEffect
     | Status;
-//| Skill
-//| Projectile;
 
 export interface DamageModifier {
     flat: number,
@@ -27,7 +26,7 @@ export interface DamageEvent {
 }
 
 export interface StatusChangeEvent {
-    holder: BattleCharacter,
+    owner: BattleCharacter,
     status: Status,
     delta: number
 }

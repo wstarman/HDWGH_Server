@@ -6,35 +6,42 @@ import { StatusChangeReason } from "../enum/StatusChange.js";
 import { BattleLogger } from "./BattleLogger.js";
 
 interface EffectCallbacks {
+    everyTick?(this: BaseEffect): void;
+    beforeStart?(this: BaseEffect): void;
     onStart?(this: BaseEffect): void;
+    onTrigger?(this: BaseEffect): void;
     onAttack?(this: BaseEffect, event: DamageEvent): void;
-    onDamageTaken?(this: BaseEffect, event: DamageEvent): void;
-    onDeath?(this: BaseEffect, event: DamageEvent): void;
-    onStatusChange?(this: BaseEffect, event: StatusChangeEvent): void;
-    onEffectTrigger?(this: BaseEffect): void;
+    beforeDamageTaken?(this: BaseEffect, event: DamageEvent): void;
+    afterDamageTaken?(this: BaseEffect, event: DamageEvent): void;
+    afterStatusChange?(this: BaseEffect, event: StatusChangeEvent): void;
+    // onAnyEffectToggle?(this: BaseEffect): void;
 }
 
 export interface BaseEffectDef extends EffectCallbacks {
-    interval?: number;
-    slot?: number;
+    triggerInterval?: number;
+    index?: number;
     persistent?: boolean;
 }
 
 export abstract class BaseEffect {
     id: string = "";
     owner: BattleCharacter;
-    slot: number = -1;
+    index: number = -1;
     persistent: boolean = false;
-    enabled: boolean = false
+    private _enabled: boolean = false;
     timer = 0;
-    interval = Infinity;
+    triggerInterval = Infinity;
+    stack: number | null = null // 會顯示在前端的通用暫時變數
+    temp1 = 0;
 
+    beforeStart?: EffectCallbacks["beforeStart"];
     onStart?: EffectCallbacks["onStart"];
+    onTrigger?: EffectCallbacks["onTrigger"];
     onAttack?: EffectCallbacks["onAttack"];
-    onDamageTaken?: EffectCallbacks["onDamageTaken"];
-    onDeath?: EffectCallbacks["onDeath"];
-    onStatusChange?: EffectCallbacks["onStatusChange"];
-    onEffectTrigger?: EffectCallbacks["onEffectTrigger"];
+    beforeDamageTaken?: EffectCallbacks["beforeDamageTaken"];
+    afterDamageTaken?: EffectCallbacks["afterDamageTaken"];
+    afterStatusChange?: EffectCallbacks["afterStatusChange"];
+    // onAnyEffectToggle?: EffectCallbacks["onAnyEffectToggle"];
 
     constructor(owner: BattleCharacter, id: string, deflist: Record<string, BaseEffectDef>) {
         this.owner = owner;
@@ -42,22 +49,27 @@ export abstract class BaseEffect {
         Object.assign(this, deflist[id]);
     }
 
-    protected logToggueEvent() {
-        this.owner.battleManager.logger.recordEffectToggleEvent(this);
+    get enabled() { return this._enabled; }
+    set enabled(value) {
+        this._enabled = value;
+        this.owner.onEffectToggle(this);
     }
 
-    protected shouldTick(interval?: number): boolean {
-        if (!interval) return false;
-        this.timer++;
-        if (this.timer < interval) return false;
-        this.timer = 0;
-        return true;
+    protected toggue() {
+        this.owner.onEffectToggle(this);
+    }
+
+    update(deltaTime: number): void {
+        this.timer += deltaTime;
+        if (this.timer >= this.triggerInterval) {
+            this.timer -= this.triggerInterval;
+            this.onTrigger?.();
+        }
     }
 }
 
 function wrapCallbacks<T extends object>(obj: T, name: string): T {
     const result = {} as T;
-
     for (const key in obj) {
         const value = obj[key];
 
@@ -65,13 +77,12 @@ function wrapCallbacks<T extends object>(obj: T, name: string): T {
             result[key] = function (this: BaseEffect, ...args: any[]) {
                 const successful = value.apply(this, args);
                 if (successful) {
-                    this.owner.battleManager.logger.recordEffectToggleEvent(this)
+                    this.owner.logger.recordEffectToggleEvent(this)
                     console.log(`[${name}] ${key}`, args);
                 }
                 return successful;
             } as any;
         }
     }
-
     return result;
 }

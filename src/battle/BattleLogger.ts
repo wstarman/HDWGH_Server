@@ -6,6 +6,7 @@ import { Passive } from "./Passive.js";
 import { Status } from "./Status.js";
 import type { BattleManager } from "./BattleManager.js";
 import type { BaseEffect } from "./BaseEffect.js";
+import type { BattleCharacterData, StatIdType } from "./BattleCharacterData.js";
 
 export interface BattleLog {
     time: number;
@@ -75,7 +76,7 @@ export class BattleLogger {
         const log: BattleLog = {
             time: this.getTime(),
             eventType: "status_stack_change",
-            owner: event.holder.index,
+            owner: event.owner.index,
             statusId: event.status.id,
             delta: after - before,
         }
@@ -88,20 +89,20 @@ export class BattleLogger {
             eventType: "equipment_toggle",
             owner: item.owner.index,
             equipmentId: item.id,
-            equipmentSlot: item.slot,
+            equipmentSlot: item.index,
             persistent: item.persistent,
             enabled: item.enabled
         }
         this.battleLog.push(log);
     }
 
-    recordStatChangeEvent(target: number, statId: string, value: number) {
+    recordStatChangeEvent(character: BattleCharacterData, statId: StatIdType) {
         const log: BattleLog = {
             time: this.getTime(),
             eventType: "stat_change",
-            target,
+            target: character.index,
             statId,
-            value,
+            value: character[statId]
         }
         this.battleLog.push(log);
     }

@@ -4,19 +4,23 @@ import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { EventType } from "../enum/EventType.js";
 
 interface StatusCallbacks {
-    onTick?(this: Status): void;
-    natureDecrease(this: Status): void;
+    onTrigger?(this: Status): void;
+    natureDecrease?(this: Status): void;
+    onCleared?(this: Status): void
 }
 
 interface StatusDef extends StatusCallbacks {
-    tickInterval?: number;
+    triggerInterval?: number;
+    damageType?: DamageType;
 }
 
 export class Status {
     id: string = "";
-    timer: number = 0
-    tickInterval = Infinity
-    holder: BattleCharacter;
+    timer: number = 0;
+    triggerInterval = Infinity;
+    maxStack = Infinity;
+    owner: BattleCharacter;
+    damageType: DamageType = DamageType.Physical;
 
     private _stack: number = 1;
     get stack(): number { return this._stack; }
@@ -24,80 +28,78 @@ export class Status {
         if (value != this._stack) {
             const delta = this._stack - value;
             this._stack = value;
-            this.holder.onStatusChange({ holder: this.holder, status: this, delta })
+            this.owner.afterStatusChange({ owner: this.owner, status: this, delta })
+            if (this.stack == 0) {
+                this.owner.clearStatus(this.id);
+            }
         }
     }
 
-    onTick?: StatusCallbacks["onTick"]
+    onTrigger?: StatusCallbacks["onTrigger"]
     natureDecrease?: StatusCallbacks["natureDecrease"]
+    onCleared?: StatusCallbacks["onCleared"]
 
-    constructor(id: string, holder: BattleCharacter, stack: number = 1) {
+    constructor(id: string, owner: BattleCharacter, stack: number = 1) {
         this.id = id;
         this.stack = stack;
-        this.holder = holder
+        this.owner = owner
         const def = StatusDefs[id];
-        if (!def) {
+        if (!(id in StatusNames) || !def) {
             throw new Error(`Unknown status: ${id}`);
         }
         Object.assign(this, def);
     }
 
-    protected shouldTick(interval?: number): boolean {
-        if (!interval) return false;
-        this.timer++;
-        if (this.timer < interval) return false;
-        this.timer = 0;
-        return true;
-    }
-
     update(deltaTime: number): void {
         if (this.stack == 0) return;
-        if (!this.shouldTick(this.tickInterval)) return;
-        this.onTick?.();
-        this.natureDecrease?.();
+        this.timer += deltaTime;
+        if (this.timer >= this.triggerInterval) {
+            this.timer -= this.triggerInterval;
+            this.onTrigger?.();
+            this.natureDecrease?.();
+        }
     }
 
+    protected toggue() {
+        this.owner.onStatusToggle(this);
+    }
+
+    dealDamageToSelf(damage: number) {
+        const damageEvent = Events.damage({
+            attacker: this.owner,
+            receiver: this.owner,
+            amount: damage,
+            type: this.damageType,
+            damageSource: this
+        })
+        damageEvent.receiver.onDamageTaken(damageEvent);
+    }
+}
+
+export enum StatusNames {
+    burning = "burning",
+    poisoning = "poisoning",
 }
 
 const StatusDefs: Record<string, StatusDef> = {
     "burning": {
-        tickInterval: 1000,
-        onTick() {
-            const damage = 10 * this.stack
-
-            const damageEvent = Events.damage({
-                attacker: this.holder,
-                receiver: this.holder,
-                amount: damage,
-                type: DamageType.Fire,
-                damageSource: this
-            })
-
-            damageEvent.receiver.onDamageTaken(damageEvent);
+        triggerInterval: 1000,
+        damageType: DamageType.Fire,
+        onTrigger() {
+            this.toggue();
+            const damage = 1 * this.stack;
+            this.dealDamageToSelf(damage);
         },
         natureDecrease() {
-            const statusChangeEvent = Events.statusChange({
-                holder: this.holder,
-                status: this,
-                delta: -1,
-            })
-            this.holder.onStatusChange(statusChangeEvent);
+            this.stack -= 1;
         }
     },
     "poisoning": {
-        tickInterval: 2000,
-        onTick() {
-            const damage = 10 * this.stack
-
-            const damageEvent = Events.damage({
-                attacker: this.holder,
-                receiver: this.holder,
-                amount: damage,
-                type: DamageType.Poison,
-                damageSource: this
-            })
-
-            damageEvent.receiver.onDamageTaken(damageEvent);
+        triggerInterval: Infinity,
+        damageType: DamageType.Poison,
+        onTrigger() {
+            const damage = 1 * this.stack
+            this.dealDamageToSelf(damage);
         },
         natureDecrease() { }
     }
