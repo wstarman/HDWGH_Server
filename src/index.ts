@@ -1,7 +1,6 @@
 import express from "express";
 import { PrismaClient } from '@prisma/client';
 import { BattleManager } from "./battle/BattleManager.js";
-import type { CharacterData } from "./battle/BattleManager.js";
 import { Shop } from "./Shop.js";
 
 const app = express();
@@ -11,7 +10,7 @@ interface IdObject {
     id: string
 }
 
-interface CharacterInitData {
+export interface CharacterInitData {
     character_id: string,
     curses: IdObject[],
     goods: IdObject[]
@@ -22,17 +21,24 @@ app.use(express.json());
 
 app.get("/", (_, res) => {
     // Test data
-    let testdata: CharacterData = JSON.parse(`{"weaponid": "sword", "statusid":["poisoning"], "passiveid": ["drug_residue"]}`);
+    let testCharacter: CharacterInitData = {
+        character_id: "DrugGuy",
+        curses: [{ "id": "overbright_eyes" },
+        { "id": "hollow_vessel" }],
+        goods: []
+    }
 
-    let bm: BattleManager = new BattleManager(testdata);
+    let bm: BattleManager = new BattleManager(testCharacter, testCharacter);
     bm.run();
 
-
+    console.log("Result:", bm.result);
+    console.log(bm.logger.battleLog);
 
     res.json({
         message: "Battle simulation successfully initialized.",
         playerhp: bm.player.hp,
         enemyhp: bm.enemy.hp,
+        result: bm.result,
         battlelog: bm.logger.battleLog
     })
 });
@@ -127,33 +133,33 @@ app.post("/battle", async (req, res) => {
     }
 
     const saveCharacter = await prisma.character.create({
+        data: {
+            game_id: game.game_id,
+            round: game.round,
             data: {
-                game_id: game.game_id,
-                round: game.round,
-                data: {
-                    character_id: game.character_id,
-                    curses: data.curses,
-                    goods: data.equipmets
-                }
+                character_id: game.character_id,
+                curses: data.curses,
+                goods: data.equipmets
             }
-        });
+        }
+    });
 
 
     return;
 
-    try {
+    // try {
 
 
-        res.json({
-            data: {
-                uuid: newChar.game_id
-            }
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error failed to create character' });
-    }
+    //     res.json({
+    //         data: {
+    //             uuid: newChar.game_id
+    //         }
+    //     });
+    // }
+    // catch (error) {
+    //     console.error(error);
+    //     res.status(500).json({ error: 'Internal server error failed to create character' });
+    // }
 });
 
 const port = Number(process.env.PORT ?? 3000);

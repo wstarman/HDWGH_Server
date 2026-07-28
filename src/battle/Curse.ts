@@ -36,17 +36,18 @@ const curseDefs: Record<string, CurseDef> = {
         此效果觸發後有3秒的冷卻並且每次觸發下次需要的數值+10
      */
     "hollow_vessel": {
-        onStart() {
+        beforeStart() {
             this.temp1 = 5;
-            this.timer = 3000;
+            this.timer = 3;
         },
         afterStatusChange(event) {
-            if (event.status.id == StatusName.poisoning && event.delta < 0 && this.timer > 3000) {
-                this.addStack(event.delta)
-            } if (this.getStackNumber() >= this.temp1) {
-                this.timer = 0;
-                this.temp1 += 10;
-                this.owner.addStatus(StatusName.dizzy, 1);
+            if (event.status.id == StatusName.poison && event.delta < 0 && this.timer > 3) {
+                this.addStack(-event.delta);
+                if (this.getStackNumber() >= this.temp1) {
+                    this.timer = 0;
+                    this.temp1 += 10;
+                    this.owner.addStatus(StatusName.dizzy, 1);
+                }
             }
         },
     }

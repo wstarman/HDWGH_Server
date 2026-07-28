@@ -1,43 +1,47 @@
+import type { CharacterInitData } from "../index.js";
 import { BattleCharacter } from "./BattleCharacter.js"
 import { BattleLogger } from "./BattleLogger.js"
-
-export interface CharacterData {
-    weaponid: string;
-    statusid: string[];
-    passiveid: string[];
-}
 
 export class BattleManager {
     player: BattleCharacter;
     enemy: BattleCharacter;
-    logger: BattleLogger
-    tickTime: number = 0.001
-    currentTick: number = 0
-    remainderTime: number = 0.0
-    elapsedTime: number = 0.0
-    running: boolean = true
+    logger: BattleLogger;
+    tickTime: number = 0.001;
+    currentTick: number = 0;
+    remainderTime: number = 0.0;
+    elapsedTime: number = 0.0;
+    running: boolean = true;
+    result: "win" | "lose" | "draw" = "win";
 
-    constructor(player: CharacterData) {
+    constructor(player: CharacterInitData, enemy: CharacterInitData) {
         this.logger = new BattleLogger(this);
-        this.player = new BattleCharacter(this, 0, player.weaponid, player.statusid, player.passiveid);
-        this.enemy = new BattleCharacter(this, 1);
+        this.player = new BattleCharacter(this, 0, player.character_id, player.curses.map(item => { return item.id }), player.goods.map(item => { return item.id }));
+        this.enemy = new BattleCharacter(this, 1, enemy.character_id, enemy.curses.map(item => { return item.id }), enemy.goods.map(item => { return item.id }));
         this.player.opponent = this.enemy;
         this.enemy.opponent = this.player;
     }
 
     run(): void {
         console.log("Battle Start")
+        this.player.beforeStart();
+        this.enemy.beforeStart();
         this.player.onStart();
         this.enemy.onStart();
         while (true) {
             this.elapsedTime += this.tickTime;
             this.player.update();
+            this.enemy.update();
             if (this.check_ending()) {
                 break;
             }
-            if (this.elapsedTime >= 30) {
-                break;
-            }
+        }
+        if (this.player.hp < 0 && this.enemy.hp < 0 || this.player.hp == this.enemy.hp) {
+            this.result = "draw";
+        }
+        else if (this.player.hp > this.enemy.hp) {
+            this.result = "win";
+        } else {
+            this.result = "lose";
         }
     }
 
@@ -46,9 +50,6 @@ export class BattleManager {
     }
 
     check_ending(): boolean {
-        if (this.player.hp <= 0.0 || this.enemy.hp <= 0.0) {
-            return true;
-        }
-        return false;
+        return this.player.hp <= 0 || this.enemy.hp <= 0 || this.elapsedTime >= 30;
     }
 }

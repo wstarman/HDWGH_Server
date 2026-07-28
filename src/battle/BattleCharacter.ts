@@ -1,25 +1,30 @@
 import { Status } from "./Status.js";
-import { Passive } from "./Passive.js";
+import { characterPassive, Passive } from "./Passive.js";
 import { type AttackEvent, type DamageEvent, type StatusChangeEvent, type DamageSource } from "./Event.js";
 import { DamageType } from "../enum/DamageType.js";
 import type { BattleManager } from "./BattleManager.js";
 import type { BaseEffect } from "./BaseEffect.js";
 import { BattleCharacterData } from "./BattleCharacterData.js";
 import { Weapon } from "./Weapon.js";
+import { Curse } from "./Curse.js";
 
 export class BattleCharacter extends BattleCharacterData {
-    constructor(manager: BattleManager, index: number, weaponid: string = "barehand", statusid: string[] = [], passiveid: string[] = []) {
+    constructor(manager: BattleManager, index: number, cid: string, curseses: string[] = [], equipments: string[] = []) {
         super(manager);
         this.battleManager = manager;
         this.index = index;
-        statusid.forEach(id => {
-            this.statuses.push(new Status(id, this, 10));
-        });
-        passiveid.forEach(id => {
-            this.allEffects.push(new Passive(this, id));
-        });
+        this.id = cid;
         this.maxHp = 100.0;
         this.hp = 100.0;
+        characterPassive[cid]?.forEach(id => {
+            this.allEffects.push(new Passive(this, id));
+        })
+        curseses.forEach(id => {
+            this.allEffects.push(new Curse(this, id));
+        });
+        equipments.forEach(id => {
+            this.allEffects.push(new Passive(this, id));
+        });
     }
 
     beforeStart() {
@@ -31,6 +36,9 @@ export class BattleCharacter extends BattleCharacterData {
     update(): void {
         this.statuses.forEach(status => {
             status.update(this.totalSpeed * this.battleManager.tickTime);
+        });
+        this.allEffects.forEach(effect => {
+            effect.update(this.totalSpeed * this.battleManager.tickTime);
         });
     }
 
@@ -114,11 +122,11 @@ export class BattleCharacter extends BattleCharacterData {
         }
     }
     afterStatusChange(event: StatusChangeEvent) {
-        this.allEffects.forEach(p => p.afterStatusChange?.(event));
         const beforeStack = event.status.stack - event.delta;
         const afterStack = event.status.stack
         event.status.stack = afterStack;
         this.logger.recordStatusChangeEvent(event, beforeStack, afterStack);
+        this.allEffects.forEach(p => p.afterStatusChange?.(event));
     }
 
     onEffectToggle(effect: BaseEffect) {

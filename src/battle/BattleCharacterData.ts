@@ -17,6 +17,7 @@ export type StatIdType =
     | "totalSpeed";
 
 export class BattleCharacterData {
+    id!: string;
     statuses: Status[] = [];
     allEffects: BaseEffect[] = [];
     timer = 0.0;
@@ -41,8 +42,8 @@ export class BattleCharacterData {
     _totalSpeed: number = 1.0;
 
     private setStat<T>(key: StatIdType, value: number): boolean {
-        if (this[key] !== value) {
-            this[key] = value;
+        if (this[`_${key}`] !== value) {
+            this[`_${key}`] = value;
             this.logger.recordStatChangeEvent(this, key);
             return true;
         }

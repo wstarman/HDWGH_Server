@@ -3,7 +3,7 @@ import type { BattleCharacter } from "./BattleCharacter.js";
 
 export enum StatusName {
     burning = "burning",
-    poisoning = "poisoning",
+    poison = "poison",
     dizzy = "dizzy"
 }
 
@@ -26,7 +26,7 @@ export class Status {
     owner: BattleCharacter;
     damageType: DamageType = DamageType.Physical;
 
-    private _stack: number = 1;
+    private _stack: number = 0;
     get stack(): number { return this._stack; }
     set stack(value: number) {
         if (value < 0)
@@ -47,8 +47,8 @@ export class Status {
 
     constructor(id: string, owner: BattleCharacter, stack: number = 1) {
         this.id = id;
+        this.owner = owner;
         this.stack = stack;
-        this.owner = owner
         const def = StatusDefs[id];
         if (!(id in StatusName) || !def) {
             throw new Error(`Unknown status: ${id}`);
@@ -77,7 +77,7 @@ export class Status {
 
 const StatusDefs: Record<string, StatusDef> = {
     "burning": {
-        triggerInterval: 1000,
+        triggerInterval: 1,
         damageType: DamageType.Fire,
         onTrigger() {
             this.toggue();
@@ -88,8 +88,8 @@ const StatusDefs: Record<string, StatusDef> = {
             this.stack -= 1;
         }
     },
-    "poisoning": {
-        triggerInterval: Infinity,
+    "poison": {
+        triggerInterval: 1,
         damageType: DamageType.Poison,
         onTrigger() {
             const damage = 1 * this.stack
@@ -98,7 +98,7 @@ const StatusDefs: Record<string, StatusDef> = {
         natureDecrease() { }
     },
     "dizzy": {
-        triggerInterval: 1000,
+        triggerInterval: 1,
         natureDecrease() {
             this.stack -= 1;
         }

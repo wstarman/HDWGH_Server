@@ -11,31 +11,35 @@ export class Passive extends BaseEffect {
     }
 }
 
+export const characterPassive: Record<string, Array<string>> = {
+    "DrugGuy": ["drug_residue", "drug_tolerance", "sobriety"],
+}
+
 const passiveDefs: Record<string, PassiveDef> = {
     /**藥物殘留
      * 開場自帶5層毒在身上*/
     "drug_residue": {
         onStart() {
             this.toggue();
-            this.owner.addStatus("poisoning", 5);
+            this.owner.addStatus("poison", 5);
         }
     },
     /**抗藥性
      * 自然獲得20%毒傷害抗性，每秒減少兩層毒
      */
     "drug_tolerance": { // 
-        triggerInterval: 1000,
+        triggerInterval: 1,
         beforeDamageTaken(damageEvent) {
             this.toggue();
-            if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.id == "poisoning") {
+            if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.id == "poison") {
                 damageEvent.modifier.multiplier *= 0.8;
             }
         },
         onTrigger() {
             this.toggue();
-            const poisoningStatus = this.owner.getStatus("poisoning");
-            if (poisoningStatus !== undefined) {
-                this.owner.addStatus(StatusName.poisoning, -2);
+            const poisonStatus = this.owner.getStatus("poison");
+            if (poisonStatus !== undefined) {
+                this.owner.addStatus(StatusName.poison, -2);
             }
         }
     },
@@ -48,9 +52,9 @@ const passiveDefs: Record<string, PassiveDef> = {
      */
     "sobriety": {
         persistent: true,
-        triggerInterval: 1000,
+        triggerInterval: 1,
         afterStatusChange(event) {
-            if (event.status.id == StatusName.poisoning && event.status.stack == 0) {
+            if (event.status.id == StatusName.poison && event.status.stack == 0) {
                 this.enabled = true;
                 this.temp1 = 0;
                 this.owner.attackSpeed += 0.3;
@@ -60,7 +64,7 @@ const passiveDefs: Record<string, PassiveDef> = {
         },
         everyTick() {
             if (!this.enabled) return;
-            if (this.owner.hasStatus(StatusName.poisoning)) {
+            if (this.owner.hasStatus(StatusName.poison)) {
                 this.temp1! += 0.001
             }
             if (this.temp1! >= 1) {
