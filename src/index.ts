@@ -32,7 +32,6 @@ app.get("/", (_, res) => {
     bm.run();
 
     console.log("Result:", bm.result);
-    console.log(bm.logger.battleLog);
 
     res.json({
         message: "Battle simulation successfully initialized.",

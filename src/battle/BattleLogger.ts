@@ -16,6 +16,8 @@ export interface BattleLog {
 
     owner?: number;
     statusId?: string;
+    beforeStack?: number
+    afterStack?: number
     delta?: number;
 
     sourceType?: string;
@@ -73,7 +75,6 @@ export class BattleLogger {
             sourceId: srcId
         }
         this.battleLog.push(log);
-        console.log("AAAAAA")
     }
 
     recordStatusChangeEvent(event: StatusChangeEvent, before: number, after: number) {
@@ -82,6 +83,8 @@ export class BattleLogger {
             eventType: "status_stack_change",
             owner: event.owner.index,
             statusId: event.status.id,
+            beforeStack: before,
+            afterStack: after,
             delta: after - before,
         }
         this.battleLog.push(log);

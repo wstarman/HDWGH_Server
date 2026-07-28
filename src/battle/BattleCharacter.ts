@@ -116,7 +116,7 @@ export class BattleCharacter extends BattleCharacterData {
         for (let i = 0; i < this.statuses.length; i++) {
             if (this.statuses[i]!.id == id) {
                 this.statuses[i]!.onCleared?.();
-                this.statuses.splice(i);
+                this.statuses.splice(i, 1);
                 return;
             }
         }

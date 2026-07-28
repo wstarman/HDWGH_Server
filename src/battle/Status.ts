@@ -10,7 +10,7 @@ export enum StatusName {
 interface StatusCallbacks {
     onTrigger?(this: Status): void;
     natureDecrease?(this: Status): void;
-    onCleared?(this: Status): void
+    onCleared?(this: Status): void;
 }
 
 interface StatusDef extends StatusCallbacks {
@@ -35,7 +35,7 @@ export class Status {
             const delta = value - this._stack;
             this._stack = value;
             this.owner.afterStatusChange({ owner: this.owner, status: this, delta })
-            if (this.stack == 0) {
+            if (this.stack <= 0) {
                 this.owner.clearStatus(this.id);
             }
         }
