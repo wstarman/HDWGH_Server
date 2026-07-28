@@ -1,5 +1,4 @@
 import { BattleCharacter } from "./BattleCharacter.js"
-import { type EffectContext } from "./Status.js";
 import { BattleLogger } from "./BattleLogger.js"
 
 export interface CharacterData {
@@ -15,91 +14,36 @@ export interface BattleContext {
 export class BattleManager {
     player: BattleCharacter;
     enemy: BattleCharacter;
-    battleLogger: BattleLogger
+    logger: BattleLogger
     tickTime: number = 0.001
-
     currentTick: number = 0
     remainderTime: number = 0.0
-
-    elapsedTime: number = 0
-
+    elapsedTime: number = 0.0
     running: boolean = true
 
     constructor(player: CharacterData) {
-        this.battleLogger = new BattleLogger(() => this.get_battle_time(this.elapsedTime));
-
-        const battleContext: BattleContext = {
-            logger: this.battleLogger
-        }
-
-        this.player = new BattleCharacter(battleContext, 0, player.weaponid, player.statusid, player.passiveid);
-        this.enemy = new BattleCharacter(battleContext, 1);
+        this.logger = new BattleLogger(this);
+        this.player = new BattleCharacter(this, 0, player.weaponid, player.statusid, player.passiveid);
+        this.enemy = new BattleCharacter(this, 1);
+        this.player.opponent = this.enemy;
+        this.enemy.opponent = this.player;
     }
 
     run(): void {
-
-        let ctx: EffectContext = {
-            holder: this.player,
-        }
+        console.log("Battle Start")
         this.player.onStart();
         this.enemy.onStart();
-
         while (true) {
-            this.elapsedTime++;
-
-            /*if(this.elapsedTime % this.Player.WieldWeapon.WeaponCooldown == 0){
-                this.record_attack(elapsedTime, 0, 1, this.Player, this.Enemy);
-            }*/
-
-            this.player.update(ctx);
-
+            this.elapsedTime += this.tickTime;
+            this.player.update();
             if (this.check_ending()) {
                 break;
             }
-
-            /*if(elapsedTime % this.Enemy.WieldWeapon.WeaponCooldown == 0){
-                this.record_attack(elapsedTime, 1, 0, this.Enemy, this.Player);
-            }*/
-
-            if (this.check_ending()) {
-                break;
-            }
-
-            if (this.elapsedTime >= 30000) {
+            if (this.elapsedTime >= 30) {
                 break;
             }
         }
     }
-
-    /*record_attack(elapsedTime: number, attackerIndex: number, receiverIndex: number, attacker: Character, receiver: Character): void {
-        const weapon = attacker.WieldWeapon;
-
-        this.BattleLog.push({
-            time: this.get_battle_time(elapsedTime),
-            attacker: attackerIndex,
-            receiver: receiverIndex,
-            damage: weapon.WeaponDamage,
-            weaponName: weapon.WeaponId,
-            damageType: "physical",
-        });
-
-        attacker.NormalAttack(receiver);
-    }
-
-    record_status_effect(elapsedTime: number, statusHolderIndex: number, targetIndex: number, effect: StatusEffectResult | null): void {
-        if(effect == null){
-            return;
-        }
-
-        this.BattleLog.push({
-            time: this.get_battle_time(elapsedTime),
-            attacker: statusHolderIndex,
-            receiver: effect.receiver == "statusHolder" ? statusHolderIndex : targetIndex,
-            damage: effect.damage,
-            weaponName: effect.sourceName,
-            damageType: effect.damageType,
-        });
-    }*/
 
     get_battle_time(elapsedTime: number): number {
         return Number((elapsedTime * this.tickTime).toFixed(6));
@@ -109,21 +53,6 @@ export class BattleManager {
         if (this.player.hp <= 0.0 || this.enemy.hp <= 0.0) {
             return true;
         }
-
         return false;
     }
 }
-
-/*
-
-
-func get_result() -> void:
-    running = false
-    if Enemy.HP <= 0.0:
-        print("You Win")
-    else:
-        print("You Lose")
-    	
-func _on_request_completed(result, response_code, headers, body):
-    print(body.get_string_from_utf8())
-    */

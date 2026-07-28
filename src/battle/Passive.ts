@@ -1,6 +1,6 @@
 import { DamageType } from "../enum/DamageType.js";
 import type { BattleCharacter } from "./BattleCharacter.js";
-import { Status, type EffectContext, type StatusAddEvent } from "./Status.js";
+import { Status } from "./Status.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
 import { StatusChangeReason } from "../enum/StatusChange.js";
@@ -12,7 +12,6 @@ export class Passive extends BaseEffect {
     id: string = "";
 
     constructor(owner: BattleCharacter, id: string) {
-        console.log(id, passiveDefs)
         super(owner, id, passiveDefs);
     }
 }
@@ -22,31 +21,32 @@ enum PassiveNames {
     DrugTolerance = "drug_tolerance",
     Sobriety = "sobriety"
 }
-function Log(id: string) { }
+
 const passiveDefs: Record<string, PassiveDef> = {
     "drug_residue": {
         onStart() {
+            this.logToggueEvent()
             this.owner.addStatus("poisoning", 5);
         }
     },
     "drug_tolerance": {
         interval: 1000,
-        onDamageTaken: (damageEvent) => {
+        onDamageTaken(damageEvent) {
             if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.id == "poisoning") {
                 damageEvent.modifier.multiplier *= 0.8;
             }
         },
-        onEffectTrigger(ctx) {
-            const poisoningStatus = ctx.holder.getStatus("poisoning");
+        onEffectTrigger() {
+            const poisoningStatus = this.owner.getStatus("poisoning");
 
             if (poisoningStatus !== undefined) {
                 const statusChangeEvent = Events.statusChange({
-                    holder: ctx.holder,
+                    holder: this.owner,
                     status: poisoningStatus,
-                    amount: -1
+                    delta: -1
                 })
 
-                ctx.holder.onStatusChange(statusChangeEvent);
+                this.owner.onStatusChange(statusChangeEvent);
             }
         }
     },

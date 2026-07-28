@@ -3,7 +3,9 @@ import { DamageType } from "../enum/DamageType.js";
 import { EventType } from "../enum/EventType.js";
 import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
 import { Passive } from "./Passive.js";
-import { Status, type EffectContext } from "./Status.js";
+import { Status } from "./Status.js";
+import type { BattleManager } from "./BattleManager.js";
+import type { BaseEffect } from "./BaseEffect.js";
 
 export interface BattleLog {
     time: number;
@@ -22,24 +24,36 @@ export interface BattleLog {
     sourceObjectType?: string;
     sourceId?: string;
 
-    equipmentId?: string
+    equipmentId?: string;
     equipmentSlot?: number;
+    persistent?: boolean;
+    enabled?: boolean;
+
+    statId?: string;
+    target?: number;
+    value?: number;
 }
 
 export class BattleLogger {
-    BattleLog: BattleLog[] = [];
+    battleManeger: BattleManager;
+    battleLog: BattleLog[] = [];
 
-    constructor(private readonly getTime: () => number) { }
+    constructor(battleManeger: BattleManager) {
+        this.battleManeger = battleManeger;
+    }
+
+    getTime() {
+        return this.battleManeger.elapsedTime;
+    }
 
     recordDamageEvent(event: DamageEvent, final: number) {
-
         let srcType: string = "error";
-        let srcOT: string = "error";
+        let srcObjectType: string = "error";
         let srcId: string = "error";
 
         if (event.damageSource instanceof Status) {
             srcType = "status";
-            srcOT = "status";
+            srcObjectType = "status";
             srcId = event.damageSource.id;
         }
 
@@ -51,30 +65,44 @@ export class BattleLogger {
             damage: final,
             damageType: event.type,
             sourceType: srcType,
-            sourceObjectType: srcOT,
+            sourceObjectType: srcObjectType,
             sourceId: srcId
         }
-
-        this.BattleLog.push(log);
+        this.battleLog.push(log);
     }
 
     recordStatusChangeEvent(event: StatusChangeEvent, before: number, after: number) {
-
-        let srcType: string = "error";
-        let srcOT: string = "error";
-        let srcId: string = "error";
-
         const log: BattleLog = {
             time: this.getTime(),
             eventType: "status_stack_change",
             owner: event.holder.index,
             statusId: event.status.id,
             delta: after - before,
-            sourceType: srcType,
-            sourceObjectType: srcOT,
-            sourceId: srcId,
         }
+        this.battleLog.push(log);
+    }
 
-        this.BattleLog.push(log);
+    recordEffectToggleEvent(item: BaseEffect) {
+        const log: BattleLog = {
+            time: this.getTime(),
+            eventType: "equipment_toggle",
+            owner: item.owner.index,
+            equipmentId: item.id,
+            equipmentSlot: item.slot,
+            persistent: item.persistent,
+            enabled: item.enabled
+        }
+        this.battleLog.push(log);
+    }
+
+    recordStatChangeEvent(target: number, statId: string, value: number) {
+        const log: BattleLog = {
+            time: this.getTime(),
+            eventType: "stat_change",
+            target,
+            statId,
+            value,
+        }
+        this.battleLog.push(log);
     }
 }

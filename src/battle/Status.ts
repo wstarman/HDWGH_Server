@@ -1,60 +1,45 @@
 import { DamageType } from "../enum/DamageType.js";
-
 import type { BattleCharacter } from "./BattleCharacter.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { EventType } from "../enum/EventType.js";
-import { StatusChangeReason } from "../enum/StatusChange.js";
-import { BaseEffect } from "./BaseEffect.js";
 
-export interface EffectContext {
-    holder: BattleCharacter,
-    target?: BattleCharacter
+interface StatusCallbacks {
+    onTick?(this: Status): void;
+    natureDecrease(this: Status): void;
 }
 
-interface StatusDef {
+interface StatusDef extends StatusCallbacks {
     tickInterval?: number;
-    onTick?: (status: Status, ctx: EffectContext) => void;
-    natureDecrease: (status: Status, ctx: EffectContext) => void;
-    //onAttack?: (status: Status, ctx: StatusContext) => void;
-    //onDamageTaken?: (status: Status, ctx: StatusContext) => void;
-    //onDeath?: (status: Status, ctx: StatusContext) => void;
-}
-
-export interface StatusAddEvent {
-    holder: BattleCharacter,
-    status: Status,
-    stack: number
 }
 
 export class Status {
     id: string = "";
     timer: number = 0
+    tickInterval = Infinity
+    holder: BattleCharacter;
+
     private _stack: number = 1;
     get stack(): number { return this._stack; }
     set stack(value: number) {
         if (value != this._stack) {
-            //let original = this._Stack;
+            const delta = this._stack - value;
             this._stack = value;
-            //this.holder.onStatusChange({holder: this.holder, status:this, originalStack: original, newStack: value})
+            this.holder.onStatusChange({ holder: this.holder, status: this, delta })
         }
     }
 
-    holder: BattleCharacter;
-
-    statusDefinition: StatusDef;
+    onTick?: StatusCallbacks["onTick"]
+    natureDecrease?: StatusCallbacks["natureDecrease"]
 
     constructor(id: string, holder: BattleCharacter, stack: number = 1) {
         this.id = id;
         this.stack = stack;
         this.holder = holder
-
         const def = StatusDefs[id];
-
         if (!def) {
             throw new Error(`Unknown status: ${id}`);
         }
-
-        this.statusDefinition = def;
+        Object.assign(this, def);
     }
 
     protected shouldTick(interval?: number): boolean {
@@ -65,61 +50,55 @@ export class Status {
         return true;
     }
 
-    processOnTick(ctx: EffectContext): void {
+    update(deltaTime: number): void {
         if (this.stack == 0) return;
-
-        if (!this.shouldTick(this.statusDefinition.tickInterval)) return;
-
-        this.statusDefinition.onTick?.(this, ctx);
-        this.statusDefinition.natureDecrease(this, ctx);
+        if (!this.shouldTick(this.tickInterval)) return;
+        this.onTick?.();
+        this.natureDecrease?.();
     }
 
-    clone(): Status {
-        return new Status(this.id, this.holder, this.stack);
-    }
 }
 
 const StatusDefs: Record<string, StatusDef> = {
     "burning": {
         tickInterval: 1000,
-        onTick: (status, ctx) => {
-            const damage = 10 * status.stack
+        onTick() {
+            const damage = 10 * this.stack
 
             const damageEvent = Events.damage({
-                attacker: ctx.holder,
-                receiver: ctx.holder,
+                attacker: this.holder,
+                receiver: this.holder,
                 amount: damage,
                 type: DamageType.Fire,
-                damageSource: status
+                damageSource: this
             })
 
             damageEvent.receiver.onDamageTaken(damageEvent);
         },
-        natureDecrease: (status, ctx) => {
+        natureDecrease() {
             const statusChangeEvent = Events.statusChange({
-                holder: ctx.holder,
-                status: status,
-                amount: -1,
+                holder: this.holder,
+                status: this,
+                delta: -1,
             })
-
-            ctx.holder.onStatusChange(statusChangeEvent);
+            this.holder.onStatusChange(statusChangeEvent);
         }
     },
     "poisoning": {
         tickInterval: 2000,
-        onTick: (status, ctx) => {
-            const damage = 10 * status.stack
+        onTick() {
+            const damage = 10 * this.stack
 
             const damageEvent = Events.damage({
-                attacker: ctx.holder,
-                receiver: ctx.holder,
+                attacker: this.holder,
+                receiver: this.holder,
                 amount: damage,
                 type: DamageType.Poison,
-                damageSource: status
+                damageSource: this
             })
 
             damageEvent.receiver.onDamageTaken(damageEvent);
         },
-        natureDecrease: (status, ctx) => { }
+        natureDecrease() { }
     }
 };

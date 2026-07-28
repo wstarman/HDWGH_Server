@@ -19,7 +19,6 @@ export interface DamageModifier {
 
 export interface DamageEvent {
     modifier: DamageModifier,
-
     attacker: BattleCharacter,
     receiver: BattleCharacter,
     amount: number,
@@ -30,7 +29,7 @@ export interface DamageEvent {
 export interface StatusChangeEvent {
     holder: BattleCharacter,
     status: Status,
-    amount: number
+    delta: number
 }
 
 export const Events = {
