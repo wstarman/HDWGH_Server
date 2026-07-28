@@ -7,6 +7,17 @@ import { Shop } from "./Shop.js";
 const app = express();
 const prisma = new PrismaClient();
 
+interface IdObject {
+    id: string
+}
+
+interface CharacterInitData {
+    character_id: string,
+    curses: IdObject[],
+    goods: IdObject[]
+}
+
+
 app.use(express.json());
 
 app.get("/", (_, res) => {
@@ -53,7 +64,7 @@ app.post("/new_game", async (req, res) => {
     }
 
     try {
-        const newChar = await prisma.game.create({
+        const newGame = await prisma.game.create({
             data: {
                 character_id: character_id,
                 round: 1,
@@ -62,11 +73,9 @@ app.post("/new_game", async (req, res) => {
             }
         });
 
-        console.log(1);
-
         res.json({
             data: {
-                uuid: newChar.game_id
+                uuid: newGame.game_id
             }
         });
     }
@@ -98,6 +107,53 @@ app.get("/shop", async (req, res) => {
             goods: drawnItems.goods
         }
     });
+});
+
+app.post("/battle", async (req, res) => {
+    const { uuid } = req.query;
+
+    const game = await prisma.game.findUnique({
+        where: {
+            game_id: uuid,
+        },
+    });
+
+    const { data } = req.body;
+
+    const init_data: CharacterInitData = {
+        character_id: game.character_id,
+        curses: data.curses,
+        goods: data.equipmets
+    }
+
+    const saveCharacter = await prisma.character.create({
+            data: {
+                game_id: game.game_id,
+                round: game.round,
+                data: {
+                    character_id: game.character_id,
+                    curses: data.curses,
+                    goods: data.equipmets
+                }
+            }
+        });
+
+
+    return;
+
+    try {
+
+
+        res.json({
+            data: {
+                uuid: newChar.game_id
+            }
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error failed to create character' });
+    }
 });
 
 const port = Number(process.env.PORT ?? 3000);
