@@ -1,14 +1,14 @@
 import { DamageType } from "../enum/DamageType.js";
 
-import type { Character } from "./Character.js";
+import type { BattleCharacter } from "./BattleCharacter.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { EventType } from "../enum/EventType.js";
 import { StatusChangeReason } from "../enum/StatusChange.js";
 import { BaseEffect } from "./BaseEffect.js";
 
 export interface EffectContext {
-    holder: Character,
-    target?: Character
+    holder: BattleCharacter,
+    target?: BattleCharacter
 }
 
 interface StatusDef {
@@ -21,7 +21,7 @@ interface StatusDef {
 }
 
 export interface StatusAddEvent {
-    holder: Character,
+    holder: BattleCharacter,
     status: Status,
     stack: number
 }
@@ -39,11 +39,11 @@ export class Status {
         }
     }
 
-    holder: Character;
+    holder: BattleCharacter;
 
     statusDefinition: StatusDef;
 
-    constructor(id: string, holder: Character, stack: number = 1) {
+    constructor(id: string, holder: BattleCharacter, stack: number = 1) {
         this.id = id;
         this.stack = stack;
         this.holder = holder

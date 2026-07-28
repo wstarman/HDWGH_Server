@@ -1,5 +1,5 @@
 import { DamageType } from "../enum/DamageType.js";
-import type { Character } from "./Character.js";
+import type { BattleCharacter } from "./BattleCharacter.js";
 import { Status, type EffectContext, type StatusAddEvent } from "./Status.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { StatusChangeReason } from "../enum/StatusChange.js";
@@ -8,7 +8,7 @@ export abstract class BaseEffect {
     id: string = "";
     timer = 0
     interval = Infinity
-    owner: Character;
+    owner: BattleCharacter;
     onStart?: EffectCallbacks["onStart"];
     onAttack?: EffectCallbacks["onAttack"];
     onDamageTaken?: EffectCallbacks["onDamageTaken"];
@@ -17,7 +17,7 @@ export abstract class BaseEffect {
     onStatusAdd?: EffectCallbacks["onStatusAdd"];
     onEffectTrigger?: EffectCallbacks["onEffectTrigger"];
 
-    constructor(owner: Character, id: string, deflist: Record<string, BaseEffectDef>) {
+    constructor(owner: BattleCharacter, id: string, deflist: Record<string, BaseEffectDef>) {
         this.owner = owner
         this.id = id
         console.log(id, deflist)

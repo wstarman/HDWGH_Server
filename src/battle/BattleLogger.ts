@@ -1,4 +1,4 @@
-import { Character } from "./Character.js"
+import { BattleCharacter } from "./BattleCharacter.js"
 import { DamageType } from "../enum/DamageType.js";
 import { EventType } from "../enum/EventType.js";
 import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";

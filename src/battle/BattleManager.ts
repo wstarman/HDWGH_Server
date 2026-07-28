@@ -1,4 +1,4 @@
-import { Character } from "./Character.js"
+import { BattleCharacter } from "./BattleCharacter.js"
 import { type EffectContext } from "./Status.js";
 import { BattleLogger } from "./BattleLogger.js"
 
@@ -13,8 +13,8 @@ export interface BattleContext {
 }
 
 export class BattleManager {
-    player: Character;
-    enemy: Character;
+    player: BattleCharacter;
+    enemy: BattleCharacter;
     battleLogger: BattleLogger
     tickTime: number = 0.001
 
@@ -32,8 +32,8 @@ export class BattleManager {
             logger: this.battleLogger
         }
 
-        this.player = new Character(battleContext, 0, player.weaponid, player.statusid, player.passiveid);
-        this.enemy = new Character(battleContext, 1);
+        this.player = new BattleCharacter(battleContext, 0, player.weaponid, player.statusid, player.passiveid);
+        this.enemy = new BattleCharacter(battleContext, 1);
     }
 
     run(): void {

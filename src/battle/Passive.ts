@@ -1,5 +1,5 @@
 import { DamageType } from "../enum/DamageType.js";
-import type { Character } from "./Character.js";
+import type { BattleCharacter } from "./BattleCharacter.js";
 import { Status, type EffectContext, type StatusAddEvent } from "./Status.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
@@ -11,7 +11,7 @@ interface PassiveDef extends BaseEffectDef {
 export class Passive extends BaseEffect {
     id: string = "";
 
-    constructor(owner: Character, id: string) {
+    constructor(owner: BattleCharacter, id: string) {
         console.log(id, passiveDefs)
         super(owner, id, passiveDefs);
     }

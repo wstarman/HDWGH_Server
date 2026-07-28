@@ -5,7 +5,7 @@ import type { DamageEvent, StatusChangeEvent } from "./Event.js";
 import { DamageType } from "../enum/DamageType.js";
 import type { BattleContext } from "./BattleManager.js";
 
-export class Character {
+export class BattleCharacter {
     index: number;
 
     wieldWeapon: Weapon = new Weapon();
