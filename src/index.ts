@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from '@prisma/client';
-import { BattleManager } from "./BattleManager.js";
-import type { CharacterData } from "./BattleManager.js";
+import { BattleManager } from "./battle/BattleManager.js";
+import type { CharacterData } from "./battle/BattleManager.js";
 import { Shop } from "./Shop.js";
 
 const app = express();
@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.get("/", (_, res) => {
     // Test data
-    let testdata: CharacterData = JSON.parse(`{"weaponid": "sword", "statusid":["poisoning"], "passiveid": ["drug_resistance"]}`);
+    let testdata: CharacterData = JSON.parse(`{"weaponid": "sword", "statusid":["poisoning"], "passiveid": ["drug_residue"]}`);
 
     let bm: BattleManager = new BattleManager(testdata);
     bm.run();

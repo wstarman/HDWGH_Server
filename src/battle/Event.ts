@@ -1,20 +1,16 @@
-import type { Character } from "./Character.js";
+import type { BattleCharacter } from "./BattleCharacter.js";
 
-import { EventType } from "./enum/EventType.js";
-import type { DamageType } from "./enum/DamageType.js";
+import { EventType } from "../enum/EventType.js";
+import type { DamageType } from "../enum/DamageType.js";
 import type { Status } from "./Status.js";
-import type { StatusChangeReason } from "./enum/StatusChange.js";
+import type { StatusChangeReason } from "../enum/StatusChange.js";
 import type { Passive } from "./Passive.js";
 
 type DamageSource =
-    | Character
+    | BattleCharacter
     | Status;
 //| Skill
 //| Projectile;
-
-type ChangeSource =
-    | Status
-    | Passive;
 
 export interface DamageModifier {
     flat: number,
@@ -24,19 +20,17 @@ export interface DamageModifier {
 export interface DamageEvent {
     modifier: DamageModifier,
 
-    attacker: Character,
-    receiver: Character,
+    attacker: BattleCharacter,
+    receiver: BattleCharacter,
     amount: number,
     type: DamageType,
     damageSource: DamageSource
 }
 
 export interface StatusChangeEvent {
-    holder: Character,
+    holder: BattleCharacter,
     status: Status,
-    amount: number,
-    reason: StatusChangeReason,
-    changeSource: ChangeSource
+    amount: number
 }
 
 export const Events = {

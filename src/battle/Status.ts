@@ -1,14 +1,14 @@
-import { DamageType } from "./enum/DamageType.js";
+import { DamageType } from "../enum/DamageType.js";
 
-import type { Character } from "./Character.js";
+import type { BattleCharacter } from "./BattleCharacter.js";
 import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
-import { EventType } from "./enum/EventType.js";
-import { StatusChangeReason } from "./enum/StatusChange.js";
+import { EventType } from "../enum/EventType.js";
+import { StatusChangeReason } from "../enum/StatusChange.js";
 import { BaseEffect } from "./BaseEffect.js";
 
 export interface EffectContext {
-    holder: Character,
-    target?: Character
+    holder: BattleCharacter,
+    target?: BattleCharacter
 }
 
 interface StatusDef {
@@ -21,13 +21,14 @@ interface StatusDef {
 }
 
 export interface StatusAddEvent {
-    holder: Character,
+    holder: BattleCharacter,
     status: Status,
     stack: number
 }
 
-export class Status extends BaseEffect {
+export class Status {
     id: string = "";
+    timer: number = 0
     private _stack: number = 1;
     get stack(): number { return this._stack; }
     set stack(value: number) {
@@ -38,13 +39,11 @@ export class Status extends BaseEffect {
         }
     }
 
-    holder: Character;
+    holder: BattleCharacter;
 
     statusDefinition: StatusDef;
 
-    constructor(id: string, holder: Character, stack: number = 1) {
-        super();
-
+    constructor(id: string, holder: BattleCharacter, stack: number = 1) {
         this.id = id;
         this.stack = stack;
         this.holder = holder
@@ -56,6 +55,14 @@ export class Status extends BaseEffect {
         }
 
         this.statusDefinition = def;
+    }
+
+    protected shouldTick(interval?: number): boolean {
+        if (!interval) return false;
+        this.timer++;
+        if (this.timer < interval) return false;
+        this.timer = 0;
+        return true;
     }
 
     processOnTick(ctx: EffectContext): void {
@@ -93,8 +100,6 @@ const StatusDefs: Record<string, StatusDef> = {
                 holder: ctx.holder,
                 status: status,
                 amount: -1,
-                reason: StatusChangeReason.Tick,
-                changeSource: status
             })
 
             ctx.holder.onStatusChange(statusChangeEvent);

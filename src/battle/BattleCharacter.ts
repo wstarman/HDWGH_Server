@@ -2,10 +2,10 @@ import { Weapon } from "./Weapon.js";
 import { Status, type EffectContext } from "./Status.js";
 import { Passive } from "./Passive.js";
 import type { DamageEvent, StatusChangeEvent } from "./Event.js";
-import { DamageType } from "./enum/DamageType.js";
+import { DamageType } from "../enum/DamageType.js";
 import type { BattleContext } from "./BattleManager.js";
 
-export class Character {
+export class BattleCharacter {
     index: number;
 
     wieldWeapon: Weapon = new Weapon();
@@ -37,33 +37,29 @@ export class Character {
         });
 
         passiveid.forEach(id => {
-            this.passives.push(new Passive(id));
+            this.passives.push(new Passive(this, id));
         });
 
         this.maxHp = 100.0;
         this.hp = 100.0;
     }
 
-    NormalAttack(Enemy: Character): void {
-        //Enemy.TakeDamage(this.WieldWeapon.WeaponDamage);
-    }
-
-    GetStatus(id: string): Status | undefined {
+    getStatus(id: string): Status | undefined {
         return this.currentStatus.find(s => s.id === id);
     }
 
-    Update(ctx: EffectContext): void {
+    update(ctx: EffectContext): void {
         // Checking OnTick Status
         this.currentStatus.forEach(status => {
             status.processOnTick(ctx);
         });
 
-        this.passives.forEach(passive => {
-            passive.triggerEffect(ctx);
-        });
+        // this.passives.forEach(passive => {
+        //     passive.triggerEffect(ctx);
+        // });
     }
 
-    ApplyResistance(damage: DamageEvent) {
+    applyResistance(damage: DamageEvent) {
         const resistance = this.resistance[damage.type];
 
         if (resistance !== undefined) {
@@ -71,11 +67,11 @@ export class Character {
         }
     }
 
-    TakeDamage(damage: number): void {
+    takeDamage(damage: number): void {
         this.hp -= Math.max(damage, 0);
     }
 
-    AddStatus(id: string, stack: number) {
+    addStatus(id: string, stack: number) {
         for (let status of this.currentStatus) {
             if (status.id == id) {
                 status.stack += stack;
@@ -86,24 +82,24 @@ export class Character {
     }
 
     onStart() {
-        this.passives.forEach(p => { p.passiveDefinition.onStart?.(this) });
+        this.passives.forEach(p => { p.onStart });
     }
 
     onDamageTaken(event: DamageEvent) {
-        this.passives.forEach(p => { p.passiveDefinition.onDamageTaken?.(event) });
+        this.passives.forEach(p => { p.onDamageTaken?.(event) });
 
-        this.ApplyResistance(event);
+        this.applyResistance(event);
 
 
         const final = (event.amount + event.modifier.flat) * event.modifier.multiplier
 
         this.battleCtx.logger.recordDamageEvent(event, final);
 
-        this.TakeDamage(final);
+        this.takeDamage(final);
     }
 
     onStatusChange(event: StatusChangeEvent) {
-        this.passives.forEach(p => { p.passiveDefinition.onStatusChange?.(event) });
+        this.passives.forEach(p => { p.onStatusChange?.(event) });
 
         const beforeStack = event.status.stack;
         const afterStack = Math.max(0, beforeStack + event.amount);
