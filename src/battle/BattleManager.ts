@@ -7,10 +7,6 @@ export interface CharacterData {
     passiveid: string[];
 }
 
-export interface BattleContext {
-    logger: BattleLogger;
-}
-
 export class BattleManager {
     player: BattleCharacter;
     enemy: BattleCharacter;

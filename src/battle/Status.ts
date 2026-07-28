@@ -1,7 +1,11 @@
 import { DamageType } from "../enum/DamageType.js";
 import type { BattleCharacter } from "./BattleCharacter.js";
-import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
-import { EventType } from "../enum/EventType.js";
+
+export enum StatusName {
+    burning = "burning",
+    poisoning = "poisoning",
+    dizzy = "dizzy"
+}
 
 interface StatusCallbacks {
     onTrigger?(this: Status): void;
@@ -25,8 +29,10 @@ export class Status {
     private _stack: number = 1;
     get stack(): number { return this._stack; }
     set stack(value: number) {
+        if (value < 0)
+            value = 0;
         if (value != this._stack) {
-            const delta = this._stack - value;
+            const delta = value - this._stack;
             this._stack = value;
             this.owner.afterStatusChange({ owner: this.owner, status: this, delta })
             if (this.stack == 0) {
@@ -44,7 +50,7 @@ export class Status {
         this.stack = stack;
         this.owner = owner
         const def = StatusDefs[id];
-        if (!(id in StatusNames) || !def) {
+        if (!(id in StatusName) || !def) {
             throw new Error(`Unknown status: ${id}`);
         }
         Object.assign(this, def);
@@ -65,20 +71,8 @@ export class Status {
     }
 
     dealDamageToSelf(damage: number) {
-        const damageEvent = Events.damage({
-            attacker: this.owner,
-            receiver: this.owner,
-            amount: damage,
-            type: this.damageType,
-            damageSource: this
-        })
-        damageEvent.receiver.onDamageTaken(damageEvent);
+        this.owner.calculateDamage(this.owner, damage, this.damageType, this);
     }
-}
-
-export enum StatusNames {
-    burning = "burning",
-    poisoning = "poisoning",
 }
 
 const StatusDefs: Record<string, StatusDef> = {
@@ -102,5 +96,11 @@ const StatusDefs: Record<string, StatusDef> = {
             this.dealDamageToSelf(damage);
         },
         natureDecrease() { }
+    },
+    "dizzy": {
+        triggerInterval: 1000,
+        natureDecrease() {
+            this.stack -= 1;
+        }
     }
 };

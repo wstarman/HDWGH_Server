@@ -1,10 +1,11 @@
 import { Status } from "./Status.js";
 import { Passive } from "./Passive.js";
-import type { DamageEvent, StatusChangeEvent } from "./Event.js";
+import { type AttackEvent, type DamageEvent, type StatusChangeEvent, type DamageSource } from "./Event.js";
 import { DamageType } from "../enum/DamageType.js";
-import type { BattleContext, BattleManager } from "./BattleManager.js";
+import type { BattleManager } from "./BattleManager.js";
 import type { BaseEffect } from "./BaseEffect.js";
 import { BattleCharacterData } from "./BattleCharacterData.js";
+import { Weapon } from "./Weapon.js";
 
 export class BattleCharacter extends BattleCharacterData {
     constructor(manager: BattleManager, index: number, weaponid: string = "barehand", statusid: string[] = [], passiveid: string[] = []) {
@@ -22,10 +23,10 @@ export class BattleCharacter extends BattleCharacterData {
     }
 
     beforeStart() {
-        this.allEffects.forEach(p => { p.beforeStart?.() });
+        this.allEffects.forEach(effect => { effect.beforeStart?.() });
     }
     onStart() {
-        this.allEffects.forEach(p => { p.onStart?.() });
+        this.allEffects.forEach(effect => { effect.onStart?.() });
     }
     update(): void {
         this.statuses.forEach(status => {
@@ -33,15 +34,43 @@ export class BattleCharacter extends BattleCharacterData {
         });
     }
 
-    onDamageTaken(event: DamageEvent) {
-        this.allEffects.forEach(p => { p.beforeDamageTaken?.(event) });
+    attack(weapon: Weapon, power: number = weapon.power, damageType = weapon.damageType) {
+        const event: AttackEvent = {
+            hitRate: this.hitRate,
+            critRate: this.critRate,
+            attacker: this,
+            receiver: this.opponent,
+            amount: power,
+            type: damageType,
+            damageSource: weapon
+        }
+        this.allEffects.forEach(effect => effect.beforeAttack?.(event));
+        if (Math.random() < event.hitRate) {
+            this.opponent.calculateDamage(this, event.amount, damageType, weapon);
+        } else {
+            this.allEffects.forEach(effect => effect.onAttackMisses?.());
+        }
+    }
+    calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource) {
+        const event: DamageEvent = {
+            modifier: {
+                flat: 0,
+                multiplier: 1.0
+            },
+            attacker: attacker,
+            receiver: this,
+            amount,
+            type,
+            damageSource
+        }
+        this.allEffects.forEach(p => p.beforeDamageTaken?.(event));
         this.applyResistance(event);
         const final = (event.amount + event.modifier.flat) * event.modifier.multiplier
         this.logger.recordDamageEvent(event, final);
         this.takeDamage(final);
-        this.allEffects.forEach(p => { p.afterDamageTaken?.(event) });
+        this.allEffects.forEach(p => p.afterDamageTaken?.(event));
     }
-    applyResistance(damage: DamageEvent) {
+    private applyResistance(damage: DamageEvent) {
         let partialResistance = 0;
         switch (damage.type) {
             case DamageType.Poison:
@@ -53,10 +82,16 @@ export class BattleCharacter extends BattleCharacterData {
         }
         damage.modifier.multiplier *= (1.0 - partialResistance) * (1.0 - this.allResistance);
     }
-    takeDamage(damage: number): void {
-        this.hp -= Math.max(damage, 0);
+    private takeDamage(damage: number): void {
+        damage = Math.max(damage, 0);
+        const remaining = damage - this.shield;
+        this.shield -= Math.min(damage, this.shield)
+        this.hp -= remaining;
     }
 
+    hasStatus(id: string): boolean {
+        return !!this.statuses.find(s => s.id === id);
+    }
     getStatus(id: string): Status | undefined {
         return this.statuses.find(s => s.id === id);
     }
@@ -79,7 +114,7 @@ export class BattleCharacter extends BattleCharacterData {
         }
     }
     afterStatusChange(event: StatusChangeEvent) {
-        this.allEffects.forEach(p => { p.afterStatusChange?.(event) });
+        this.allEffects.forEach(p => p.afterStatusChange?.(event));
         const beforeStack = event.status.stack - event.delta;
         const afterStack = event.status.stack
         event.status.stack = afterStack;
@@ -88,6 +123,7 @@ export class BattleCharacter extends BattleCharacterData {
 
     onEffectToggle(effect: BaseEffect) {
         this.logger.recordEffectToggleEvent(effect)
+        this.allEffects.forEach(p => p.onAnyEffectToggle?.(effect));
     }
     onStatusToggle(status: Status) { }
 }

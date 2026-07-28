@@ -11,7 +11,7 @@ export type StatIdType =
     | "physicalResistance"
     | "poisonResistance"
     | "critRate"
-    | "accuracy"
+    | "hitRate"
     | "evasion"
     | "attackSpeed"
     | "totalSpeed";
@@ -35,7 +35,7 @@ export class BattleCharacterData {
     _poisonResistance: number = 0.0;
 
     _critRate: number = 0.0;
-    _accuracy: number = 1.0;
+    _hitRate: number = 1.0;
     _evasion: number = 1.0;
     _attackSpeed: number = 1.0;
     _totalSpeed: number = 1.0;
@@ -63,8 +63,8 @@ export class BattleCharacterData {
     set poisonResistance(value: number) { this.setStat("poisonResistance", value); }
     get critRate() { return this._critRate; }
     set critRate(value: number) { this.setStat("critRate", value); }
-    get accuracy() { return this._accuracy; }
-    set accuracy(value: number) { this.setStat("accuracy", value); }
+    get hitRate() { return this._hitRate; }
+    set hitRate(value: number) { this.setStat("hitRate", value); }
     get evasion() { return this._evasion; }
     set evasion(value: number) { this.setStat("evasion", value); }
     get attackSpeed() { return this._attackSpeed; }

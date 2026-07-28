@@ -1,8 +1,4 @@
-import { BattleCharacter } from "./BattleCharacter.js"
-import { DamageType } from "../enum/DamageType.js";
-import { EventType } from "../enum/EventType.js";
-import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
-import { Passive } from "./Passive.js";
+import type { DamageEvent, StatusChangeEvent } from "./Event.js";
 import { Status } from "./Status.js";
 import type { BattleManager } from "./BattleManager.js";
 import type { BaseEffect } from "./BaseEffect.js";
@@ -103,6 +99,18 @@ export class BattleLogger {
             target: character.index,
             statId,
             value: character[statId]
+        }
+        this.battleLog.push(log);
+    }
+
+    recordEffectStackChangeEvent(effect: BaseEffect) {
+        const log: BattleLog = {
+            time: this.getTime(),
+            eventType: "stat_change",
+            target: effect.owner.index,
+            statId: effect.id,
+            value: effect.stack !== null ? effect.stack : -1,
+            equipmentSlot: effect.index
         }
         this.battleLog.push(log);
     }

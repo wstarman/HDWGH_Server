@@ -1,9 +1,6 @@
-import { DamageType } from "../enum/DamageType.js";
 import type { BattleCharacter } from "./BattleCharacter.js";
-import { Status, StatusNames as StatusName } from "./Status.js";
-import { Events, type DamageEvent, type StatusChangeEvent } from "./Event.js";
+import { Status, StatusName as StatusName } from "./Status.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
-import { StatusChangeReason } from "../enum/StatusChange.js";
 
 interface PassiveDef extends BaseEffectDef {
 }
@@ -63,7 +60,7 @@ const passiveDefs: Record<string, PassiveDef> = {
         },
         everyTick() {
             if (!this.enabled) return;
-            if (this.owner.getStatus(StatusName.poisoning)) {
+            if (this.owner.hasStatus(StatusName.poisoning)) {
                 this.temp1! += 0.001
             }
             if (this.temp1! >= 1) {
