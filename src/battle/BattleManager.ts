@@ -1,9 +1,6 @@
-import { Character } from "./Character.js"
-import { DamageType } from "./enum/DamageType.js";
-import { EventType } from "./enum/EventType.js";
-import type { DamageEvent, Events, StatusChangeEvent } from "./Event.js";
-import { Passive } from "./Passive.js";
-import { Status, type EffectContext } from "./Status.js";
+import { BattleCharacter } from "./BattleCharacter.js"
+import { type EffectContext } from "./Status.js";
+import { BattleLogger } from "./BattleLogger.js"
 
 export interface CharacterData {
     weaponid: string;
@@ -15,100 +12,9 @@ export interface BattleContext {
     logger: BattleLogger;
 }
 
-export interface BattleLog {
-    time: number;
-    eventType: string;
-
-    attacker?: number;
-    receiver?: number;
-    damage?: number;
-    damageType?: string;
-
-    owner?: number;
-    statusId?: string;
-    beforeStack?: number;
-    afterStack?: number;
-    delta?: number;
-    reason?: string;
-
-
-
-    sourceType?: string;
-    sourceObjectType?: string;
-    sourceId?: string;
-    equipmentSlot?: number;
-}
-
-export class BattleLogger {
-    BattleLog: BattleLog[] = [];
-
-    constructor(private readonly getTime: () => number) { }
-
-    recordDamageEvent(event: DamageEvent, final: number) {
-
-        let srcType: string = "error";
-        let srcOT: string = "error";
-        let srcId: string = "error";
-
-        if (event.damageSource instanceof Status) {
-            srcType = "status";
-            srcOT = "status";
-            srcId = event.damageSource.id;
-        }
-
-        const log: BattleLog = {
-            time: this.getTime(),
-            eventType: "damage",
-            attacker: event.attacker.index,
-            receiver: event.receiver.index,
-            damage: final,
-            damageType: event.type,
-            sourceType: srcType,
-            sourceObjectType: srcOT,
-            sourceId: srcId
-        }
-
-        this.BattleLog.push(log);
-    }
-
-    recordStatusChangeEvent(event: StatusChangeEvent, before: number, after: number) {
-
-        let srcType: string = "error";
-        let srcOT: string = "error";
-        let srcId: string = "error";
-
-        if (event.changeSource instanceof Status) {
-            srcType = "status";
-            srcOT = "status";
-            srcId = event.changeSource.id;
-        }
-        else if (event.changeSource instanceof Passive) {
-            srcType = "passive";
-            srcOT = "passive";
-            srcId = event.changeSource.id;
-        }
-
-        const log: BattleLog = {
-            time: this.getTime(),
-            eventType: "status_stack_change",
-            owner: event.holder.index,
-            statusId: event.status.id,
-            beforeStack: before,
-            afterStack: after,
-            delta: after - before,
-            reason: event.reason,
-            sourceType: srcType,
-            sourceObjectType: srcOT,
-            sourceId: srcId,
-        }
-
-        this.BattleLog.push(log);
-    }
-}
-
 export class BattleManager {
-    player: Character;
-    enemy: Character;
+    player: BattleCharacter;
+    enemy: BattleCharacter;
     battleLogger: BattleLogger
     tickTime: number = 0.001
 
@@ -126,8 +32,8 @@ export class BattleManager {
             logger: this.battleLogger
         }
 
-        this.player = new Character(battleContext, 0, player.weaponid, player.statusid, player.passiveid);
-        this.enemy = new Character(battleContext, 1);
+        this.player = new BattleCharacter(battleContext, 0, player.weaponid, player.statusid, player.passiveid);
+        this.enemy = new BattleCharacter(battleContext, 1);
     }
 
     run(): void {
@@ -145,7 +51,7 @@ export class BattleManager {
                 this.record_attack(elapsedTime, 0, 1, this.Player, this.Enemy);
             }*/
 
-            this.player.Update(ctx);
+            this.player.update(ctx);
 
             if (this.check_ending()) {
                 break;
