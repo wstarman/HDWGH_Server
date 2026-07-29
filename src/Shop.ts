@@ -1,14 +1,13 @@
-import CurseData from "./Curse.json" with {type: "json"}
-import EqData from "./Equipment.json" with {type: "json"}
+import CurseData from "./curses.json" with {type: "json"}
+import EqData from "./equipments.json" with {type: "json"}
 
-
-interface GradeChance {
-    basic: number,
-    mid: number,
-    advanced: number
+enum ItemGrade {
+    Low = "low",
+    Mid = "mid",
+    High = "high"
 }
 
-type ItemGrade = "basic" | "mid" | "advanced";
+type GradeChance = Record<ItemGrade, number>;
 
 interface EquipmentDTO {
     id: string;
@@ -20,7 +19,7 @@ interface ShopDrawResult {
 }
 
 export class Shop {
-    static draw(round: number): ShopDrawResult {
+    static draw(character: string, round: number): ShopDrawResult {
         let ShopCurseList: EquipmentDTO[][] = [];
         let ShopEqList: EquipmentDTO[][] = [];
 
@@ -32,10 +31,40 @@ export class Shop {
             while (CurseSelected.length < 3) {
                 const grade = Shop.selectGrade(round);
 
-                let CurseRoll = Math.floor(Math.random() * this.EQUIPMENT_TABLE[grade].length)
+                let selected: string | undefined;
+
+                if(this.SIGNATURE_CURSE_TABLE[character] === undefined){
+                    throw new Error("No Signature Table");
+                }
+
+                if (this.SIGNATURE_CURSE_TABLE[character][grade].length === 0) {
+                    let CurseRoll = Math.floor(Math.random() * this.CURSE_TABLE[grade].length)
+
+                    selected = this.CURSE_TABLE[grade][CurseRoll];
+                }
+                else if (this.CURSE_TABLE[grade].length === 0) {
+                    let CurseRoll = Math.floor(Math.random() * this.SIGNATURE_CURSE_TABLE[character][grade].length)
+
+                    selected = this.SIGNATURE_CURSE_TABLE[character][grade][CurseRoll];
+                }
+                else {
+                    const isSig: number = Math.floor(Math.random() * 2);
+
+                    if (isSig) {
+                        let CurseRoll = Math.floor(Math.random() * this.SIGNATURE_CURSE_TABLE[character][grade].length)
+
+                        selected = this.SIGNATURE_CURSE_TABLE[character][grade][CurseRoll];
+                    }
+                    else {
+                        let CurseRoll = Math.floor(Math.random() * this.CURSE_TABLE[grade].length)
+
+                        selected = this.CURSE_TABLE[grade][CurseRoll];
+                    }
+                }
 
 
-                const selected = this.CURSE_TABLE[grade][CurseRoll];
+
+
                 if (selected/* && !selectedCurseIds.has(selected)*/) {
                     //selectedCurseIds.add(selected);
                     CurseSelected.push({ id: selected });
@@ -46,16 +75,42 @@ export class Shop {
         }
 
         // Equipment
-
         for (let i = 0; i < 3; i++) {
             let EqSelected: EquipmentDTO[] = [];
             while (EqSelected.length < 3) {
                 const grade = Shop.selectGrade(round);
 
-                let EqRoll = Math.floor(Math.random() * this.EQUIPMENT_TABLE[grade].length)
+                let selected: string | undefined;
 
+                if(this.SIGNATURE_EQUIPMENT_TABLE[character] === undefined){
+                    throw new Error("No Signature Table");
+                }
 
-                const selected = this.EQUIPMENT_TABLE[grade][EqRoll];
+                if (this.SIGNATURE_EQUIPMENT_TABLE[character][grade].length === 0) {
+                    let EqRoll = Math.floor(Math.random() * this.EQUIPMENT_TABLE[grade].length)
+
+                    selected = this.EQUIPMENT_TABLE[grade][EqRoll];
+                }
+                else if (this.EQUIPMENT_TABLE[grade].length === 0) {
+                    let EqRoll = Math.floor(Math.random() * this.SIGNATURE_EQUIPMENT_TABLE[character][grade].length)
+
+                    selected = this.SIGNATURE_EQUIPMENT_TABLE[character][grade][EqRoll];
+                }
+                else {
+                    const isSig: number = Math.floor(Math.random() * 2);
+
+                    if (isSig) {
+                        let EqRoll = Math.floor(Math.random() * this.SIGNATURE_EQUIPMENT_TABLE[character][grade].length)
+
+                        selected = this.SIGNATURE_EQUIPMENT_TABLE[character][grade][EqRoll];
+                    }
+                    else {
+                        let EqRoll = Math.floor(Math.random() * this.EQUIPMENT_TABLE[grade].length)
+
+                        selected = this.EQUIPMENT_TABLE[grade][EqRoll];
+                    }
+                }
+
                 if (selected) {
                     EqSelected.push({ id: selected });
                 }
@@ -82,11 +137,13 @@ export class Shop {
 
         let total = 0;
 
-        for (const [grade, value] of Object.entries(chance)) {
+        for (const grade of Object.values(ItemGrade)) {
+            const value = chance[grade];
+
             total += value;
 
             if (roll < total) {
-                return grade as ItemGrade;
+                return grade;
             }
         }
 
@@ -95,68 +152,115 @@ export class Shop {
         );
     }
 
+    static checkDraw(round: number, com_table: Record<ItemGrade, string[]>, sig_table: Record<ItemGrade, string[]>): boolean {
+        const chance = this.CHANCE_TABLE[round];
+
+        if (!chance) return false;
+
+        for (const [grade, value] of Object.entries(chance)) {
+            if (value <= 0) continue;
+
+            if (!isItemGrade(grade)) continue;
+
+            if (com_table[grade].length > 0 ||
+                sig_table[grade].length > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     static readonly CHANCE_TABLE: Record<number, GradeChance> = {
         1: {
-            basic: 100,
-            mid: 0,
-            advanced: 0
+            [ItemGrade.Low]: 100,
+            [ItemGrade.Mid]: 0,
+            [ItemGrade.High]: 0
         },
         2: {
-            basic: 80,
-            mid: 20,
-            advanced: 0
+            [ItemGrade.Low]: 80,
+            [ItemGrade.Mid]: 20,
+            [ItemGrade.High]: 0
         },
         3: {
-            basic: 60,
-            mid: 30,
-            advanced: 10
+            [ItemGrade.Low]: 60,
+            [ItemGrade.Mid]: 30,
+            [ItemGrade.High]: 10
         },
         4: {
-            basic: 40,
-            mid: 40,
-            advanced: 20,
+            [ItemGrade.Low]: 40,
+            [ItemGrade.Mid]: 40,
+            [ItemGrade.High]: 20
         },
         5: {
-            basic: 20,
-            mid: 50,
-            advanced: 30,
+            [ItemGrade.Low]: 20,
+            [ItemGrade.Mid]: 50,
+            [ItemGrade.High]: 30
         },
         6: {
-            basic: 0,
-            mid: 60,
-            advanced: 40,
+            [ItemGrade.Low]: 0,
+            [ItemGrade.Mid]: 60,
+            [ItemGrade.High]: 40
         },
     };
 
+    static SIGNATURE_CURSE_TABLE: Record<string, Record<ItemGrade, string[]>> = {}
+
     static CURSE_TABLE: Record<ItemGrade, string[]> = {
-        basic: [],
-        mid: [],
-        advanced: [],
+        [ItemGrade.Low]: [],
+        [ItemGrade.Mid]: [],
+        [ItemGrade.High]: []
     };
 
+    static SIGNATURE_EQUIPMENT_TABLE: Record<string, Record<ItemGrade, string[]>> = {}
+
     static EQUIPMENT_TABLE: Record<ItemGrade, string[]> = {
-        basic: [],
-        mid: [],
-        advanced: [],
+        [ItemGrade.Low]: [],
+        [ItemGrade.Mid]: [],
+        [ItemGrade.High]: []
     };
 
     static {
-        Object.entries(CurseData as Record<ItemGrade, string[]>).forEach(([grade, curselist]) => {
-            if (!isItemGrade(grade)) return;
+        CurseData.forEach(curse => {
+            if (!isItemGrade(curse.grade)) return;
 
+            if (curse.characters.length) {
+                curse.characters.forEach(character => {
+                    this.SIGNATURE_CURSE_TABLE[character] ??= {
+                        [ItemGrade.Low]: [],
+                        [ItemGrade.Mid]: [],
+                        [ItemGrade.High]: []
+                    };
 
-            this.CURSE_TABLE[grade] = curselist;
+                    this.SIGNATURE_CURSE_TABLE[character][curse.grade as ItemGrade].push(curse.id);
+                })
+            }
+            else {
+                this.CURSE_TABLE[curse.grade as ItemGrade].push(curse.id);
+            }
         });
 
-        Object.entries(EqData as Record<ItemGrade, string[]>).forEach(([grade, eqlist]) => {
-            if (!isItemGrade(grade)) return;
+        EqData.forEach(equipment => {
+            if (!isItemGrade(equipment.grade)) return;
 
+            if (equipment.characters.length) {
+                equipment.characters.forEach(character => {
+                    this.SIGNATURE_EQUIPMENT_TABLE[character] ??= {
+                        [ItemGrade.Low]: [],
+                        [ItemGrade.Mid]: [],
+                        [ItemGrade.High]: []
+                    };
 
-            this.EQUIPMENT_TABLE[grade] = eqlist;
+                    this.SIGNATURE_EQUIPMENT_TABLE[character][equipment.grade as ItemGrade].push(equipment.id);
+                })
+            }
+            else {
+                this.EQUIPMENT_TABLE[equipment.grade as ItemGrade].push(equipment.id);
+            }
         });
     }
 }
 
 function isItemGrade(key: string): key is ItemGrade {
-    return ["basic", "mid", "advanced"].includes(key);
+    return Object.values(ItemGrade).includes(key as ItemGrade);
 }
