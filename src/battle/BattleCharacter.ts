@@ -27,8 +27,8 @@ export class BattleCharacter extends BattleCharacterData {
             if (id in weaponDefs) {
                 this.allEffects.push(new Weapon(this, id, i));
             } else {
-                if (!(equipmentDefs[id]?.isUnique && (id in uniquiItemSet))) {
-                    uniquiItemSet.add(id);
+                if (!(equipmentDefs[id]?.isUnique && uniquiItemSet.has(id))) {
+                    uniquiItemSet.add(id)
                     this.allEffects.push(new Equipment(this, id, i));
                 }
             }

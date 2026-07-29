@@ -75,7 +75,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
             if (event.damageSource instanceof Weapon) {
                 this.stack += 1;
                 if (this.stack >= 4) {
-                    this.attack(this.damage, this.hitRate, this.owner.stamina / 2);
+                    this.attack(this.damage, this.hitRate, this.staminaCost / 2);
                     this.stack -= 4;
                 }
             }
