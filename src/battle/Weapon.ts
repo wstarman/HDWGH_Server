@@ -2,7 +2,7 @@ import type { BattleCharacter } from "./BattleCharacter.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
 import { DamageType } from "../enum/DamageType.js";
 import { Equipment, type EquipmentDef } from "./Equipment.js";
-import weaponData from "../../../../assets/text/weapons.json" with { type: "json" };
+import weaponData from "../data/weapons.json" with { type: "json" };
 import { StatusName } from "./Status.js";
 
 interface WeaponDef extends EquipmentDef {

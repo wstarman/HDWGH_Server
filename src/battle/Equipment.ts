@@ -1,6 +1,6 @@
 import type { BattleCharacter } from "./BattleCharacter.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
-import equipmentData from "../../../../assets/text/equipments.json" with { type: "json" };
+import equipmentData from "../data/equipments.json" with { type: "json" };
 import { StatusName } from "./Status.js";
 import { Weapon } from "./Weapon.js";
 

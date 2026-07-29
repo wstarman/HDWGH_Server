@@ -1,5 +1,5 @@
-import CurseData from "./curses.json" with {type: "json"}
-import EqData from "./equipments.json" with {type: "json"}
+import CurseData from "./data/curses.json" with {type: "json"}
+import EqData from "./data/equipments.json" with {type: "json"}
 
 enum ItemGrade {
     Low = "low",
@@ -33,7 +33,7 @@ export class Shop {
 
                 let selected: string | undefined;
 
-                if(this.SIGNATURE_CURSE_TABLE[character] === undefined){
+                if (this.SIGNATURE_CURSE_TABLE[character] === undefined) {
                     throw new Error("No Signature Table");
                 }
 
@@ -82,7 +82,7 @@ export class Shop {
 
                 let selected: string | undefined;
 
-                if(this.SIGNATURE_EQUIPMENT_TABLE[character] === undefined){
+                if (this.SIGNATURE_EQUIPMENT_TABLE[character] === undefined) {
                     throw new Error("No Signature Table");
                 }
 

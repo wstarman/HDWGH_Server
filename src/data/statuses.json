@@ -1,0 +1,18 @@
+[
+    {
+        "id": "poison",
+        "icon_name": "poison",
+        "english_name": "poison",
+        "chinese_name": "中毒",
+        "english_description": "",
+        "chinese_description": "每秒造成層數*1點傷害"
+    },
+    {
+        "id": "dizzy",
+        "icon_name": "poison",
+        "english_name": "poison",
+        "chinese_name": "昏厥",
+        "english_description": "",
+        "chinese_description": "道具暫停觸發1秒"
+    }
+]

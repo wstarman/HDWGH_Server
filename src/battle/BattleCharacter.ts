@@ -113,7 +113,6 @@ export class BattleCharacter extends BattleCharacterData {
         let multiplier = this.allDamageTakenMultiplier;
         if (damage.damageSource instanceof Weapon) {
             multiplier *= this.weaponDamageTakenMultiplier;
-            console.log("Weapon Damage!")
         }
         switch (damage.type) {
             case DamageType.Poison:
