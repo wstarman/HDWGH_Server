@@ -133,7 +133,7 @@ app.get("/shop", async (req, res) => {
         return res.status(404).json({ error: "Game data not found" });
     }
 
-    const drawnItems = Shop.draw(game.round);
+    const drawnItems = Shop.draw(game.character_id, game.round);
 
     res.json({
         data: {
