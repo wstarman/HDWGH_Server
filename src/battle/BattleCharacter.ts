@@ -42,7 +42,7 @@ export class BattleCharacter extends BattleCharacterData {
         });
     }
 
-    attack(weapon: Weapon, power: number = weapon.power, damageType = weapon.damageType) {
+    attack(weapon: Weapon, power: number = weapon.damage, damageType = weapon.damageType) {
         const event: AttackEvent = {
             hitRate: this.hitRate,
             critRate: this.critRate,
