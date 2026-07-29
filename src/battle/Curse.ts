@@ -19,15 +19,18 @@ const curseDefs: Record<string, CurseDef> = {
         攻擊miss後清除所有感官過載 
      */
     "overbright_eyes": {
+        beforeStart() {
+            this.stack = 0;
+        },
         onAnyEffectToggle(effect) {
             if (!effect.hasTag("drug")) return;
-            this.addStack(1);
+            this.stack += 1;
         },
         beforeAttack(event) {
-            event.hitRate -= this.getStackNumber() * 0.1;
+            event.hitRate -= this.stack * 0.1;
         },
-        onAttackMisses() {
-            this.clearStack();
+        onAttackMiss() {
+            this.stack = 0;
         },
     },
     /**
@@ -37,13 +40,14 @@ const curseDefs: Record<string, CurseDef> = {
      */
     "hollow_vessel": {
         beforeStart() {
+            this.stack = 0;
             this.temp1 = 5;
             this.timer = 3;
         },
         afterStatusChange(event) {
             if (event.status.id == StatusName.poison && event.delta < 0 && this.timer > 3) {
-                this.addStack(-event.delta);
-                if (this.getStackNumber() >= this.temp1) {
+                this.stack -= event.delta;
+                if (this.stack >= this.temp1) {
                     this.timer = 0;
                     this.temp1 += 10;
                     this.owner.addStatus(StatusName.dizzy, 1);

@@ -6,6 +6,9 @@ import type { Status } from "./Status.js";
 export type StatIdType =
     | "maxHp"
     | "hp"
+    | "stamina"
+    | "maxStamina"
+    | "staminaRecover"
     | "shield"
     | "allResistance"
     | "physicalResistance"
@@ -30,6 +33,9 @@ export class BattleCharacterData {
     // Combat Stat
     _maxHp: number = 100.0;
     _hp: number = 100.0;
+    _maxStamina: number = 10.0;
+    _stamina: number = 10.0;
+    _staminaRecover: number = 1.0;
     _shield: number = 0.0;
     _allResistance: number = 0.0;
     _physicalResistance: number = 0.0;
@@ -54,6 +60,12 @@ export class BattleCharacterData {
     set maxHp(value: number) { this.setStat("maxHp", value) }
     get hp() { return this._hp; }
     set hp(value: number) { this.setStat("hp", value); }
+    get maxStamina() { return this._maxStamina; }
+    set maxStamina(value: number) { this.setStat("maxStamina", value); }
+    get stamina() { return this._stamina; }
+    set stamina(value: number) { this.setStat("stamina", value); }
+    get staminaRecover() { return this._staminaRecover; }
+    set staminaRecover(value: number) { this.setStat("staminaRecover", value); }
     get shield() { return this._shield; }
     set shield(value: number) { this.setStat("shield", value); }
     get allResistance() { return this._allResistance; }

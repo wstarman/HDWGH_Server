@@ -62,10 +62,10 @@ const passiveDefs: Record<string, PassiveDef> = {
                 this.timer = 0;
             }
         },
-        everyTick() {
+        everyTick(deltaTime) {
             if (!this.enabled) return;
             if (this.owner.hasStatus(StatusName.poison)) {
-                this.temp1! += 0.001
+                this.temp1! += deltaTime
             }
             if (this.temp1! >= 1) {
                 this.owner.attackSpeed -= 0.3;

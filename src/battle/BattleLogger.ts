@@ -120,7 +120,7 @@ export class BattleLogger {
             eventType: "stat_change",
             target: effect.owner.index,
             statId: effect.id,
-            value: effect.stack !== null ? effect.stack : -1,
+            value: effect.stack < 0 ? effect.stack : -1,
             equipmentSlot: effect.index
         }
         this.battleLog.push(log);

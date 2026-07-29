@@ -4,15 +4,29 @@ import { type AttackEvent, type DamageEvent, type StatusChangeEvent } from "./Ev
 import { StatusName } from "./Status.js";
 
 interface EffectCallbacks {
-    everyTick?(this: BaseEffect): void;
+    // 每一個tick，用於驅動臨時計時器或檢測狀態
+    everyTick?(this: BaseEffect, deltaTime: number): void;
+    // 在onStart之前，通常用於給自己上狀態或加基礎數值
     beforeStart?(this: BaseEffect): void;
+    // 戰鬥開始瞬間，用於開場就會攻擊或干擾對面的裝備等
     onStart?(this: BaseEffect): void;
+    // 計時器達到 triggerInterval 時，也用於武器攻擊
     onTrigger?(this: BaseEffect): void;
+    // 自身的攻擊開始前，用於改變命中率等
     beforeAttack?(this: BaseEffect, event: AttackEvent): void;
-    onAttackMisses?(this: BaseEffect): void;
+    // 攻擊命中時，用於給攻擊附加效果和改變傷害。
+    onAttackHit?(this: BaseEffect, event: AttackEvent): void;
+    // 攻擊未命中時
+    onAttackMiss?(this: BaseEffect): void;
+    // 對方攻擊未命中時，會接在對方的onAttackMisses之後
+    onDodge?(this: BaseEffect): void;
+    // 自身受到的傷害計算前，被攻擊時會在對手的onAttackHit之後，可在此改變受到的傷害
     beforeDamageTaken?(this: BaseEffect, event: DamageEvent): void;
+    // 受到傷害後
     afterDamageTaken?(this: BaseEffect, event: DamageEvent): void;
+    // 異常狀態層數改變後，包含新增或移除
     afterStatusChange?(this: BaseEffect, event: StatusChangeEvent): void;
+    // 任何效果觸發時，通常會在該效果處理之前，且僅包含主動觸發效果
     onAnyEffectToggle?(this: BaseEffect, effect: BaseEffect): void;
 }
 
@@ -20,7 +34,7 @@ export interface BaseEffectDef extends EffectCallbacks {
     triggerInterval?: number;
     index?: number;
     persistent?: boolean;
-    tags?: string;
+    tags?: Array<string>;
 }
 
 export abstract class BaseEffect {
@@ -31,15 +45,23 @@ export abstract class BaseEffect {
     private _enabled: boolean = false;
     timer = 0;
     triggerInterval = Infinity;
-    _stack: number | null = null; // 會顯示在前端的通用暫時變數
+    _stack: number = -1; // 會顯示在前端的通用暫時變數，為負數時不顯示
     tags: Array<string> = [];
+
+    damage: number = 0;
+    staminaCost: number = 0;
+    damageType: DamageType = DamageType.Physical;
+    hitRate: number = 1.0;
     temp1 = 0;
 
+    everyTick?: EffectCallbacks["everyTick"];
     beforeStart?: EffectCallbacks["beforeStart"];
     onStart?: EffectCallbacks["onStart"];
     onTrigger?: EffectCallbacks["onTrigger"];
     beforeAttack?: EffectCallbacks["beforeAttack"];
-    onAttackMisses?: EffectCallbacks["onAttackMisses"];
+    onAttackHit?: EffectCallbacks["onAttackHit"];
+    onAttackMiss?: EffectCallbacks["onAttackMiss"];
+    onDodge?: EffectCallbacks["onDodge"];
     beforeDamageTaken?: EffectCallbacks["beforeDamageTaken"];
     afterDamageTaken?: EffectCallbacks["afterDamageTaken"];
     afterStatusChange?: EffectCallbacks["afterStatusChange"];
@@ -61,36 +83,34 @@ export abstract class BaseEffect {
         this._stack = value;
         this.owner.logger.recordEffectStackChangeEvent(this);
     }
-    addStack(value: number) {
-        if (this.stack === null) {
-            this.stack = value;
-        } else {
-            this.stack += value;
-        }
-    }
-    clearStack() {
-        this.stack = null;
-    }
-    getStackNumber() {
-        return this._stack !== null ? this._stack : 0;
-    }
 
     protected toggue() {
         this.owner.onEffectToggle(this);
     }
 
     update(deltaTime: number): void {
-        if (this.owner.hasStatus(StatusName.dizzy))
-            return;
-        this.timer += deltaTime;
-        if (this.timer >= this.triggerInterval) {
-            this.timer -= this.triggerInterval;
-            this.onTrigger?.();
+        if (!this.owner.hasStatus(StatusName.dizzy)) {
+            this.timer += deltaTime;
+            if (this.timer >= this.triggerInterval) {
+                this.timer -= this.triggerInterval;
+                this.onTrigger?.();
+            }
         }
+        this.everyTick?.(deltaTime);
     }
 
     hasTag(tag: string): boolean {
         return this.tags.includes(tag);
+    }
+
+    attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): boolean {
+        if (this.owner.stamina >= staminaCost) {
+            this.toggue();
+            this.owner.stamina -= staminaCost;
+            this.owner.attack(this, damage, hitRate);
+            return true;
+        }
+        return false;
     }
 }
 

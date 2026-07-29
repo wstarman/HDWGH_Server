@@ -14,8 +14,6 @@ export class BattleCharacter extends BattleCharacterData {
         this.battleManager = manager;
         this.index = index;
         this.id = cid;
-        this.maxHp = 100.0;
-        this.hp = 100.0;
         characterPassive[cid]?.forEach(id => {
             this.allEffects.push(new Passive(this, id));
         })
@@ -34,6 +32,7 @@ export class BattleCharacter extends BattleCharacterData {
         this.allEffects.forEach(effect => { effect.onStart?.() });
     }
     update(): void {
+        this.stamina += Math.min(this.maxStamina - this.stamina, this.staminaRecover / this.battleManager.tickTime);
         this.statuses.forEach(status => {
             status.update(this.totalSpeed * this.battleManager.tickTime);
         });
@@ -42,21 +41,23 @@ export class BattleCharacter extends BattleCharacterData {
         });
     }
 
-    attack(weapon: Weapon, power: number = weapon.damage, damageType = weapon.damageType) {
+    attack(weapon: Weapon, damage: number = weapon.damage, baseHitRate = 1.0, damageType = weapon.damageType) {
         const event: AttackEvent = {
-            hitRate: this.hitRate,
+            hitRate: this.hitRate * baseHitRate,
             critRate: this.critRate,
             attacker: this,
             receiver: this.opponent,
-            amount: power,
+            amount: damage,
             type: damageType,
             damageSource: weapon
         }
         this.allEffects.forEach(effect => effect.beforeAttack?.(event));
         if (Math.random() < event.hitRate) {
+            this.allEffects.forEach(effect => effect.onAttackHit?.(event));
             this.opponent.calculateDamage(this, event.amount, damageType, weapon);
         } else {
-            this.allEffects.forEach(effect => effect.onAttackMisses?.());
+            this.allEffects.forEach(effect => effect.onAttackMiss?.());
+            this.opponent.allEffects.forEach(effect => effect.onDodge?.())
         }
     }
     calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource) {
