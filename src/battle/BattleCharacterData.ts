@@ -40,10 +40,10 @@ export class BattleCharacterData {
     _staminaRecover: number = 1.0;
     _shield: number = 0.0;
 
-    _allDamageTakenMultiplier: number = 0.0;
-    _weaponDamageTakenMultiplier: number = 0.0;
-    _physicalDamageTakenMultiplier: number = 0.0;
-    _poisonDamageTakenMultiplier: number = 0.0;
+    _allDamageTakenMultiplier: number = 1.0;
+    _weaponDamageTakenMultiplier: number = 1.0;
+    _physicalDamageTakenMultiplier: number = 1.0;
+    _poisonDamageTakenMultiplier: number = 1.0;
 
     _attackPower: number = 1.0;
     _critRate: number = 0.0;
