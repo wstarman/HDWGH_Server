@@ -20,7 +20,7 @@ const passiveDefs: Record<string, PassiveDef> = {
      * 開場自帶5層毒在身上*/
     "drug_residue": {
         onStart() {
-            this.toggue();
+            this.toggle();
             this.owner.addStatus("poison", 5);
         }
     },
@@ -29,14 +29,11 @@ const passiveDefs: Record<string, PassiveDef> = {
      */
     "drug_tolerance": { // 
         triggerInterval: 1,
-        beforeDamageTaken(damageEvent) {
-            this.toggue();
-            if (damageEvent.damageSource instanceof Status && damageEvent.damageSource.id == "poison") {
-                damageEvent.modifier.multiplier *= 0.8;
-            }
+        beforeStart() {
+            this.owner.poisonDamageTakenMultiplier *= 0.8;
         },
         onTrigger() {
-            this.toggue();
+            this.toggle();
             const poisonStatus = this.owner.getStatus("poison");
             if (poisonStatus !== undefined) {
                 this.owner.addStatus(StatusName.poison, -2);
@@ -55,27 +52,29 @@ const passiveDefs: Record<string, PassiveDef> = {
         triggerInterval: 1,
         afterStatusChange(event) {
             if (event.status.id == StatusName.poison && event.status.stack == 0) {
-                this.enabled = true;
+                this.toggle(true);
                 this.temp1 = 0;
                 this.owner.attackSpeed += 0.3;
                 this.owner.critRate += 0.2;
-                this.timer = 0;
+                this.mainTimer = 0;
             }
         },
         everyTick(deltaTime) {
             if (!this.enabled) return;
             if (this.owner.hasStatus(StatusName.poison)) {
                 this.temp1! += deltaTime
+            } else {
+                this.temp1 = 0;
             }
             if (this.temp1! >= 1) {
+                this.toggle(false);
                 this.owner.attackSpeed -= 0.3;
                 this.owner.critRate -= 0.2;
-                this.enabled = false;
             }
         },
         onTrigger() {
             if (!this.enabled) return;
-            this.toggue();
+            this.toggle();
             this.owner.shield += 5;
         }
     }

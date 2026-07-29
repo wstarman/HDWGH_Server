@@ -10,9 +10,11 @@ export type StatIdType =
     | "maxStamina"
     | "staminaRecover"
     | "shield"
-    | "allResistance"
-    | "physicalResistance"
-    | "poisonResistance"
+    | "allDamageTakenMultiplier"
+    | "weaponDamageTakenMultiplier"
+    | "physicalDamageTakenMultiplier"
+    | "poisonDamageTakenMultiplier"
+    | "attackPower"
     | "critRate"
     | "hitRate"
     | "evasion"
@@ -37,27 +39,33 @@ export class BattleCharacterData {
     _stamina: number = 10.0;
     _staminaRecover: number = 1.0;
     _shield: number = 0.0;
-    _allResistance: number = 0.0;
-    _physicalResistance: number = 0.0;
-    _poisonResistance: number = 0.0;
 
+    _allDamageTakenMultiplier: number = 0.0;
+    _weaponDamageTakenMultiplier: number = 0.0;
+    _physicalDamageTakenMultiplier: number = 0.0;
+    _poisonDamageTakenMultiplier: number = 0.0;
+
+    _attackPower: number = 1.0;
     _critRate: number = 0.0;
     _hitRate: number = 1.0;
     _evasion: number = 1.0;
     _attackSpeed: number = 1.0;
     _totalSpeed: number = 1.0;
 
+    maxHpGainRate = 1.0;
+
     private setStat<T>(key: StatIdType, value: number): boolean {
         if (this[`_${key}`] !== value) {
             this[`_${key}`] = value;
             this.logger.recordStatChangeEvent(this, key);
+            this.allEffects.forEach(effect => { effect.onStatChange?.(key, value) });
             return true;
         }
         return false;
     }
 
     get maxHp() { return this._maxHp; }
-    set maxHp(value: number) { this.setStat("maxHp", value) }
+    set maxHp(value: number) { value *= this.maxHpGainRate; this.setStat("maxHp", value); }
     get hp() { return this._hp; }
     set hp(value: number) { this.setStat("hp", value); }
     get maxStamina() { return this._maxStamina; }
@@ -68,12 +76,18 @@ export class BattleCharacterData {
     set staminaRecover(value: number) { this.setStat("staminaRecover", value); }
     get shield() { return this._shield; }
     set shield(value: number) { this.setStat("shield", value); }
-    get allResistance() { return this._allResistance; }
-    set allResistance(value: number) { this.setStat("allResistance", value); }
-    get physicalResistance() { return this._physicalResistance; }
-    set physicalResistance(value: number) { this.setStat("physicalResistance", value); }
-    get poisonResistance() { return this._poisonResistance; }
-    set poisonResistance(value: number) { this.setStat("poisonResistance", value); }
+
+    get allDamageTakenMultiplier() { return this._allDamageTakenMultiplier; }
+    set allDamageTakenMultiplier(value: number) { this.setStat("allDamageTakenMultiplier", value); }
+    get weaponDamageTakenMultiplier() { return this._weaponDamageTakenMultiplier; }
+    set weaponDamageTakenMultiplier(value: number) { this.setStat("weaponDamageTakenMultiplier", value); }
+    get physicalDamageTakenMultiplier() { return this._physicalDamageTakenMultiplier; }
+    set physicalDamageTakenMultiplier(value: number) { this.setStat("physicalDamageTakenMultiplier", value); }
+    get poisonDamageTakenMultiplier() { return this._poisonDamageTakenMultiplier; }
+    set poisonDamageTakenMultiplier(value: number) { this.setStat("poisonDamageTakenMultiplier", value); }
+
+    get attackPower() { return this._attackPower; }
+    set attackPower(value: number) { this.setStat("attackPower", value); }
     get critRate() { return this._critRate; }
     set critRate(value: number) { this.setStat("critRate", value); }
     get hitRate() { return this._hitRate; }

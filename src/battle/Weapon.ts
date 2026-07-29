@@ -13,7 +13,7 @@ interface WeaponDef extends EquipmentDef {
 }
 
 export class Weapon extends Equipment {
-    constructor(owner: BattleCharacter, id: string) {
+    constructor(owner: BattleCharacter, id: string, index: number) {
         if (!weaponDataLoaded) {
             for (const weapon of weaponData) {
                 const wid = weapon.id;
@@ -29,13 +29,13 @@ export class Weapon extends Equipment {
             }
             weaponDataLoaded = true;
         }
-        super(owner, id, weaponDefs);
+        super(owner, id, index, weaponDefs);
     }
 
 }
 
 let weaponDataLoaded = false;
-const weaponDefs: Record<string, WeaponDef> = {
+export const weaponDefs: Record<string, WeaponDef> = {
     /**命在弦上
      * 每 1 秒射擊一次，跟俄羅斯輪盤一樣有機會空槍，一直到射中為止。
      * 空槍算正常攻擊，並被標註為 miss。
@@ -56,7 +56,7 @@ const weaponDefs: Record<string, WeaponDef> = {
                 // hit
                 if (this.attack(this.damage, Infinity)) {
                     this.stack = 6;
-                    this.timer = -2;
+                    this.mainTimer = -2;
                 }
             }
         }

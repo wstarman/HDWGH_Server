@@ -11,7 +11,7 @@ export interface BattleLog {
 
     attacker?: number;
     receiver?: number;
-    damage?: number;
+    damage?: number | "miss";
     damageType?: string;
 
     owner?: number;
@@ -46,7 +46,7 @@ export class BattleLogger {
         return this.battleManeger.elapsedTime;
     }
 
-    recordDamageEvent(event: DamageEvent, finalDamage: number) {
+    recordDamageEvent(event: DamageEvent, finalDamage: number | "miss") {
         let srcType: string = "error";
         let srcObjectType: string = "error";
         let srcId: string = "error";

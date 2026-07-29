@@ -42,13 +42,13 @@ const curseDefs: Record<string, CurseDef> = {
         beforeStart() {
             this.stack = 0;
             this.temp1 = 5;
-            this.timer = 3;
+            this.mainTimer = 3;
         },
         afterStatusChange(event) {
-            if (event.status.id == StatusName.poison && event.delta < 0 && this.timer > 3) {
+            if (event.status.id == StatusName.poison && event.delta < 0 && this.mainTimer > 3) {
                 this.stack -= event.delta;
                 if (this.stack >= this.temp1) {
-                    this.timer = 0;
+                    this.mainTimer = 0;
                     this.temp1 += 10;
                     this.owner.addStatus(StatusName.dizzy, 1);
                 }

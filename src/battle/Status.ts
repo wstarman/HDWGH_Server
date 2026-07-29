@@ -25,6 +25,7 @@ export class Status {
     maxStack = Infinity;
     owner: BattleCharacter;
     damageType: DamageType = DamageType.Physical;
+    speed: number = 1.0
 
     private _stack: number = 0;
     get stack(): number { return this._stack; }
@@ -58,6 +59,7 @@ export class Status {
 
     update(deltaTime: number): void {
         if (this.stack == 0) return;
+        deltaTime *= this.speed;
         this.timer += deltaTime;
         if (this.timer >= this.triggerInterval) {
             this.timer -= this.triggerInterval;
@@ -66,7 +68,7 @@ export class Status {
         }
     }
 
-    protected toggue() {
+    protected toggle() {
         this.owner.onStatusToggle(this);
     }
 
@@ -80,7 +82,7 @@ const StatusDefs: Record<string, StatusDef> = {
         triggerInterval: 1,
         damageType: DamageType.Fire,
         onTrigger() {
-            this.toggue();
+            this.toggle();
             const damage = 1 * this.stack;
             this.dealDamageToSelf(damage);
         },

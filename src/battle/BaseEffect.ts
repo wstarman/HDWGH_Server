@@ -1,5 +1,6 @@
 import { DamageType } from "../enum/DamageType.js";
 import type { BattleCharacter } from "./BattleCharacter.js";
+import type { StatIdType } from "./BattleCharacterData.js";
 import { type AttackEvent, type DamageEvent, type StatusChangeEvent } from "./Event.js";
 import { StatusName } from "./Status.js";
 
@@ -28,6 +29,8 @@ interface EffectCallbacks {
     afterStatusChange?(this: BaseEffect, event: StatusChangeEvent): void;
     // 任何效果觸發時，通常會在該效果處理之前，且僅包含主動觸發效果
     onAnyEffectToggle?(this: BaseEffect, effect: BaseEffect): void;
+    // 己方狀態改變時
+    onStatChange?(this: BaseEffect, stat: StatIdType, value: number): void;
 }
 
 export interface BaseEffectDef extends EffectCallbacks {
@@ -35,6 +38,7 @@ export interface BaseEffectDef extends EffectCallbacks {
     index?: number;
     persistent?: boolean;
     tags?: Array<string>;
+    isUnique?: boolean;
 }
 
 export abstract class BaseEffect {
@@ -43,16 +47,21 @@ export abstract class BaseEffect {
     index: number = -1;
     persistent: boolean = false;
     private _enabled: boolean = false;
-    timer = 0;
+    enabled2: boolean = false;
+    mainTimer = 0;
     triggerInterval = Infinity;
     _stack: number = -1; // 會顯示在前端的通用暫時變數，為負數時不顯示
-    tags: Array<string> = [];
+    tags: string[] = [];
 
+    isUniqui: boolean = false;
     damage: number = 0;
     staminaCost: number = 0;
     damageType: DamageType = DamageType.Physical;
     hitRate: number = 1.0;
+    speed: number = 1.0;
+    subTimers: TimerManager = new TimerManager();
     temp1 = 0;
+    temp2 = 0;
 
     everyTick?: EffectCallbacks["everyTick"];
     beforeStart?: EffectCallbacks["beforeStart"];
@@ -66,6 +75,7 @@ export abstract class BaseEffect {
     afterDamageTaken?: EffectCallbacks["afterDamageTaken"];
     afterStatusChange?: EffectCallbacks["afterStatusChange"];
     onAnyEffectToggle?: EffectCallbacks["onAnyEffectToggle"];
+    onStatChange?: EffectCallbacks["onStatChange"];
 
     constructor(owner: BattleCharacter, id: string, deflist: Record<string, BaseEffectDef>) {
         this.owner = owner;
@@ -84,18 +94,25 @@ export abstract class BaseEffect {
         this.owner.logger.recordEffectStackChangeEvent(this);
     }
 
-    protected toggue() {
-        this.owner.onEffectToggle(this);
+    protected toggle(enabled?: boolean) {
+        if (enabled === true) {
+            this.enabled = enabled;
+        } else {
+            enabled = true;
+        }
+        this.owner.onEffectToggle(this, enabled);
     }
 
     update(deltaTime: number): void {
+        deltaTime *= this.speed;
         if (!this.owner.hasStatus(StatusName.dizzy)) {
-            this.timer += deltaTime;
-            if (this.timer >= this.triggerInterval) {
-                this.timer -= this.triggerInterval;
+            this.mainTimer += deltaTime;
+            if (this.mainTimer >= this.triggerInterval) {
+                this.mainTimer -= this.triggerInterval;
                 this.onTrigger?.();
             }
         }
+        this.subTimers.update(deltaTime);
         this.everyTick?.(deltaTime);
     }
 
@@ -105,12 +122,52 @@ export abstract class BaseEffect {
 
     attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): boolean {
         if (this.owner.stamina >= staminaCost) {
-            this.toggue();
+            this.toggle();
             this.owner.stamina -= staminaCost;
             this.owner.attack(this, damage, hitRate);
             return true;
         }
         return false;
+    }
+
+    addTimer(duration: number, callBack: () => void) {
+        this.subTimers.add(duration, callBack);
+    }
+}
+
+class Timer {
+    time = 0;
+    constructor(
+        public duration: number,
+        public callback: () => void
+    ) { }
+}
+class TimerManager {
+    private timers: Timer[] = [];
+    add(duration: number, callback: () => void): Timer {
+        const timer = new Timer(duration, callback);
+        this.timers.push(timer);
+        return timer;
+    }
+    remove(timer: Timer): void {
+        const index = this.timers.indexOf(timer);
+        if (index !== -1) {
+            this.timers.splice(index, 1);
+        }
+    }
+    clear(): void {
+        this.timers.length = 0;
+    }
+    update(deltaTime: number): void {
+        for (let i = this.timers.length - 1; i >= 0; i--) {
+            const timer = this.timers[i];
+            if (!timer) continue;
+            timer.time += deltaTime;
+            if (timer.time >= timer.duration) {
+                this.timers.splice(i, 1);
+                timer.callback();
+            }
+        }
     }
 }
 
