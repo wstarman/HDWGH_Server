@@ -2,6 +2,7 @@ import type { BattleCharacter } from "./BattleCharacter.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
 import equipmentData from "../../../../assets/text/equipments.json" with { type: "json" };
 import { StatusName } from "./Status.js";
+import { Weapon } from "./Weapon.js";
 
 export interface EquipmentDef extends BaseEffectDef {
 }
@@ -94,11 +95,13 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.toggle(false);
                 this.owner.weaponDamageTakenMultiplier /= 0.5;
                 this.owner.addStatus(StatusName.poison, 1);
-                this.owner.takeDamage(this.temp1 * 0.4);
+                this.owner.takeDamage(this.temp1 * 0.8);
             });
         },
         afterDamageTaken(event) {
-            this.temp1 += event.amount;
+            if (event.damageSource instanceof Weapon) {
+                this.temp1 += event.amount;
+            }
         },
     },
     /**過期維他命

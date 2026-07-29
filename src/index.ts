@@ -25,7 +25,37 @@ app.get("/", (_, res) => {
         character_id: "DrugGuy",
         curses: [{ "id": "overbright_eyes" },
         { "id": "hollow_vessel" }],
-        goods: []
+        goods: [
+            { "id": "loaded_fate" },
+            { "id": "rebound_baton" },
+            { "id": "rusty_dagger" },
+            { "id": "pills" },
+            { "id": "bitter_syrup" },
+            { "id": "night_pill" },
+            { "id": "expired_vitamin" },
+            { "id": "recovery_note" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+            { "id": "withdrawal_patch" },
+        ]
     }
 
     let bm: BattleManager = new BattleManager(testCharacter, testCharacter);
