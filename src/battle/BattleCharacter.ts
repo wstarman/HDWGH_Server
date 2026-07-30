@@ -115,8 +115,8 @@ export class BattleCharacter extends BattleCharacterData {
             multiplier *= this.weaponDamageTakenMultiplier;
         }
         switch (damage.type) {
-            case DamageType.Poison:
-                multiplier *= this.poisonDamageTakenMultiplier;
+            case DamageType.Toxic:
+                multiplier *= this.toxicDamageTakenMultiplier;
                 break;
             case DamageType.Physical:
                 multiplier *= this.physicalDamageTakenMultiplier;

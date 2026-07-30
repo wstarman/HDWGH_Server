@@ -92,7 +92,7 @@ const StatusDefs: Record<string, StatusDef> = {
     },
     "poison": {
         triggerInterval: 1,
-        damageType: DamageType.Poison,
+        damageType: DamageType.Toxic,
         onTrigger() {
             const damage = 1 * this.stack
             this.dealDamageToSelf(damage);

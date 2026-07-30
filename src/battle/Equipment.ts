@@ -61,7 +61,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "bitter_syrup": {
         triggerInterval: 3,
         beforeStart() {
-            this.owner.poisonDamageTakenMultiplier *= 0.9;
+            this.owner.toxicDamageTakenMultiplier *= 0.9;
         },
         onStart() {
             this.owner.addStatus(StatusName.poison, 1);

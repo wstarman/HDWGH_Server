@@ -13,7 +13,7 @@ export type StatIdType =
     | "allDamageTakenMultiplier"
     | "weaponDamageTakenMultiplier"
     | "physicalDamageTakenMultiplier"
-    | "poisonDamageTakenMultiplier"
+    | "toxicDamageTakenMultiplier"
     | "attackPower"
     | "critRate"
     | "hitRate"
@@ -43,7 +43,7 @@ export class BattleCharacterData {
     _allDamageTakenMultiplier: number = 1.0;
     _weaponDamageTakenMultiplier: number = 1.0;
     _physicalDamageTakenMultiplier: number = 1.0;
-    _poisonDamageTakenMultiplier: number = 1.0;
+    _toxicDamageTakenMultiplier: number = 1.0;
 
     _attackPower: number = 1.0;
     _critRate: number = 0.0;
@@ -83,8 +83,8 @@ export class BattleCharacterData {
     set weaponDamageTakenMultiplier(value: number) { this.setStat("weaponDamageTakenMultiplier", value); }
     get physicalDamageTakenMultiplier() { return this._physicalDamageTakenMultiplier; }
     set physicalDamageTakenMultiplier(value: number) { this.setStat("physicalDamageTakenMultiplier", value); }
-    get poisonDamageTakenMultiplier() { return this._poisonDamageTakenMultiplier; }
-    set poisonDamageTakenMultiplier(value: number) { this.setStat("poisonDamageTakenMultiplier", value); }
+    get toxicDamageTakenMultiplier() { return this._toxicDamageTakenMultiplier; }
+    set toxicDamageTakenMultiplier(value: number) { this.setStat("toxicDamageTakenMultiplier", value); }
 
     get attackPower() { return this._attackPower; }
     set attackPower(value: number) { this.setStat("attackPower", value); }

@@ -30,7 +30,7 @@ const passiveDefs: Record<string, PassiveDef> = {
     "drug_tolerance": { // 
         triggerInterval: 1,
         beforeStart() {
-            this.owner.poisonDamageTakenMultiplier *= 0.8;
+            this.owner.toxicDamageTakenMultiplier *= 0.8;
         },
         onTrigger() {
             this.toggle();
