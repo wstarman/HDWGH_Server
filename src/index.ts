@@ -144,19 +144,6 @@ app.post("/battle", async (req, res) => {
         equipmets: data.equipmets
     }
 
-    /*const saveCharacter = await prisma.character.create({
-        data: {
-            game_id: game.game_id,
-            round: game.round,
-            data: {
-                character_id: game.character_id,
-                curses: data.curses,
-                goods: data.equipmets
-            }
-        }
-    });*/
-
-
     try {
 
         const [randomCharacter] = await prisma.$queryRaw<Character[]>`
@@ -167,20 +154,53 @@ app.post("/battle", async (req, res) => {
             LIMIT 1;
         `;
 
-        const enemy_data: CharacterInitData = randomCharacter.data;
+        const enemy_data: CharacterInitData = randomCharacter?.data ?? {
+            character_id: "DrugGuy",
+            curses: [],
+            equipmets: []
+        };
 
         //console.log(enemy_data);
 
         const bm: BattleManager = new BattleManager(init_data, enemy_data)
-        const result = bm.run()
+        bm.run()
+
+        let finalHp = game.hp
+
+        if (bm.result == "win") {
+            await prisma.character.create({
+                data: {
+                    game_id: game.game_id,
+                    round: game.round,
+                    data: {
+                        character_id: game.character_id,
+                        curses: data.curses,
+                        equipmets: data.equipmets
+                    }
+                }
+            });
+        }
+        else if (bm.result == "lose") {
+            finalHp -= 1;
+        }
+
+        await prisma.game.update({
+            where: {
+                game_id: uuid,
+            },
+            data: {
+                hp: finalHp,
+                round: game.round + 1
+            }
+        });
 
         res.json({
             data: {
                 player_character: init_data,
                 opponent_character: enemy_data,
                 battlelog: bm.logger.battleLog,
-                battle_result: result,
-                game_result: "win"
+                battle_result: bm.result,
+                game_result: "continue"
             }
         });
     }
