@@ -14,7 +14,7 @@ interface IdObject {
 export interface CharacterInitData {
     character_id: string,
     curses: IdObject[],
-    goods: IdObject[]
+    equipmets: IdObject[]
 }
 
 
@@ -26,7 +26,7 @@ app.get("/", (_, res) => {
         character_id: "DrugGuy",
         curses: [{ "id": "overbright_eyes" },
         { "id": "hollow_vessel" }],
-        goods: [
+        equipmets: [
             { "id": "loaded_fate" },
             { "id": "rebound_baton" },
             { "id": "rusty_dagger" },
@@ -35,26 +35,6 @@ app.get("/", (_, res) => {
             { "id": "night_pill" },
             { "id": "expired_vitamin" },
             { "id": "recovery_note" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
-            { "id": "withdrawal_patch" },
             { "id": "withdrawal_patch" },
         ]
     }
@@ -65,12 +45,14 @@ app.get("/", (_, res) => {
     console.log("Result:", bm.result);
 
     res.json({
-        message: "Battle simulation successfully initialized.",
-        playerhp: bm.player.hp,
-        enemyhp: bm.enemy.hp,
-        result: bm.result,
-        battlelog: bm.logger.battleLog
-    })
+        data: {
+            player_character: testCharacter,
+            opponent_character: testCharacter,
+            battlelog: bm.logger.battleLog,
+            battle_result: bm.result,
+            game_result: "continue"
+        }
+    });
 });
 
 app.get("/Character/:id", async (req, res) => {
@@ -159,7 +141,7 @@ app.post("/battle", async (req, res) => {
     const init_data: CharacterInitData = {
         character_id: game.character_id,
         curses: data.curses,
-        goods: data.equipmets
+        equipmets: data.equipmets
     }
 
     /*const saveCharacter = await prisma.character.create({
@@ -185,7 +167,7 @@ app.post("/battle", async (req, res) => {
             LIMIT 1;
         `;
 
-        const enemy_data:CharacterInitData = randomCharacter.data;
+        const enemy_data: CharacterInitData = randomCharacter.data;
 
         //console.log(enemy_data);
 
@@ -193,13 +175,14 @@ app.post("/battle", async (req, res) => {
         const result = bm.run()
 
         res.json({
-        data: {
-            opponent_character: enemy_data,
-            battlelog: bm.logger.battleLog,
-            battle_result: result,
-            game_result: "win"
-        }
-    });
+            data: {
+                player_character: init_data,
+                opponent_character: enemy_data,
+                battlelog: bm.logger.battleLog,
+                battle_result: result,
+                game_result: "win"
+            }
+        });
     }
     catch (error) {
         console.error(error);

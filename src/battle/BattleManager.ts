@@ -6,7 +6,7 @@ export class BattleManager {
     player: BattleCharacter;
     enemy: BattleCharacter;
     logger: BattleLogger;
-    tickTime: number = 0.001;
+    tickTime: number = 0.01;
     currentTick: number = 0;
     remainderTime: number = 0.0;
     elapsedTime: number = 0.0;
@@ -15,8 +15,8 @@ export class BattleManager {
 
     constructor(player: CharacterInitData, enemy: CharacterInitData) {
         this.logger = new BattleLogger(this);
-        this.player = new BattleCharacter(this, 0, player.character_id, player.curses.map(item => { return item.id }), player.goods.map(item => { return item.id }));
-        this.enemy = new BattleCharacter(this, 1, enemy.character_id, enemy.curses.map(item => { return item.id }), enemy.goods.map(item => { return item.id }));
+        this.player = new BattleCharacter(this, 0, player.character_id, player.curses.map(item => { return item.id }), player.equipmets.map(item => { return item.id }));
+        this.enemy = new BattleCharacter(this, 1, enemy.character_id, enemy.curses.map(item => { return item.id }), enemy.equipmets.map(item => { return item.id }));
         this.player.opponent = this.enemy;
         this.enemy.opponent = this.player;
     }

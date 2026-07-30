@@ -43,7 +43,7 @@ export class BattleCharacter extends BattleCharacterData {
         this.allEffects.forEach(effect => { effect.onStart?.() });
     }
     update(): void {
-        this.stamina += Math.min(this.maxStamina - this.stamina, this.staminaRecover / this.battleManager.tickTime);
+        this._stamina += Math.min(this.maxStamina - this.stamina, this.staminaRecover * this.battleManager.tickTime); // 避免log
         this.statuses.forEach(status => {
             status.update(this.totalSpeed * this.battleManager.tickTime);
         });
