@@ -4,7 +4,7 @@ import type { BattleCharacter } from "./BattleCharacter.js";
 export enum StatusName {
     burning = "burning",
     poison = "poison",
-    dizzy = "dizzy"
+    stun = "stun"
 }
 
 interface StatusCallbacks {
@@ -99,7 +99,7 @@ const StatusDefs: Record<string, StatusDef> = {
         },
         natureDecrease() { }
     },
-    "dizzy": {
+    "stun": {
         triggerInterval: 1,
         natureDecrease() {
             this.stack -= 1;

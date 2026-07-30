@@ -9,6 +9,7 @@
         "stamina_cost": 2,
         "attack_interval": 1,
         "damage": 30,
+        "price": 10,
         "grade": "low",
         "characters": [
             "Common"
@@ -24,6 +25,7 @@
         "stamina_cost": 6,
         "attack_interval": 4,
         "damage": 10,
+        "price": 10,
         "grade": "low",
         "characters": [
             "Common"
@@ -39,6 +41,7 @@
         "stamina_cost": 3,
         "attack_interval": 1.5,
         "damage": 3,
+        "price": 5,
         "grade": "low",
         "characters": [
             "Common"

@@ -105,7 +105,7 @@ export abstract class BaseEffect {
 
     update(deltaTime: number): void {
         deltaTime *= this.speed;
-        if (!this.owner.hasStatus(StatusName.dizzy)) {
+        if (!this.owner.hasStatus(StatusName.stun)) {
             this.mainTimer += deltaTime;
             if (this.mainTimer >= this.triggerInterval) {
                 this.mainTimer -= this.triggerInterval;

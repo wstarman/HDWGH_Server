@@ -50,7 +50,7 @@ const curseDefs: Record<string, CurseDef> = {
                 if (this.stack >= this.temp1) {
                     this.mainTimer = 0;
                     this.temp1 += 10;
-                    this.owner.addStatus(StatusName.dizzy, 1);
+                    this.owner.addStatus(StatusName.stun, 1);
                 }
             }
         },
