@@ -1,5 +1,6 @@
 import express from "express";
 import { PrismaClient } from '@prisma/client';
+import type { Character } from "@prisma/client";
 import { BattleManager } from "./battle/BattleManager.js";
 import { Shop } from "./Shop.js";
 
@@ -161,7 +162,7 @@ app.post("/battle", async (req, res) => {
         goods: data.equipmets
     }
 
-    const saveCharacter = await prisma.character.create({
+    /*const saveCharacter = await prisma.character.create({
         data: {
             game_id: game.game_id,
             round: game.round,
@@ -171,24 +172,39 @@ app.post("/battle", async (req, res) => {
                 goods: data.equipmets
             }
         }
+    });*/
+
+
+    try {
+
+        const [randomCharacter] = await prisma.$queryRaw<Character[]>`
+            SELECT *
+            FROM "Character"
+            WHERE round = ${game.round}
+            ORDER BY RANDOM()
+            LIMIT 1;
+        `;
+
+        const enemy_data:CharacterInitData = randomCharacter.data;
+
+        //console.log(enemy_data);
+
+        const bm: BattleManager = new BattleManager(init_data, enemy_data)
+        const result = bm.run()
+
+        res.json({
+        data: {
+            opponent_character: enemy_data,
+            battlelog: bm.logger.battleLog,
+            battle_result: result,
+            game_result: "win"
+        }
     });
-
-
-    return;
-
-    // try {
-
-
-    //     res.json({
-    //         data: {
-    //             uuid: newChar.game_id
-    //         }
-    //     });
-    // }
-    // catch (error) {
-    //     console.error(error);
-    //     res.status(500).json({ error: 'Internal server error failed to create character' });
-    // }
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error failed to initialize battle' });
+    }
 });
 
 const port = Number(process.env.PORT ?? 3000);
