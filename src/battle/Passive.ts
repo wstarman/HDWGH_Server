@@ -51,7 +51,7 @@ const passiveDefs: Record<string, PassiveDef> = {
         persistent: true,
         triggerInterval: 1,
         afterStatusChange(event) {
-            if (event.status.id == StatusName.poison && event.status.stack == 0) {
+            if (event.status.id == StatusName.poison && event.status.stack == 0 && !this.enabled) {
                 this.toggle(true);
                 this.temp1 = 0;
                 this.owner.attackSpeed += 0.3;
