@@ -133,7 +133,7 @@ export class BattleCharacter extends BattleCharacterData {
     }
     takeDamage(damage: number): void {
         damage = Math.max(damage, 0);
-        const remaining = damage - this.shield;
+        const remaining = Math.max(damage - this.shield, 0);
         this.shield -= Math.min(damage, this.shield)
         this.hp -= remaining;
     }
