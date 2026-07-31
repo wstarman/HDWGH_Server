@@ -1,5 +1,6 @@
 import CurseData from "./data/curses.json" with {type: "json"}
 import EqData from "./data/equipments.json" with {type: "json"}
+import WeaponData from "./data/weapons.json" with {type: "json"}
 
 enum ItemGrade {
     Low = "low",
@@ -75,7 +76,7 @@ export class Shop {
         }
 
         // Equipment
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 5; i++) {
             let EqSelected: EquipmentDTO[] = [];
             while (EqSelected.length < 3) {
                 const grade = Shop.selectGrade(round);
@@ -224,7 +225,7 @@ export class Shop {
         CurseData.forEach(curse => {
             if (!isItemGrade(curse.grade)) return;
 
-            if (curse.characters.length) {
+            if (curse.characters.length >= 1 && curse.characters[0] !== "Common") {
                 curse.characters.forEach(character => {
                     this.SIGNATURE_CURSE_TABLE[character] ??= {
                         [ItemGrade.Low]: [],
@@ -243,7 +244,7 @@ export class Shop {
         EqData.forEach(equipment => {
             if (!isItemGrade(equipment.grade)) return;
 
-            if (equipment.characters.length) {
+            if (equipment.characters.length >= 1 && equipment.characters[0] !== "Common") {
                 equipment.characters.forEach(character => {
                     this.SIGNATURE_EQUIPMENT_TABLE[character] ??= {
                         [ItemGrade.Low]: [],
@@ -256,6 +257,25 @@ export class Shop {
             }
             else {
                 this.EQUIPMENT_TABLE[equipment.grade as ItemGrade].push(equipment.id);
+            }
+        });
+
+        WeaponData.forEach(weapon => {
+            if (!isItemGrade(weapon.grade)) return;
+
+            if (weapon.characters.length >= 1 && weapon.characters[0] !== "Common") {
+                weapon.characters.forEach(character => {
+                    this.SIGNATURE_EQUIPMENT_TABLE[character] ??= {
+                        [ItemGrade.Low]: [],
+                        [ItemGrade.Mid]: [],
+                        [ItemGrade.High]: []
+                    };
+
+                    this.SIGNATURE_EQUIPMENT_TABLE[character][weapon.grade as ItemGrade].push(weapon.id);
+                })
+            }
+            else {
+                this.EQUIPMENT_TABLE[weapon.grade as ItemGrade].push(weapon.id);
             }
         });
     }

@@ -166,6 +166,8 @@ app.post("/battle", async (req, res) => {
         bm.run()
 
         let finalHp = game.hp
+        let finalMoney = data.money
+        let result = "continue";
 
         if (bm.result == "win") {
             await prisma.character.create({
@@ -179,9 +181,12 @@ app.post("/battle", async (req, res) => {
                     }
                 }
             });
+
+            finalMoney += 20;
         }
         else if (bm.result == "lose") {
             finalHp -= 1;
+            finalMoney += 25;
         }
 
         await prisma.game.update({
@@ -190,9 +195,17 @@ app.post("/battle", async (req, res) => {
             },
             data: {
                 hp: finalHp,
-                round: game.round + 1
+                round: game.round + 1,
+                money: finalMoney
             }
         });
+
+        if(finalHp <= 0){
+            result = "lose";
+        }
+        else if(game.round == 6){
+            result = "win";
+        } 
 
         res.json({
             data: {
@@ -200,7 +213,7 @@ app.post("/battle", async (req, res) => {
                 opponent_character: enemy_data,
                 battlelog: bm.logger.battleLog,
                 battle_result: bm.result,
-                game_result: "continue"
+                game_result: result
             }
         });
     }
