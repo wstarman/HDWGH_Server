@@ -13,6 +13,7 @@ export interface BattleLog {
     receiver?: number;
     damage?: number | "miss";
     damageType?: string;
+    isCritHit?: boolean;
 
     owner?: number;
     statusId?: string;
@@ -72,7 +73,8 @@ export class BattleLogger {
             damageType: event.type,
             sourceType: srcType,
             sourceObjectType: srcObjectType,
-            sourceId: srcId
+            sourceId: srcId,
+            isCritHit: event.isCritHit
         }
         this.battleLog.push(log);
     }
@@ -120,7 +122,7 @@ export class BattleLogger {
             eventType: "stat_change",
             target: effect.owner.index,
             statId: effect.id,
-            value: effect.stack < 0 ? effect.stack : -1,
+            value: effect.stack >= 0 ? effect.stack : -1,
             equipmentSlot: effect.index
         }
         this.battleLog.push(log);

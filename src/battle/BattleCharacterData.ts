@@ -65,7 +65,7 @@ export class BattleCharacterData {
     }
 
     get maxHp() { return this._maxHp; }
-    set maxHp(value: number) { value *= this.maxHpGainRate; this.setStat("maxHp", value); }
+    set maxHp(value: number) { value += (this.maxHpGainRate - 1) * (value - this.maxHp); this.setStat("maxHp", value); }
     get hp() { return this._hp; }
     set hp(value: number) { this.setStat("hp", value); }
     get maxStamina() { return this._maxStamina; }

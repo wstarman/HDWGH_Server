@@ -95,10 +95,8 @@ export abstract class BaseEffect {
     }
 
     protected toggle(enabled?: boolean) {
-        if (enabled === true) {
+        if (enabled !== undefined) {
             this.enabled = enabled;
-        } else {
-            enabled = true;
         }
         this.owner.onEffectToggle(this, enabled);
     }
