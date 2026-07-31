@@ -19,7 +19,7 @@
         "english_name": "Bitter Syrup",
         "chinese_name": "苦味糖漿",
         "english_description": "Takes effect at the start of battle. Recover 3 HP every 1 second and reduce Poison damage taken by 10%. At the start of battle and every 3 seconds afterward, gain 1 Poison stack.",
-        "chinese_description": "開始時生效，每 1 秒回復 3 HP，並使受到的中毒傷害降低 10%。開場時以及之後每 3 秒加 1 層毒。",
+        "chinese_description": "開始時生效，每 1 秒回復 3 HP，並使受到的中毒傷害降低 10%。開場時以及之後每 3 秒獲得 1 層中毒。",
         "price": 5,
         "grade": "low",
         "characters": [
@@ -33,7 +33,7 @@
         "english_name": "Night Pill",
         "chinese_name": "安眠藥",
         "english_description": "Battle-wide passive. Triggers every 3 seconds. For the next 2 seconds, weapon damage taken is reduced by 50%. When the effect ends, gain 1 Poison stack and return 40% of the damage.",
-        "chinese_description": "全場被動。每 3 秒觸發一次。接下來 2 秒內，受到的武器傷害降低 50%，但是在效果結束時獲得一層中毒並且返還 40% 傷害。",
+        "chinese_description": "全場被動。每 3 秒觸發一次。接下來 2 秒內，受到的武器傷害降低 50%，但是在效果結束時獲得 1 層中毒並且返還 40% 傷害。",
         "price": 10,
         "grade": "low",
         "characters": [
@@ -47,7 +47,7 @@
         "english_name": "Expired Vitamin",
         "chinese_name": "過期維他命",
         "english_description": "Passive: maximum health gain +10%. Triggers every 4 seconds. On trigger, gain 10 max HP and 1 Poison stack. For the next 5 seconds, attack speed +20%.",
-        "chinese_description": "被動：最大生命值獲取量 +10%。每 4 秒觸發一次。觸發時，獲得 10 max HP、一層毒。接下來 5 秒內，攻擊速度 +20%。",
+        "chinese_description": "被動：最大生命值獲取量 +10%。每 4 秒觸發一次。觸發時，獲得 10 max HP、 1 層中毒。接下來 5 秒內，攻擊速度 +20%。",
         "price": 10,
         "grade": "low",
         "characters": [
@@ -75,7 +75,7 @@
         "english_name": "Withdrawal Patch",
         "chinese_name": "戒斷貼片",
         "english_description": "Battle-wide passive. If the character takes Poison damage, 10% of that damage is converted into Shield. Increases the character's natural Poison decay speed by 20%. This effect does not apply while Poison stacks are below 5.",
-        "chinese_description": "全場被動。如果角色因為中毒受傷，其中的 10% 轉化為護盾。增加「抗藥性」的中毒衰減速度20%，此效果在毒層數低於 5 時不生效。",
+        "chinese_description": "全場被動。如果角色因為中毒受傷，其中的 10% 轉化為護盾。此外，當中毒層數大於 4 層時，增加「抗藥性」的中毒衰減速度 20%。",
         "price": 5,
         "grade": "low",
         "characters": [

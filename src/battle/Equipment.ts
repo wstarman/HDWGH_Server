@@ -44,13 +44,22 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             const r = Math.random();
             if (r < 0.333) {
                 this.owner.attackPower += 0.15;
-                this.addTimer(4, () => this.owner.attackPower -= 0.15)
+                this.addTimer(4, () => {
+                    this.owner.attackPower -= 0.15;
+                    this.toggle(false);
+                })
             } else if (r < 0.667) {
                 this.owner.attackSpeed += 0.1;
-                this.addTimer(4, () => this.owner.attackSpeed -= 0.1)
+                this.addTimer(4, () => {
+                    this.owner.attackSpeed -= 0.1;
+                    this.toggle(false);
+                })
             } else {
                 this.owner.weaponDamageTakenMultiplier *= 0.9;
-                this.addTimer(4, () => this.owner.weaponDamageTakenMultiplier /= 0.9)
+                this.addTimer(4, () => {
+                    this.owner.weaponDamageTakenMultiplier /= 0.9;
+                    this.toggle(false);
+                })
             }
         },
     },
@@ -128,14 +137,17 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "recovery_note": {
         isUnique: true,
         beforeStart() {
-            this.stack = 2;
+            this.temp1 = 0;
+            this.stack = 0;
         },
         afterStatusChange(event) {
             if (event.status.id == StatusName.poison && event.delta < 0) {
-                this.stack -= event.delta;
-                if (this.stack >= 2) {
+                this.temp1 += -event.delta;
+                if (this.temp1 >= 2) {
                     this.owner.shield += 5;
                     this.owner.attackPower += 0.05;
+                    this.temp1 -= 2;
+                    this.stack += 1;
                 }
             }
         },

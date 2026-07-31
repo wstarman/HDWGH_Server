@@ -64,13 +64,18 @@ export class BattleCharacter extends BattleCharacterData {
             receiver: this.opponent,
             amount: damage,
             type: damageType,
-            damageSource: weapon
+            damageSource: weapon,
+            isCritHit: false
         }
         this.allEffects.forEach(effect => effect.beforeAttack?.(event));
         if (Math.random() < event.hitRate) {
             // hit
             this.allEffects.forEach(effect => effect.onAttackHit?.(event));
-            this.opponent.calculateDamage(this, event.amount, damageType, weapon);
+            if (Math.random() < this.critRate) {
+                event.amount *= 2;
+                event.isCritHit = true;
+            }
+            this.opponent.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit);
         } else {
             // miss
             const missEvent: DamageEvent = {
@@ -82,14 +87,15 @@ export class BattleCharacter extends BattleCharacterData {
                 receiver: this.opponent,
                 amount: -1,
                 type: damageType,
-                damageSource: weapon
+                damageSource: weapon,
+                isCritHit: false
             }
             this.logger.recordDamageEvent(missEvent, "miss");
             this.allEffects.forEach(effect => effect.onAttackMiss?.());
             this.opponent.allEffects.forEach(effect => effect.onDodge?.())
         }
     }
-    calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource) {
+    calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource, isCritHit: boolean = false) {
         const event: DamageEvent = {
             modifier: {
                 flat: 0,
@@ -99,7 +105,8 @@ export class BattleCharacter extends BattleCharacterData {
             receiver: this,
             amount,
             type,
-            damageSource
+            damageSource,
+            isCritHit
         }
         this.allEffects.forEach(p => p.beforeDamageTaken?.(event));
         this.applyDamageTakenMultiplier(event);

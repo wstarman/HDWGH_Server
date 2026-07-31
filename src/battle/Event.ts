@@ -21,7 +21,8 @@ export interface AttackEvent {
     receiver: BattleCharacter,
     amount: number,
     type: DamageType,
-    damageSource: DamageSource
+    damageSource: DamageSource,
+    isCritHit: boolean
 }
 
 export interface DamageEvent {
@@ -30,7 +31,8 @@ export interface DamageEvent {
     receiver: BattleCharacter,
     amount: number,
     type: DamageType,
-    damageSource: DamageSource
+    damageSource: DamageSource,
+    isCritHit: boolean
 }
 
 export interface StatusChangeEvent {
