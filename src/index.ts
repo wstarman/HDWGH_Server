@@ -213,7 +213,9 @@ app.post("/battle", async (req, res) => {
                 opponent_character: enemy_data,
                 battlelog: bm.logger.battleLog,
                 battle_result: bm.result,
-                game_result: result
+                game_result: result,
+                round: game.round + 1,
+                life: finalHp
             }
         });
     }
