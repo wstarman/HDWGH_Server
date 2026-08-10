@@ -1,4 +1,4 @@
-import { Status } from "./Status.js";
+import { Status, StatusName } from "./Status.js";
 import { characterPassive, Passive } from "./Passive.js";
 import { type AttackEvent, type DamageEvent, type StatusChangeEvent, type DamageSource, type DamageModifier } from "./Event.js";
 import { DamageType } from "../enum/DamageType.js";
@@ -35,6 +35,7 @@ export class BattleCharacter extends BattleCharacterData {
             i += 1;
         });
     }
+    get alive() { return this.hp > 0 || this.undead; }
 
     beforeStart() {
         this.allEffects.forEach(effect => { effect.beforeStart?.() });
@@ -45,17 +46,26 @@ export class BattleCharacter extends BattleCharacterData {
     update(): void {
         this._stamina += Math.min(this.maxStamina - this.stamina, this.staminaRecover * this.battleManager.tickTime); // 避免log
         this.statuses.forEach(status => {
-            status.update(this.totalSpeed * this.battleManager.tickTime);
-        });
-        this.allEffects.forEach(effect => {
-            if (effect instanceof Weapon) {
-                effect.update(this.totalSpeed * this.attackSpeed * this.battleManager.tickTime);
-            } else {
-                effect.update(this.totalSpeed * this.battleManager.tickTime);
+            if (this.alive) {
+                status.update(this.totalSpeed * this.battleManager.tickTime);
             }
         });
+        this.allEffects.forEach(effect => {
+            if (this.alive) {
+                if (effect instanceof Weapon) {
+                    effect.update(this.totalSpeed * this.attackSpeed * this.battleManager.tickTime);
+                } else {
+                    effect.update(this.totalSpeed * this.nonAttackSpeed * this.battleManager.tickTime);
+                }
+            }
+        });
+        if (!this.alive) {
+            this.allEffects.forEach(effect => {
+                effect.beforeDead?.()
+            });
+        }
     }
-
+    // return true if hit
     attack(weapon: Weapon, damage: number = weapon.damage, baseHitRate = 1.0, damageType = weapon.damageType, isTrueDamage = false) {
         const event: AttackEvent = {
             modifier: {
@@ -82,6 +92,7 @@ export class BattleCharacter extends BattleCharacterData {
                 event.isCritHit = true;
             }
             this.opponent.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
+            return true
         } else {
             // miss
             const missEvent: DamageEvent = {
@@ -100,6 +111,7 @@ export class BattleCharacter extends BattleCharacterData {
             this.logger.recordDamageEvent(missEvent, "miss");
             this.allEffects.forEach(effect => effect.onAttackMiss?.());
             this.opponent.allEffects.forEach(effect => effect.onDodge?.())
+            return false
         }
     }
     calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource,
@@ -123,6 +135,7 @@ export class BattleCharacter extends BattleCharacterData {
         event.amount = final
         this.logger.recordDamageEvent(event, final);
         this.takeDamage(final);
+        this.opponent.heal(final * this.opponent.lifeSteal);
         this.allEffects.forEach(p => p.afterDamageTaken?.(event));
     }
     private applyDamageTakenMultiplier(damage: DamageEvent) {
@@ -160,6 +173,14 @@ export class BattleCharacter extends BattleCharacterData {
     addStatus(id: string, delta: number) {
         for (let status of this.statuses) {
             if (status.id == id) {
+                if (status.id == StatusName.poison && delta > 0) {
+                    const straps = this.getEffects("detox_strap");
+                    straps.forEach(strap => {
+                        let originalDelta = delta;
+                        delta = Math.max(delta - strap.stack, 0);
+                        strap.stack -= Math.min(strap.stack, originalDelta);
+                    })
+                }
                 status.stack = Math.max(0, status.stack + delta);
                 return;
             }
@@ -185,6 +206,16 @@ export class BattleCharacter extends BattleCharacterData {
 
     getEffect(id: string) {
         return this.allEffects.find(effect => effect.id == id);
+    }
+
+    getEffects(id: string) {
+        return this.allEffects.filter(effect => effect.id == id);
+    }
+
+    getEffectNumber(id: string) {
+        let result = 0;
+        this.allEffects.forEach(effect => { if (effect.id == id) result++; });
+        return result
     }
 
     onEffectToggle(effect: BaseEffect, enabled: boolean = true) {

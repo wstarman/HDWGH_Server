@@ -51,6 +51,20 @@ const passiveDefs: Record<string, PassiveDef> = {
      * 全場被動。
      * 角色清醒狀態時，受到的所有傷害降低 15%。
      * 每次脫離清醒狀態的時候，獲得當前毒層數*2的護盾
+     * 
+     * 相關道具：病房門卡 (ward_access_card)
+     * 全場被動。
+     * 清醒狀態時所有非武器裝備觸發快50%
+     * 角色每次身上中毒超過20層後，進入病房狀態
+     * 病房狀態期間：
+     * 強制清醒
+     * 腳色每秒減少10層毒
+     * 此期間每減少10層毒扣除等量5%最大生命值的HP
+     * 若毒在此期間到達0，病房狀態將會滯留1秒後解除
+     * 
+     * 相關道具：淨斷束帶(detox_strap)
+     * 清醒狀態減傷+15%
+     * 每次腳色脫離清醒狀態，降低10%最大HP，立刻減少等量的毒層數，若無層數可減，獲得解毒劑層數(使接下來N層毒失效)
      */
     "sobriety": {
         persistent: true,
@@ -65,10 +79,14 @@ const passiveDefs: Record<string, PassiveDef> = {
                 if (this.owner.getEffect("life_monitor_bracelet")) {
                     this.owner._allDamageTakenMultiplier *= 0.85;
                 }
+                if (this.owner.getEffect("ward_access_card")) {
+                    this.owner.nonAttackSpeed += 0.5;
+                }
+                this.owner.allDamageTakenMultiplier *= Math.pow(0.85, this.owner.getEffectNumber("detox_strap"))
             }
         },
         everyTick(deltaTime) {
-            if (!this.enabled) return;
+            if (!this.enabled || this.owner.getEffect("ward_access_card")?.enabled) return;
             if (this.owner.hasStatus(StatusName.poison)) {
                 this.temp1! += deltaTime
             } else {
@@ -84,6 +102,10 @@ const passiveDefs: Record<string, PassiveDef> = {
                         this.owner.shield += this.owner.getStatus(StatusName.poison)!.stack * 2
                     }
                 }
+                if (this.owner.getEffect("ward_access_card")) {
+                    this.owner.nonAttackSpeed -= 0.5;
+                }
+                this.owner.getEffects("detox_strap").forEach(effect => effect.onTrigger?.())
             }
         },
         onTrigger() {

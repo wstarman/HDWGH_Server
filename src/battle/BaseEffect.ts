@@ -31,6 +31,8 @@ interface EffectCallbacks {
     onAnyEffectToggle?(this: BaseEffect, effect: BaseEffect): void;
     // 己方狀態改變時
     onStatChange?(this: BaseEffect, stat: StatIdType, value: number): void;
+    // 遺言
+    beforeDead?(this: BaseEffect): void;
 }
 
 export interface BaseEffectDef extends EffectCallbacks {
@@ -62,6 +64,7 @@ export abstract class BaseEffect {
     subTimers: TimerManager = new TimerManager();
     temp1 = 0;
     temp2 = 0;
+    triggerProhibited = false;
 
     everyTick?: EffectCallbacks["everyTick"];
     beforeStart?: EffectCallbacks["beforeStart"];
@@ -76,6 +79,7 @@ export abstract class BaseEffect {
     afterStatusChange?: EffectCallbacks["afterStatusChange"];
     onAnyEffectToggle?: EffectCallbacks["onAnyEffectToggle"];
     onStatChange?: EffectCallbacks["onStatChange"];
+    beforeDead?: EffectCallbacks["beforeDead"];
 
     constructor(owner: BattleCharacter, id: string, deflist: Record<string, BaseEffectDef>) {
         this.owner = owner;
@@ -86,12 +90,14 @@ export abstract class BaseEffect {
     get enabled() { return this._enabled; }
     set enabled(value) {
         this._enabled = value;
-        this.owner.onEffectToggle(this);
+        // this.owner.onEffectToggle(this);
     }
     get stack() { return this._stack; }
     set stack(value) {
-        this._stack = value;
-        this.owner.logger.recordEffectStackChangeEvent(this);
+        if (value != this.stack) {
+            this._stack = value;
+            this.owner.logger.recordEffectStackChangeEvent(this);
+        }
     }
 
     protected toggle(enabled?: boolean) {
@@ -103,7 +109,7 @@ export abstract class BaseEffect {
 
     update(deltaTime: number): void {
         deltaTime *= this.speed;
-        if (!this.owner.hasStatus(StatusName.stun)) {
+        if (!this.owner.hasStatus(StatusName.stun) && !this.triggerProhibited) {
             this.mainTimer += deltaTime;
             if (this.mainTimer >= this.triggerInterval) {
                 this.mainTimer -= this.triggerInterval;
@@ -119,11 +125,11 @@ export abstract class BaseEffect {
     }
 
     attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): boolean {
+        if (this.owner.attackProhibited) return false;
         if (this.owner.stamina >= staminaCost) {
             this.toggle();
             this.owner.stamina -= staminaCost;
-            this.owner.attack(this, damage, hitRate);
-            return true;
+            return this.owner.attack(this, damage, hitRate);
         }
         return false;
     }

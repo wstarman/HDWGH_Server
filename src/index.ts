@@ -30,9 +30,10 @@ app.get("/", (_, res) => {
             { "id": "dirty_blood" },
             { "id": "glass_nerves" },
             { "id": "organ_failure" },
+            { "id": "white_rooms" },
         ],
         equipmets: [
-            { "id": "loaded_fate" },
+            // { "id": "loaded_fate" },
             { "id": "rebound_baton" },
             { "id": "rusty_dagger" },
             { "id": "pills" },
@@ -47,6 +48,12 @@ app.get("/", (_, res) => {
             { "id": "low_grade_serum" },
             { "id": "life_monitor_bracelet" },
             { "id": "routine_pillbox" },
+            { "id": "black_adrenal" },
+            { "id": "overclock_ampoule" },
+            { "id": "white_sun" },
+            { "id": "deadman_protocol" },
+            { "id": "ward_access_card" },
+            { "id": "detox_strap" }
         ]
     }
 

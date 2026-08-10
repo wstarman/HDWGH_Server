@@ -54,6 +54,10 @@ export class BattleCharacterData {
 
     maxHpGainRate = 1.0;
     healRate = 1.0;
+    attackProhibited = false;
+    lifeSteal = 0.0;
+    undead = false;
+    nonAttackSpeed = 1.0;
 
     private setStat<T>(key: StatIdType, value: number): boolean {
         if (this[`_${key}`] !== value) {

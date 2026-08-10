@@ -85,13 +85,10 @@ export const weaponDefs: Record<string, WeaponDef> = {
      * 每次攻擊時有 50% 的機率造成對手 +1 中毒。
      */
     "rusty_dagger": {
-        onAttackHit(event) {
-            if (Math.random() > 0.5) {
+        onTrigger() {
+            if (this.attack() && Math.random() > 0.5) {
                 this.owner.opponent.addStatus(StatusName.poison, 1);
             }
-        },
-        onTrigger() {
-            this.attack();
         },
     },
 };

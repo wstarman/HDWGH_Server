@@ -65,16 +65,8 @@ const curseDefs: Record<string, CurseDef> = {
         triggerInterval: 4,
         onAnyEffectToggle(effect) {
             if (!effect.hasTag("drug")) return;
-            this.mainTimer = 0;
-            if (!this.enabled) {
-                this.toggle(true);
-                this.owner.healRate -= 0.2;
-            }
-            this.addTimer(4, () => { this.owner.healRate -= 0.01 });
-        },
-        onTrigger() {   // 效果結束
-            this.toggle(false);
-            this.owner.healRate += 0.2;
+            this.owner.healRate -= 0.2;
+            this.addTimer(4, () => { this.owner.healRate += 0.19 });
         },
     },
     /**
@@ -114,5 +106,51 @@ const curseDefs: Record<string, CurseDef> = {
             }
         },
     },
+    /**
+     * 白色房間
+     * 戰鬥開始時:所有藥物同時觸發，效果不計算但是毒層數計算(簡單來說就是全部的毒上一次)，此效果後毒層數1.5倍
+     * 在進入第一次清醒狀態前排毒速度增加，未進入第一次清醒狀態前，你的所有藥物停止觸發，並且你無法攻擊
+     */
+    "white_rooms": {
+        onStart() {
+            this.enabled = true;
+            const equipmentAddedPoision: Record<string, number> = {
+                "pills": 1,
+                "bitter_syrup": 1,
+                "night_pill": 1,
+                "expired_vitamin": 1,
+                "black_market_prescription": 3,
+                "neon_inhaler": 2,
+                "dream_dust": 6,
+                "low_grade_serum": 20,
+                "black_adrenal": 20,
+                "white_sun": 5,
+                "deadman_protocol": 0 // grok is this true?
+            }
+            for (let item of this.owner.allEffects) {
+                if (equipmentAddedPoision[item.id] !== undefined) {
+                    this.owner.addStatus(StatusName.poison, equipmentAddedPoision[item.id]!);
+                }
+                if (item.hasTag("drug")) {
+                    item.triggerProhibited = true;
+                }
+            }
+            if (this.owner.hasStatus(StatusName.poison)) {
+                this.owner.addStatus(StatusName.poison, Math.round(this.owner.getStatus(StatusName.poison)!.stack * 0.5));
+            }
+            this.owner.attackProhibited = true;
+        },
+        onAnyEffectToggle(effect) {
+            if (this.enabled && effect.id == "sobriety" && effect.enabled) {
+                this.enabled = false;
+                this.owner.attackProhibited = false;
+                for (let item of this.owner.allEffects) {
+                    if (item.hasTag("drug")) {
+                        item.triggerProhibited = false;
+                    }
+                }
+            }
+        }
+    }
 };
 

@@ -211,8 +211,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 }
             }
             if (r1 == 4 || r2 == 4) {
-                this.owner.toxicDamageTakenMultiplier *= r1 == r2 ? 0.6 : 0.001;
-                this.addTimer(4, () => { this.owner.toxicDamageTakenMultiplier /= r1 == r2 ? 0.6 : 0.001; })
+                this.owner.toxicDamageTakenMultiplier *= r1 == r2 ? 0.6 : 0.4 * 0.4;
+                this.addTimer(4, () => { this.owner.toxicDamageTakenMultiplier /= r1 == r2 ? 0.6 : 0.4 * 0.4; })
             }
             this.addTimer(4, () => { this.toggle(false); })
         },
@@ -242,7 +242,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         onAttackHit(event) {
             if (this.enabled) {
-                event.modifier.finalFlat += 2;
+                event.modifier.finalFlat += 1;
             }
         },
     },
@@ -283,6 +283,9 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      */
     "low_grade_serum": {
         triggerInterval: 8,
+        beforeStart() {
+            this.stack = 0;
+        },
         onTrigger() {
             this.toggle();
             this.owner.addStatus(StatusName.poison, 20);
@@ -314,6 +317,9 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      */
     "routine_pillbox": {
         isUnique: true,
+        beforeStart() {
+            this.stack = 0;
+        },
         afterDamageTaken(event) {
             if (event.type == DamageType.Toxic) {
                 this.temp1 += event.amount;
@@ -323,6 +329,212 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                     this.stack++;
                 }
             }
+        }
+    },
+    /**
+     * Black Adrenal  (抓著心臟跳動)
+     * 每 9 秒觸發一次。
+     * 觸發時，獲得 20層中毒。
+     * 接下來 5 秒內，攻擊力 +25%，攻擊速度 +25%，並且攻擊增加50%吸血。
+     * 藥效結束後，失去目前生命值的 20% + 最大生命的10%。
+     */
+    "black_adrenal": {
+        persistent: true,
+        triggerInterval: 9,
+        onTrigger() {
+            this.toggle(true);
+            this.owner.addStatus(StatusName.poison, 20);
+            this.owner.attackPower += 0.25;
+            this.owner.attackSpeed += 0.25;
+            this.owner.lifeSteal += 0.5;
+            this.addTimer(5, () => {
+                this.toggle(false);
+                this.owner.attackPower -= 0.25;
+                this.owner.attackSpeed -= 0.25;
+                this.owner.lifeSteal -= 0.5;
+                this.owner.hp -= this.owner.hp * 0.2 + this.owner.maxHp * 0.1;
+            })
+        }
+    },
+    /**
+     * 超頻安瓿 / Overclock Ampoule
+     * 每 8 秒觸發一次。
+     * 接下來 5 秒內，攻擊速度 +50%。
+     * 藥效期間，每次攻擊後，額外獲得 1 層超頻。
+     * 每層超頻使攻擊速度再 +5%，最多 10 層。
+     * 藥效結束後，清除所有超頻，並進入神經燒灼 3 秒。
+     * 神經燒灼期間，每次攻擊獲得兩層中毒。
+     */
+    "overclock_ampoule": {
+        persistent: true,
+        triggerInterval: 8,
+        onTrigger() {
+            this.toggle(true);
+            this.owner.addStatus(StatusName.poison, 20);
+            this.owner.attackSpeed += 0.5;
+            this.addTimer(5, () => {
+                this.toggle(false);
+                this.owner.attackSpeed -= 0.5 + this.stack * 0.05;
+                this.stack = 0;
+                this.enabled2 = true;
+                this.addTimer(3, () => {
+                    this.enabled2 = false;
+                })
+            })
+        },
+        onAttackHit(event) {
+            if (this.enabled && this.stack < 10) {
+                this.stack++;
+                this.owner.attackSpeed += 0.05;
+            }
+            if (this.enabled2) {
+                this.owner.addStatus(StatusName.poison, 2);
+            }
+        }
+    },
+    /**
+     * 白日 / White Sun
+     * 每7秒觸發一次。
+     * 觸發時，獲得 5 層中毒。
+     * 接下來 4秒內，miss率+50%，爆擊率+50%
+     * 藥效期間，每次miss都會讓爆擊率再加上5%
+     * 藥效結束後，進入白化視界 2秒。
+     * 白化視界期間，每次攻擊有 25% 機率落空
+     */
+    "white_sun": {
+        persistent: true,
+        triggerInterval: 7,
+        onTrigger() {
+            this.toggle(true);
+            this.owner.addStatus(StatusName.poison, 5);
+            this.owner.hitRate -= 0.5;
+            this.owner.critRate += 0.5;
+            this.addTimer(4, () => {
+                this.toggle(false);
+                this.owner.hitRate += 0.5;
+                this.owner.critRate -= 0.5 + this.stack * 0.05;
+                this.stack = 0;
+                this.enabled2 = true;
+                this.owner.hitRate -= 0.25;
+                this.addTimer(2, () => {
+                    this.enabled2 = false;
+                    this.owner.hitRate += 0.25;
+                })
+            })
+        },
+        onAttackMiss() {
+            this.stack++;
+            this.owner.critRate += 0.05;
+        },
+    },
+    /**
+     * Deadman Protocol / 死人協議
+     * 被動效果。
+     * 角色受到致命傷害時自動觸發。
+     * 每場戰鬥只能觸發一次。
+     * 觸發時，獲得 150層中毒，獲得每秒降低50層毒的效果
+     * 接下來 角色無法死亡，直到毒回到0結束。
+     * 所有攻擊附帶額外傷害。
+     * 藥效結束時，如果敵人仍然存活，角色直接死亡。
+     */
+    "deadman_protocol": {
+        isUnique: true,
+        persistent: true,
+        beforeDead() {
+            if (this.temp1 == 0) {
+                this.temp1 = 1;
+                this.toggle(true);
+                this.owner.undead = true;
+                this.owner.addStatus(StatusName.poison, 150);
+                const everyEnabledSec = () => this.addTimer(1, () => {
+                    this.owner.addStatus(StatusName.poison, -50);
+                    everyEnabledSec();
+                })
+                everyEnabledSec();
+            }
+        },
+        onAttackHit(event) {
+            if (this.enabled) {
+                event.modifier.flat += 4;
+            }
+        },
+        afterStatusChange(event) {
+            if (event.status.id == StatusName.poison && event.status.stack <= 0) {
+                this.toggle(false);
+                this.owner.undead = false;
+                if (this.owner.opponent.alive) {
+                    this.owner.hp = -99999;
+                }
+            }
+        },
+    },
+    /**
+     * 病房門卡 
+     * 全場被動。
+     * 清醒狀態時所有非武器裝備觸發快50%
+     * 角色每次身上中毒超過20層後，進入病房狀態
+     * 病房狀態期間：
+     * 強制清醒
+     * 腳色每秒減少10層毒
+     * 此期間每減少10層毒扣除等量5%最大生命值的HP
+     * 若毒在此期間到達0，病房狀態將會滯留1秒後解除
+     */
+
+    "ward_access_card": {
+        isUnique: true,
+        // 部分效果寫在清醒被動中
+        beforeStart() {
+            this.stack = 0;
+        },
+        afterStatusChange(event) {
+            if (event.status.id == StatusName.poison) {
+                if (event.status.stack > 20 && !this.enabled) {
+                    this.toggle(true);
+                    this.mainTimer = 0;
+                    this.owner.getEffect("sobriety")?.toggle(true);
+                }
+                if (event.delta < 0 && this.enabled) {
+                    this.stack += -event.delta;
+                    if (this.stack >= 10) {
+                        this.stack -= 10;
+                        this.owner.hp -= this.owner.maxHp * 0.05;
+                    }
+                    if (event.status.stack <= 0) {
+                        this.addTimer(1, () => { this.toggle(false); })
+                    }
+                }
+            }
+        },
+        everyTick() {
+            if (this.enabled) {
+                this.temp1 += this.owner.battleManager.tickTime * this.owner.totalSpeed;
+                if (this.temp1 >= 1) {
+                    this.temp1 -= 1;
+                    this.owner.addStatus(StatusName.poison, -10);
+                }
+            }
+        }
+    },
+    /**
+     * 淨斷束帶
+     * 清醒狀態減傷+15%
+     * 每次腳色脫離清醒狀態，降低10%最大HP，立刻減少等量的毒層數，若無層數可減，獲得解毒劑層數(使接下來N層毒失效)
+     */
+    "detox_strap": {
+        // 部分效果和觸發條件寫在清醒被動中
+        // 解毒劑效果寫在Character::addStatus中
+        beforeStart() {
+            this.stack = 0;
+        },
+        onTrigger() {
+            const reducedHP = Math.floor(this.owner.maxHp * 0.1);
+            let antidoteStack = reducedHP
+            if (this.owner.getStatus(StatusName.poison)) {
+                antidoteStack = Math.max(0, reducedHP - this.owner.getStatus(StatusName.poison)!.stack);
+            }
+            this.owner.maxHp *= 0.9;
+            this.owner.addStatus(StatusName.poison, reducedHP)
+            this.stack += antidoteStack;
         }
     }
 };

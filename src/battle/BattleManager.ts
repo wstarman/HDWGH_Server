@@ -35,7 +35,11 @@ export class BattleManager {
                 break;
             }
         }
-        if (this.player.hp < 0 && this.enemy.hp < 0 || this.player.hp == this.enemy.hp) {
+        if (this.player.hp < 0 && this.enemy.hp < 0 && this.player.undead != this.enemy.undead) {
+            if (this.player.undead) this.result = "win";
+            else this.result = "lose";
+        }
+        else if (this.player.hp < 0 && this.enemy.hp < 0 || this.player.hp == this.enemy.hp) {
             this.result = "draw";
         }
         else if (this.player.hp > this.enemy.hp) {
@@ -50,6 +54,6 @@ export class BattleManager {
     }
 
     check_ending(): boolean {
-        return this.player.hp <= 0 || this.enemy.hp <= 0 || this.elapsedTime >= 30;
+        return !this.player.alive || !this.enemy.alive || this.elapsedTime >= 30;
     }
 }
