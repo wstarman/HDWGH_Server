@@ -11,7 +11,8 @@ export type DamageSource =
 
 export interface DamageModifier {
     flat: number,
-    multiplier: number;
+    multiplier: number,
+    finalFlat: number
 }
 
 export interface AttackEvent {
@@ -20,9 +21,11 @@ export interface AttackEvent {
     attacker: BattleCharacter,
     receiver: BattleCharacter,
     amount: number,
+    modifier: DamageModifier,
     type: DamageType,
     damageSource: DamageSource,
-    isCritHit: boolean
+    isCritHit: boolean,
+    isTrueDamage: boolean
 }
 
 export interface DamageEvent {

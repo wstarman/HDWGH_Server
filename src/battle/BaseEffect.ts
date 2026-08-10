@@ -128,8 +128,8 @@ export abstract class BaseEffect {
         return false;
     }
 
-    addTimer(duration: number, callBack: () => void) {
-        this.subTimers.add(duration, callBack);
+    addTimer(durationSec: number, callBack: () => void) {
+        this.subTimers.add(durationSec, callBack);
     }
 }
 

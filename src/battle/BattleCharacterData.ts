@@ -53,6 +53,7 @@ export class BattleCharacterData {
     _totalSpeed: number = 1.0;
 
     maxHpGainRate = 1.0;
+    healRate = 1.0;
 
     private setStat<T>(key: StatIdType, value: number): boolean {
         if (this[`_${key}`] !== value) {
@@ -65,9 +66,13 @@ export class BattleCharacterData {
     }
 
     get maxHp() { return this._maxHp; }
-    set maxHp(value: number) { value += (this.maxHpGainRate - 1) * (value - this.maxHp); this.setStat("maxHp", value); }
+    set maxHp(value: number) {
+        value += (this.maxHpGainRate - 1) * (value - this.maxHp);
+        this.setStat("maxHp", value);
+        this.hp = Math.min(this.hp, this.maxHp);
+    }
     get hp() { return this._hp; }
-    set hp(value: number) { this.setStat("hp", value); }
+    set hp(value: number) { this.setStat("hp", Math.min(value, this.maxHp)); }
     get maxStamina() { return this._maxStamina; }
     set maxStamina(value: number) { this.setStat("maxStamina", value); }
     get stamina() { return this._stamina; }

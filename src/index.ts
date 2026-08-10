@@ -24,8 +24,13 @@ app.get("/", (_, res) => {
     // Test data
     let testCharacter: CharacterInitData = {
         character_id: "DrugGuy",
-        curses: [{ "id": "overbright_eyes" },
-        { "id": "hollow_vessel" }],
+        curses: [
+            { "id": "overbright_eyes" },
+            { "id": "hollow_vessel" },
+            { "id": "dirty_blood" },
+            { "id": "glass_nerves" },
+            { "id": "organ_failure" },
+        ],
         equipmets: [
             { "id": "loaded_fate" },
             { "id": "rebound_baton" },
@@ -36,6 +41,12 @@ app.get("/", (_, res) => {
             { "id": "expired_vitamin" },
             { "id": "recovery_note" },
             { "id": "withdrawal_patch" },
+            { "id": "black_market_prescription" },
+            { "id": "neon_inhaler" },
+            { "id": "dream_dust" },
+            { "id": "low_grade_serum" },
+            { "id": "life_monitor_bracelet" },
+            { "id": "routine_pillbox" },
         ]
     }
 
@@ -50,7 +61,9 @@ app.get("/", (_, res) => {
             opponent_character: testCharacter,
             battlelog: bm.logger.battleLog,
             battle_result: bm.result,
-            game_result: "continue"
+            game_result: "continue",
+            round: 1,
+            life: 3
         }
     });
 });
@@ -200,12 +213,12 @@ app.post("/battle", async (req, res) => {
             }
         });
 
-        if(finalHp <= 0){
+        if (finalHp <= 0) {
             result = "lose";
         }
-        else if(game.round == 6){
+        else if (game.round == 6) {
             result = "win";
-        } 
+        }
 
         res.json({
             data: {

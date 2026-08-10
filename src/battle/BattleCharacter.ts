@@ -1,6 +1,6 @@
 import { Status } from "./Status.js";
 import { characterPassive, Passive } from "./Passive.js";
-import { type AttackEvent, type DamageEvent, type StatusChangeEvent, type DamageSource } from "./Event.js";
+import { type AttackEvent, type DamageEvent, type StatusChangeEvent, type DamageSource, type DamageModifier } from "./Event.js";
 import { DamageType } from "../enum/DamageType.js";
 import type { BattleManager } from "./BattleManager.js";
 import type { BaseEffect } from "./BaseEffect.js";
@@ -56,16 +56,22 @@ export class BattleCharacter extends BattleCharacterData {
         });
     }
 
-    attack(weapon: Weapon, damage: number = weapon.damage, baseHitRate = 1.0, damageType = weapon.damageType) {
+    attack(weapon: Weapon, damage: number = weapon.damage, baseHitRate = 1.0, damageType = weapon.damageType, isTrueDamage = false) {
         const event: AttackEvent = {
-            hitRate: this.hitRate * baseHitRate,
+            modifier: {
+                flat: 0,
+                multiplier: 1.0,
+                finalFlat: 0
+            },
+            hitRate: this.hitRate * baseHitRate * (1 - this.opponent.evasion),
             critRate: this.critRate,
             attacker: this,
             receiver: this.opponent,
             amount: damage,
             type: damageType,
             damageSource: weapon,
-            isCritHit: false
+            isCritHit: false,
+            isTrueDamage
         }
         this.allEffects.forEach(effect => effect.beforeAttack?.(event));
         if (Math.random() < event.hitRate) {
@@ -75,13 +81,14 @@ export class BattleCharacter extends BattleCharacterData {
                 event.amount *= 2;
                 event.isCritHit = true;
             }
-            this.opponent.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit);
+            this.opponent.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
         } else {
             // miss
             const missEvent: DamageEvent = {
                 modifier: {
                     flat: 0,
-                    multiplier: 1.0
+                    multiplier: 1.0,
+                    finalFlat: 0
                 },
                 attacker: this,
                 receiver: this.opponent,
@@ -95,12 +102,14 @@ export class BattleCharacter extends BattleCharacterData {
             this.opponent.allEffects.forEach(effect => effect.onDodge?.())
         }
     }
-    calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource, isCritHit: boolean = false) {
+    calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource,
+        isCritHit: boolean = false, isTrueDamage: boolean = false, modifier: DamageModifier = {
+            flat: 0,
+            multiplier: 1.0,
+            finalFlat: 0
+        }) {
         const event: DamageEvent = {
-            modifier: {
-                flat: 0,
-                multiplier: 1.0
-            },
+            modifier,
             attacker: attacker,
             receiver: this,
             amount,
@@ -110,8 +119,8 @@ export class BattleCharacter extends BattleCharacterData {
         }
         this.allEffects.forEach(p => p.beforeDamageTaken?.(event));
         this.applyDamageTakenMultiplier(event);
-        event.amount *= this.attackPower;
-        const final = (event.amount + event.modifier.flat) * event.modifier.multiplier
+        const final = isTrueDamage ? event.amount : (event.amount * this.attackPower + event.modifier.flat) * event.modifier.multiplier + event.modifier.finalFlat;
+        event.amount = final
         this.logger.recordDamageEvent(event, final);
         this.takeDamage(final);
         this.allEffects.forEach(p => p.afterDamageTaken?.(event));
@@ -139,7 +148,7 @@ export class BattleCharacter extends BattleCharacterData {
     }
 
     heal(value: number) {
-        this.hp += Math.min(this.maxHp - this.hp, value);
+        this.hp += Math.min(this.maxHp - this.hp, value) * Math.max(this.healRate, 0);
     }
 
     hasStatus(id: string): boolean {

@@ -46,6 +46,11 @@ const passiveDefs: Record<string, PassiveDef> = {
         攻擊速度+30%
         爆擊率+20%
         每秒獲得5護盾
+
+     * 相關道具：生命監測手環(life_monitor_bracelet)
+     * 全場被動。
+     * 角色清醒狀態時，受到的所有傷害降低 15%。
+     * 每次脫離清醒狀態的時候，獲得當前毒層數*2的護盾
      */
     "sobriety": {
         persistent: true,
@@ -57,6 +62,9 @@ const passiveDefs: Record<string, PassiveDef> = {
                 this.owner.attackSpeed += 0.3;
                 this.owner.critRate += 0.2;
                 this.mainTimer = 0;
+                if (this.owner.getEffect("life_monitor_bracelet")) {
+                    this.owner._allDamageTakenMultiplier *= 0.85;
+                }
             }
         },
         everyTick(deltaTime) {
@@ -70,6 +78,12 @@ const passiveDefs: Record<string, PassiveDef> = {
                 this.toggle(false);
                 this.owner.attackSpeed -= 0.3;
                 this.owner.critRate -= 0.2;
+                if (this.owner.getEffect("life_monitor_bracelet")) {
+                    this.owner._allDamageTakenMultiplier /= 0.85;
+                    if (this.owner.hasStatus(StatusName.poison)) {
+                        this.owner.shield += this.owner.getStatus(StatusName.poison)!.stack * 2
+                    }
+                }
             }
         },
         onTrigger() {

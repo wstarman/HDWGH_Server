@@ -3,6 +3,7 @@ import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
 import equipmentData from "../data/equipments.json" with { type: "json" };
 import { StatusName } from "./Status.js";
 import { Weapon } from "./Weapon.js";
+import { DamageType } from "../enum/DamageType.js";
 
 export interface EquipmentDef extends BaseEffectDef {
 }
@@ -171,6 +172,158 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.owner.shield += event.amount * 0.1;
             }
         },
+    },
+    /**
+     * 黑市處方 
+     * 每 4 秒觸發一次。
+     * 觸發時，獲得3層中毒，並隨機獲得以下兩種效果，持續 4 秒：
+     * 攻擊力 +30%
+     * 攻擊速度 +20%
+     * 受到傷害 -20%
+     * 每秒增加2點護盾
+     * 中毒傷害降低 40%
+     * 如果隨機到重複效果，該效果數值提高 50%。(例如抽到兩次攻擊力，最後效果是(30%+30%)*1.5=+90%
+     */
+    "black_market_prescription": {
+        triggerInterval: 4,
+        persistent: true,
+        onTrigger() {
+            this.toggle(true);
+            this.owner.addStatus(StatusName.poison, 3);
+            const r1 = Math.floor(Math.random() * 5)
+            const r2 = Math.floor(Math.random() * 5)
+            const effectMultiplier = r1 == r2 ? 3 : 1;
+            if (r1 == 0 || r2 == 0) {
+                this.owner.attackPower += 0.3 * effectMultiplier;
+                this.addTimer(4, () => { this.owner.attackPower -= 0.3 * effectMultiplier; })
+            }
+            if (r1 == 1 || r2 == 1) {
+                this.owner.attackSpeed += 0.2 * effectMultiplier;
+                this.addTimer(4, () => { this.owner.attackSpeed -= 0.2 * effectMultiplier; })
+            }
+            if (r1 == 2 || r2 == 2) {
+                this.owner.allDamageTakenMultiplier *= r1 == r2 ? 0.4 : 0.8;
+                this.addTimer(4, () => { this.owner.allDamageTakenMultiplier /= r1 == r2 ? 0.4 : 0.8; })
+            }
+            if (r1 == 3 || r2 == 3) {
+                for (let i = 1; i <= 4; i++) {
+                    this.addTimer(i, () => { this.owner.shield += 2 * effectMultiplier; })
+                }
+            }
+            if (r1 == 4 || r2 == 4) {
+                this.owner.toxicDamageTakenMultiplier *= r1 == r2 ? 0.6 : 0.001;
+                this.addTimer(4, () => { this.owner.toxicDamageTakenMultiplier /= r1 == r2 ? 0.6 : 0.001; })
+            }
+            this.addTimer(4, () => { this.toggle(false); })
+        },
+    },
+    /**
+     * 霓虹吸入器
+     * 每 5 秒觸發一次。
+     * 觸發時，獲得 2 層中毒。
+     * 接下來 3 秒內，攻擊速度 +30%。
+     * 藥效期間，每次攻擊命中時，額外造成一次小量傷害(這個傷害不參加倍數計算)。
+     * 藥效結束後，攻擊速度 -20%，持續 2 秒。
+     */
+    "neon_inhaler": {
+        triggerInterval: 5,
+        persistent: true,
+        onTrigger() {
+            this.toggle(true);
+            this.owner.addStatus(StatusName.poison, 2);
+            this.owner.attackSpeed += 0.3;
+            this.addTimer(3, () => {
+                this.toggle(false);
+                this.owner.attackSpeed -= 0.5;
+                this.addTimer(2, () => {
+                    this.owner.attackSpeed += 0.2;
+                })
+            })
+        },
+        onAttackHit(event) {
+            if (this.enabled) {
+                event.modifier.finalFlat += 2;
+            }
+        },
+    },
+    /**
+     * Dream Dust(幻覺)
+     * 開場食用，獲得6層毒
+     * 閃避率 +20%，miss率+20%。
+     * 每次成功閃避時，獲得5護盾。
+     * 每次攻擊落空，攻擊速度+50%(直到下次攻擊命中)
+     */
+    "dream_dust": {
+        beforeStart() {
+            this.owner.addStatus(StatusName.poison, 6);
+            this.owner.evasion += 0.2;
+            this.owner.hitRate -= 0.2;
+        },
+        onDodge() {
+            this.owner.shield += 5;
+        },
+        onAttackMiss() {
+            if (!this.enabled2) {
+                this.enabled2 = true;
+                this.owner.attackSpeed += 0.5;
+            }
+        },
+        onAttackHit(event) {
+            if (this.enabled2) {
+                this.enabled2 = false;
+                this.owner.attackSpeed -= 0.5;
+            }
+        }
+    },
+    /**
+     * 劣質血清 
+     * 每 8 秒觸發一次。
+     * 觸發時，獲得 20層中毒。
+     * 立刻移除目前 50% 的中毒層數，每移除10層，本場戰鬥受到的毒傷害-5%
+     */
+    "low_grade_serum": {
+        triggerInterval: 8,
+        onTrigger() {
+            this.toggle();
+            this.owner.addStatus(StatusName.poison, 20);
+            const removedPoison = Math.round(this.owner.getStatus(StatusName.poison)!.stack * 0.5);
+            this.owner.addStatus(StatusName.poison, -removedPoison);
+            this.stack += removedPoison;
+            if (this.stack >= 10) {
+                this.stack -= 10;
+                this.owner.toxicDamageTakenMultiplier *= 0.95;
+            }
+        }
+    },
+    /**
+     * 生命監測手環
+     * 全場被動。
+     * 角色清醒狀態時，受到的所有傷害降低 15%。
+     * 每次脫離清醒狀態的時候，獲得當前毒層數*2的護盾
+     */
+    "life_monitor_bracelet": {
+        isUnique: true
+        // 效果實作於"清醒狀態"部分
+    },
+    /**
+     * 規律藥盒 / Routine Pillbox
+     * 全場被動。
+     * 角色每受到5中毒傷害時候，獲得 1 層規律。
+     * 最多 5 層。
+     * 每層規律使毒自然降低速度+5%。
+     */
+    "routine_pillbox": {
+        isUnique: true,
+        afterDamageTaken(event) {
+            if (event.type == DamageType.Toxic) {
+                this.temp1 += event.amount;
+                while (this.temp1 >= 5 && this.stack < 5) {
+                    this.temp1 -= 5;
+                    this.owner.getEffect("drug_tolerance")!.speed += 0.05;
+                    this.stack++;
+                }
+            }
+        }
     }
 };
 
