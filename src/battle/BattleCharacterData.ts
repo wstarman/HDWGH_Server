@@ -48,7 +48,7 @@ export class BattleCharacterData {
     _attackPower: number = 1.0;
     _critRate: number = 0.0;
     _hitRate: number = 1.0;
-    _evasion: number = 1.0;
+    _evasion: number = 0.0;
     _attackSpeed: number = 1.0;
     _totalSpeed: number = 1.0;
 
