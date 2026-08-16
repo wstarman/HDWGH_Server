@@ -77,7 +77,7 @@ const passiveDefs: Record<string, PassiveDef> = {
                 this.owner.critRate += 0.2;
                 this.mainTimer = 0;
                 if (this.owner.getEffect("life_monitor_bracelet")) {
-                    this.owner._allDamageTakenMultiplier *= 0.85;
+                    this.owner.allDamageTakenMultiplier *= 0.85;
                 }
                 if (this.owner.getEffect("ward_access_card")) {
                     this.owner.nonAttackSpeed += 0.5;
@@ -97,7 +97,7 @@ const passiveDefs: Record<string, PassiveDef> = {
                 this.owner.attackSpeed -= 0.3;
                 this.owner.critRate -= 0.2;
                 if (this.owner.getEffect("life_monitor_bracelet")) {
-                    this.owner._allDamageTakenMultiplier /= 0.85;
+                    this.owner.allDamageTakenMultiplier /= 0.85;
                     if (this.owner.hasStatus(StatusName.poison)) {
                         this.owner.shield += this.owner.getStatus(StatusName.poison)!.stack * 2
                     }

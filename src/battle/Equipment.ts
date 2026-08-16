@@ -144,7 +144,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         afterStatusChange(event) {
             if (event.status.id == StatusName.poison && event.delta < 0) {
                 this.temp1 += -event.delta;
-                if (this.temp1 >= 2) {
+                while (this.temp1 >= 2) {
                     this.owner.shield += 5;
                     this.owner.attackPower += 0.05;
                     this.temp1 -= 2;
@@ -202,7 +202,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.addTimer(4, () => { this.owner.attackSpeed -= 0.2 * effectMultiplier; })
             }
             if (r1 == 2 || r2 == 2) {
-                this.owner.allDamageTakenMultiplier *= r1 == r2 ? 0.4 : 0.8;
+                this.owner.allDamageTakenMultiplier *= r1 == r2 ? 0.7 * 0.7 : 0.8;
                 this.addTimer(4, () => { this.owner.allDamageTakenMultiplier /= r1 == r2 ? 0.4 : 0.8; })
             }
             if (r1 == 3 || r2 == 3) {
@@ -211,8 +211,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 }
             }
             if (r1 == 4 || r2 == 4) {
-                this.owner.toxicDamageTakenMultiplier *= r1 == r2 ? 0.6 : 0.4 * 0.4;
-                this.addTimer(4, () => { this.owner.toxicDamageTakenMultiplier /= r1 == r2 ? 0.6 : 0.4 * 0.4; })
+                this.owner.toxicDamageTakenMultiplier *= r1 == r2 ? 0.4 * 0.4 : 0.6;
+                this.addTimer(4, () => { this.owner.toxicDamageTakenMultiplier /= r1 == r2 ? 0.4 * 0.4 : 0.6; })
             }
             this.addTimer(4, () => { this.toggle(false); })
         },
@@ -292,7 +292,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             const removedPoison = Math.round(this.owner.getStatus(StatusName.poison)!.stack * 0.5);
             this.owner.addStatus(StatusName.poison, -removedPoison);
             this.stack += removedPoison;
-            if (this.stack >= 10) {
+            while (this.stack >= 10) {
                 this.stack -= 10;
                 this.owner.toxicDamageTakenMultiplier *= 0.95;
             }
@@ -423,8 +423,10 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             })
         },
         onAttackMiss() {
-            this.stack++;
-            this.owner.critRate += 0.05;
+            if (this.enabled) {
+                this.stack++;
+                this.owner.critRate += 0.05;
+            }
         },
     },
     /**
@@ -533,7 +535,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 antidoteStack = Math.max(0, reducedHP - this.owner.getStatus(StatusName.poison)!.stack);
             }
             this.owner.maxHp *= 0.9;
-            this.owner.addStatus(StatusName.poison, reducedHP)
+            this.owner.addStatus(StatusName.poison, -reducedHP)
             this.stack += antidoteStack;
         }
     }

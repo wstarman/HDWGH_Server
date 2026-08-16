@@ -48,13 +48,15 @@ export const weaponDefs: Record<string, WeaponDef> = {
         onTrigger() {
             if (Math.random() > 1 / this.stack!) {
                 // miss
-                if (this.attack(this.damage, -Infinity)) {
+                const result = this.attack(this.damage, -Infinity)
+                if (result.used) {
                     this.stack! -= 1;
                 }
 
             } else {
                 // hit
-                if (this.attack(this.damage, Infinity)) {
+                const result = this.attack(this.damage, Infinity)
+                if (result.used) {
                     this.stack = 6;
                     this.mainTimer = -2;
                 }
@@ -86,7 +88,8 @@ export const weaponDefs: Record<string, WeaponDef> = {
      */
     "rusty_dagger": {
         onTrigger() {
-            if (this.attack() && Math.random() > 0.5) {
+            const result = this.attack();
+            if (result.hit && Math.random() > 0.5) {
                 this.owner.opponent.addStatus(StatusName.poison, 1);
             }
         },

@@ -55,7 +55,7 @@ export abstract class BaseEffect {
     _stack: number = -1; // 會顯示在前端的通用暫時變數，為負數時不顯示
     tags: string[] = [];
 
-    isUniqui: boolean = false;
+    isUnique: boolean = false;
     damage: number = 0;
     staminaCost: number = 0;
     damageType: DamageType = DamageType.Physical;
@@ -124,14 +124,20 @@ export abstract class BaseEffect {
         return this.tags.includes(tag);
     }
 
-    attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): boolean {
-        if (this.owner.attackProhibited) return false;
+    attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): attackResult {
+        let result: attackResult = {
+            used: false,
+            hit: false
+        }
+        if (this.owner.attackProhibited) return result;
         if (this.owner.stamina >= staminaCost) {
             this.toggle();
             this.owner.stamina -= staminaCost;
-            return this.owner.attack(this, damage, hitRate);
+            result.used = true;
+            result.hit = this.owner.attack(this, damage, hitRate);
+            return result;
         }
-        return false;
+        return result;
     }
 
     addTimer(durationSec: number, callBack: () => void) {
@@ -173,6 +179,11 @@ class TimerManager {
             }
         }
     }
+}
+
+interface attackResult {
+    used: boolean;
+    hit: boolean;
 }
 
 function wrapCallbacks<T extends object>(obj: T, name: string): T {

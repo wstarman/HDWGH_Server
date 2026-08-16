@@ -57,6 +57,7 @@ export class BattleCharacterData {
     attackProhibited = false;
     lifeSteal = 0.0;
     undead = false;
+    beforeDeadTriggered = false;    // 是否觸發過beforeDead
     nonAttackSpeed = 1.0;
 
     private setStat<T>(key: StatIdType, value: number): boolean {

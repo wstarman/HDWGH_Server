@@ -59,10 +59,11 @@ export class BattleCharacter extends BattleCharacterData {
                 }
             }
         });
-        if (!this.alive) {
+        if (!this.alive && !this.beforeDeadTriggered) {
             this.allEffects.forEach(effect => {
                 effect.beforeDead?.()
             });
+            this.beforeDeadTriggered = true;
         }
     }
     // return true if hit
@@ -87,7 +88,7 @@ export class BattleCharacter extends BattleCharacterData {
         if (Math.random() < event.hitRate) {
             // hit
             this.allEffects.forEach(effect => effect.onAttackHit?.(event));
-            if (Math.random() < this.critRate) {
+            if (Math.random() < event.critRate) {
                 event.amount *= 2;
                 event.isCritHit = true;
             }
@@ -129,9 +130,10 @@ export class BattleCharacter extends BattleCharacterData {
             damageSource,
             isCritHit
         }
+        const originalDamage = event.amount;
         this.allEffects.forEach(p => p.beforeDamageTaken?.(event));
         this.applyDamageTakenMultiplier(event);
-        const final = isTrueDamage ? event.amount : (event.amount * this.attackPower + event.modifier.flat) * event.modifier.multiplier + event.modifier.finalFlat;
+        const final = isTrueDamage ? originalDamage : (event.amount * this.attackPower + event.modifier.flat) * event.modifier.multiplier + event.modifier.finalFlat;
         event.amount = final
         this.logger.recordDamageEvent(event, final);
         this.takeDamage(final);
@@ -175,21 +177,28 @@ export class BattleCharacter extends BattleCharacterData {
             if (status.id == id) {
                 if (status.id == StatusName.poison && delta > 0) {
                     const straps = this.getEffects("detox_strap");
-                    straps.forEach(strap => {
-                        let originalDelta = delta;
-                        delta = Math.max(delta - strap.stack, 0);
-                        strap.stack -= Math.min(strap.stack, originalDelta);
-                    })
+                    for (const strap of straps) {
+                        const prevented = Math.min(delta, strap.stack);
+                        delta -= prevented;
+                        strap.stack -= prevented;
+                        if (delta <= 0) break;
+                    }
                 }
                 status.stack = Math.max(0, status.stack + delta);
+                if (status.stack == 0) {
+                    this.statuses.slice(this.statuses.indexOf(status), 1);
+                }
                 return;
             }
         }
-        this.statuses.push(new Status(id, this, delta));
+        if (delta > 0) {
+            this.statuses.push(new Status(id, this, delta));
+        }
     }
     clearStatus(id: string) {
         for (let i = 0; i < this.statuses.length; i++) {
             if (this.statuses[i]!.id == id) {
+                this.statuses[i]!.stack = 0;
                 this.statuses[i]!.onCleared?.();
                 this.statuses.splice(i, 1);
                 return;
@@ -199,7 +208,6 @@ export class BattleCharacter extends BattleCharacterData {
     afterStatusChange(event: StatusChangeEvent) {
         const beforeStack = event.status.stack - event.delta;
         const afterStack = event.status.stack
-        event.status.stack = afterStack;
         this.logger.recordStatusChangeEvent(event, beforeStack, afterStack);
         this.allEffects.forEach(p => p.afterStatusChange?.(event));
     }

@@ -61,8 +61,6 @@ const curseDefs: Record<string, CurseDef> = {
      * 並且接下來 4 秒內，受到的治療效果降低 20%。(此效果會永久殘留1%) 
      */
     "dirty_blood": {
-        persistent: true,
-        triggerInterval: 4,
         onAnyEffectToggle(effect) {
             if (!effect.hasTag("drug")) return;
             this.owner.healRate -= 0.2;
