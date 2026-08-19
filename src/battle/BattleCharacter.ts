@@ -67,17 +67,18 @@ export class BattleCharacter extends BattleCharacterData {
         }
     }
     // return true if hit
-    attack(weapon: Weapon, damage: number = weapon.damage, baseHitRate = 1.0, damageType = weapon.damageType, isTrueDamage = false) {
+    attack(weapon: Weapon, damage: number = weapon.damage, baseHitRate = 1.0, baseCritRate = 0.0, damageType = weapon.damageType, isTrueDamage = false, toSelf = false) {
+        const receiver = toSelf ? this : this.opponent;
         const event: AttackEvent = {
             modifier: {
                 flat: 0,
                 multiplier: 1.0,
                 finalFlat: 0
             },
-            hitRate: this.hitRate * baseHitRate * (1 - this.opponent.evasion),
-            critRate: this.critRate,
+            hitRate: this.hitRate * baseHitRate * (1 - receiver.evasion),
+            critRate: baseCritRate + this.critRate,
             attacker: this,
-            receiver: this.opponent,
+            receiver,
             amount: damage,
             type: damageType,
             damageSource: weapon,
@@ -92,7 +93,14 @@ export class BattleCharacter extends BattleCharacterData {
                 event.amount *= 2;
                 event.isCritHit = true;
             }
-            this.opponent.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
+            event.amount *= Math.pow(0.8, this.getEffectNumber("cold_hand"));
+            if (!toSelf) {
+                for (let i = 0; i < this.getEffectNumber("tilt"); i++) {
+                    this.attack(weapon, weapon.damage * 0.2, weapon.hitRate, 0.5, weapon.damageType, isTrueDamage, true);
+                }
+            }
+            receiver.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
+            this.allEffects.forEach(effect => effect.afterAttackHit?.(event));
             return true
         } else {
             // miss
@@ -103,7 +111,7 @@ export class BattleCharacter extends BattleCharacterData {
                     finalFlat: 0
                 },
                 attacker: this,
-                receiver: this.opponent,
+                receiver,
                 amount: -1,
                 type: damageType,
                 damageSource: weapon,
@@ -111,7 +119,7 @@ export class BattleCharacter extends BattleCharacterData {
             }
             this.logger.recordDamageEvent(missEvent, "miss");
             this.allEffects.forEach(effect => effect.onAttackMiss?.());
-            this.opponent.allEffects.forEach(effect => effect.onDodge?.())
+            receiver.allEffects.forEach(effect => effect.onDodge?.())
             return false
         }
     }

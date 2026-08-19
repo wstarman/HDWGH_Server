@@ -1,6 +1,7 @@
 import type { BattleCharacter } from "./BattleCharacter.js";
 import { Status, StatusName as StatusName } from "./Status.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
+import type { Weapon } from "./Weapon.js";
 
 interface CurseDef extends BaseEffectDef {
 }
@@ -148,6 +149,73 @@ const curseDefs: Record<string, CurseDef> = {
                     }
                 }
             }
+        }
+    },
+
+    // ---------------- 賭徒 ----------------
+
+    /**Cold Hand / ㄕㄨㄟ洨,壞手氣
+     * 每次攻擊命中但沒有爆擊時傷害只有80%
+     */
+    "cold_hand": {
+        // 效果寫在Chracter.attack中
+    },
+    /**Wrong bet / 看走眼，下錯邊
+     * 每次攻擊未命中的時候都會減少自己的武器抗性20%5秒
+     */
+    "wrong_bet": {
+        onAttackMiss() {
+            this.owner.weaponDamageTakenMultiplier *= 1.2;
+        },
+    },
+    /**Tilt / 傾斜??? ，失去理智
+     * 每次攻擊命中但沒有爆擊都會立刻觸發一次攻擊自己的事件
+     * (20%傷害且加50%爆擊率，不消耗耐力，可miss，攻擊自己不觸發本效果)
+     */
+    "tilt": {
+        // 效果寫在Chracter.attack中
+    },
+    /**Sunk cost/ 沉沒成本
+     * 每次未命中，下一次的耐力消耗+1(可疊加)直到命中清0
+     */
+    "sunk_cost": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            this.stack++;
+        },
+        onAttackHit(event) {
+            this.stack = 0;
+        },
+    },
+    /**Gambler's Fallacy / 賭徒謬誤
+     * 每次攻擊未爆擊，減少爆擊率20%
+     * (重置條件:爆擊率完全歸0,立刻爆擊自己一次(必中），刷新此效果)
+     */
+    "gamblers_fallacy": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        afterAttackHit(event) {
+            if (!event.isCritHit) {
+                this.stack++;
+                this.owner.critRate -= 0.2;
+                if (this.owner.critRate <= 0) {
+                    const weapon = event.damageSource as Weapon;
+                    this.owner.attack(weapon, weapon.damage, Infinity, Infinity, weapon.damageType, false, true);
+                    this.owner.critRate += 0.2 * this.stack;
+                    this.stack = 0;
+                }
+            }
+        },
+    },
+    /**Total Ruin / 一敗塗地
+     * 若連續5次攻擊未命中，使自身暈眩5秒
+    */
+    "total_ruin": {
+        onAttackMiss() {
+
         }
     }
 };

@@ -25,6 +25,8 @@ interface EffectCallbacks {
     beforeDamageTaken?(this: BaseEffect, event: DamageEvent): void;
     // 受到傷害後
     afterDamageTaken?(this: BaseEffect, event: DamageEvent): void;
+    // 攻擊命中對手後，接在對手的afterDamageTaken之後，用於需要記錄自身造成傷害的裝備
+    afterAttackHit?(this: BaseEffect, event: DamageEvent): void;
     // 異常狀態層數改變後，包含新增或移除
     afterStatusChange?(this: BaseEffect, event: StatusChangeEvent): void;
     // 任何效果觸發時，通常會在該效果處理之前，且僅包含主動觸發效果
@@ -76,6 +78,7 @@ export abstract class BaseEffect {
     onDodge?: EffectCallbacks["onDodge"];
     beforeDamageTaken?: EffectCallbacks["beforeDamageTaken"];
     afterDamageTaken?: EffectCallbacks["afterDamageTaken"];
+    afterAttackHit?: EffectCallbacks["afterAttackHit"];
     afterStatusChange?: EffectCallbacks["afterStatusChange"];
     onAnyEffectToggle?: EffectCallbacks["onAnyEffectToggle"];
     onStatChange?: EffectCallbacks["onStatChange"];
@@ -125,6 +128,10 @@ export abstract class BaseEffect {
     }
 
     attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): attackResult {
+        const sunkCost = this.owner.getEffect("sunk_cost");
+        if (sunkCost) {
+            staminaCost += sunkCost.stack * this.owner.getEffectNumber("sunk_cost");
+        }
         let result: attackResult = {
             used: false,
             hit: false
