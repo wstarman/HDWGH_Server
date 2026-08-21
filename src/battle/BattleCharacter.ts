@@ -67,7 +67,7 @@ export class BattleCharacter extends BattleCharacterData {
         }
     }
     // return true if hit
-    attack(weapon: Weapon, damage: number = weapon.damage, baseHitRate = 1.0, baseCritRate = 0.0, damageType = weapon.damageType, isTrueDamage = false, toSelf = false) {
+    attack(weapon: BaseEffect, damage: number, staminaCost: number, baseHitRate = 1.0, baseCritRate = 0.0, damageType = weapon.damageType, isTrueDamage = false, toSelf = false) {
         const receiver = toSelf ? this : this.opponent;
         const event: AttackEvent = {
             modifier: {
@@ -77,29 +77,56 @@ export class BattleCharacter extends BattleCharacterData {
             },
             hitRate: this.hitRate * baseHitRate * (1 - receiver.evasion),
             critRate: baseCritRate + this.critRate,
+            critDamage: this.critDamage,
             attacker: this,
             receiver,
             amount: damage,
             type: damageType,
             damageSource: weapon,
             isCritHit: false,
-            isTrueDamage
+            isTrueDamage,
+            staminaCost
         }
         this.allEffects.forEach(effect => effect.beforeAttack?.(event));
-        if (Math.random() < event.hitRate) {
+        let hit = Math.random() < event.hitRate;
+        if (!hit) {
+            /**名字：做記號的牌
+             * 效果：每次攻擊累積層數，不小於4層後，可以在未命中時消耗4層強制變為命中。觸發後有50%機率使自身在5秒內降低50%爆擊傷害。
+             */
+            if (this.getEffect("ge9")) {
+                for (const ge9 of this.getEffects("ge9")) {
+                    if (ge9.stack >= 4) {
+                        ge9.stack -= 4;
+                        hit = true;
+                        if (Math.random() < 0.5) {
+                            this.critDamage -= 0.5;
+                            ge9.addTimer(5, () => {
+                                this.critDamage += 0.5;
+                            })
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        if (hit) {
             // hit
             this.allEffects.forEach(effect => effect.onAttackHit?.(event));
             if (Math.random() < event.critRate) {
-                event.amount *= 2;
                 event.isCritHit = true;
             }
-            event.amount *= Math.pow(0.8, this.getEffectNumber("cold_hand"));
-            if (!toSelf) {
-                for (let i = 0; i < this.getEffectNumber("tilt"); i++) {
-                    this.attack(weapon, weapon.damage * 0.2, weapon.hitRate, 0.5, weapon.damageType, isTrueDamage, true);
-                }
+            if (event.isCritHit) {
+                this.allEffects.forEach(effect => effect.onAttackCrit?.(event));
+            } else {
+                this.allEffects.forEach(effect => effect.onAttackNotCrit?.(event));
             }
+            event.amount *= event.critRate;
             receiver.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
+            if (event.isCritHit) {
+                this.allEffects.forEach(effect => effect.afterAttakCrit?.(event));
+            } else {
+                this.allEffects.forEach(effect => effect.afterAttakNotCrit?.(event));
+            }
             this.allEffects.forEach(effect => effect.afterAttackHit?.(event));
             return true
         } else {
@@ -118,7 +145,7 @@ export class BattleCharacter extends BattleCharacterData {
                 isCritHit: false
             }
             this.logger.recordDamageEvent(missEvent, "miss");
-            this.allEffects.forEach(effect => effect.onAttackMiss?.());
+            this.allEffects.forEach(effect => effect.onAttackMiss?.(event));
             receiver.allEffects.forEach(effect => effect.onDodge?.())
             return false
         }

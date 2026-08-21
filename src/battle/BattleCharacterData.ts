@@ -16,6 +16,7 @@ export type StatIdType =
     | "toxicDamageTakenMultiplier"
     | "attackPower"
     | "critRate"
+    | "critDamage"
     | "hitRate"
     | "evasion"
     | "attackSpeed"
@@ -47,6 +48,7 @@ export class BattleCharacterData {
 
     _attackPower: number = 1.0;
     _critRate: number = 0.0;
+    _critDamage: number = 2.0;
     _hitRate: number = 1.0;
     _evasion: number = 0.0;
     _attackSpeed: number = 1.0;
@@ -59,6 +61,8 @@ export class BattleCharacterData {
     undead = false;
     beforeDeadTriggered = false;    // 是否觸發過beforeDead
     nonAttackSpeed = 1.0;
+    staminaCostMultiplier = 1.0;
+    staminaCostFlat = 0.0;
 
     private setStat<T>(key: StatIdType, value: number): boolean {
         if (this[`_${key}`] !== value) {
@@ -81,7 +85,7 @@ export class BattleCharacterData {
     get maxStamina() { return this._maxStamina; }
     set maxStamina(value: number) { this.setStat("maxStamina", value); }
     get stamina() { return this._stamina; }
-    set stamina(value: number) { this.setStat("stamina", value); }
+    set stamina(value: number) { this.setStat("stamina", Math.min(value, this.maxStamina)); }
     get staminaRecover() { return this._staminaRecover; }
     set staminaRecover(value: number) { this.setStat("staminaRecover", value); }
     get shield() { return this._shield; }
@@ -100,6 +104,8 @@ export class BattleCharacterData {
     set attackPower(value: number) { this.setStat("attackPower", value); }
     get critRate() { return this._critRate; }
     set critRate(value: number) { this.setStat("critRate", value); }
+    get critDamage() { return this._critDamage; }
+    set critDamage(value: number) { this.setStat("critDamage", value); }
     get hitRate() { return this._hitRate; }
     set hitRate(value: number) { this.setStat("hitRate", value); }
     get evasion() { return this._evasion; }

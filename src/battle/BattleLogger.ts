@@ -33,6 +33,9 @@ export interface BattleLog {
     statId?: string;
     target?: number;
     value?: number;
+
+    chineseDescription?: string;
+    englishDescription?: string;
 }
 
 export class BattleLogger {
@@ -124,6 +127,16 @@ export class BattleLogger {
             statId: effect.id,
             value: effect.stack >= 0 ? effect.stack : -1,
             equipmentSlot: effect.index
+        }
+        this.battleLog.push(log);
+    }
+
+    recordCustomEvent(chinese: string, english: string) {
+        const log: BattleLog = {
+            time: this.getTime(),
+            eventType: "custom",
+            chineseDescription: chinese,
+            englishDescription: english
         }
         this.battleLog.push(log);
     }

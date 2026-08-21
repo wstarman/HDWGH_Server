@@ -13,6 +13,7 @@ export class Passive extends BaseEffect {
 
 export const characterPassive: Record<string, Array<string>> = {
     "DrugGuy": ["drug_residue", "drug_tolerance", "sobriety"],
+    "gambler": ["against_the_odds", "gamblers_paradox", "hot_streak"]
 }
 
 const passiveDefs: Record<string, PassiveDef> = {
@@ -143,12 +144,22 @@ const passiveDefs: Record<string, PassiveDef> = {
     },
     /**手氣正旺 / Hot Streak
      * 每次造成爆擊，永久增加本場戰鬥的爆擊率。效果持續至戰鬥結束。
+     * 相關裝備：老虎機
+     * 效果：每3次攻擊結算一次。三次攻擊結果完全相同時獲得獎勵：三次未命中使 手氣正旺 (被動3)立刻觸發9次；三次爆擊則立刻不消耗耐力攻擊7次。
+     * 
+     * 相關裝備：捲錢跑路
+     * 效果：生命降至0時不直接死亡，清除「手氣正旺」(被動3)在本場戰鬥累積的所有爆擊率(X)，發動一次200%吸血的攻擊(必中並且傷害*X)。每場戰鬥只能觸發一次。
      */
     "hot_streak": {
-        afterAttackHit(event) {
-            if (event.isCritHit) {
-                this.owner.critRate += 0.01;
-            }
+        beforeStart() {
+            this.temp1 = 0.01;
+        },
+        afterAttakCrit(event) {
+            this.onTrigger!();
+        },
+        onTrigger() {
+            this.stack++;
+            this.owner.critRate += this.temp1;
         },
     }
 };

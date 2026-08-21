@@ -18,6 +18,7 @@ export interface DamageModifier {
 export interface AttackEvent {
     hitRate: number,
     critRate: number,
+    critDamage: number,
     attacker: BattleCharacter,
     receiver: BattleCharacter,
     amount: number,
@@ -25,7 +26,8 @@ export interface AttackEvent {
     type: DamageType,
     damageSource: DamageSource,
     isCritHit: boolean,
-    isTrueDamage: boolean
+    isTrueDamage: boolean,
+    staminaCost: number
 }
 
 export interface DamageEvent {

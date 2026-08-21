@@ -38,7 +38,7 @@
         "chinese_name": "生鏽匕首",
         "english_description": "Each attack has a 50% chance to apply +1 Poison to the opponent.",
         "chinese_description": "每次攻擊時有 50% 的機率造成對手 +1 中毒。",
-        "stamina_cost": 3,
+        "stamina_cost": 0,
         "attack_interval": 1.5,
         "damage": 3,
         "price": 5,
