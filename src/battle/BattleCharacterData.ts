@@ -81,7 +81,7 @@ export class BattleCharacterData {
         this.hp = Math.min(this.hp, this.maxHp);
     }
     get hp() { return this._hp; }
-    set hp(value: number) { this.setStat("hp", Math.min(value, this.maxHp)); }
+    set hp(value: number) { this.setStat("hp", Math.max(Math.min(value, this.maxHp), 0)); }
     get maxStamina() { return this._maxStamina; }
     set maxStamina(value: number) { this.setStat("maxStamina", value); }
     get stamina() { return this._stamina; }

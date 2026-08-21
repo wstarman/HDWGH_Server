@@ -666,12 +666,12 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         afterAttackHit(event) {
             this.stack++;
-            if (this.stack >= 3) {
+            if (this.stack == 3) {
+                const weapon = event.damageSource as BaseEffect;
+                for (let i = 0; i < 10; i++) {
+                    this.owner.attack(weapon, weapon.damage * 0.1, 0);
+                }
                 this.stack = 0;
-            }
-            const weapon = event.damageSource as BaseEffect;
-            for (let i = 0; i < 10; i++) {
-                this.owner.attack(weapon, weapon.damage * 0.1, 0);
             }
         }
     },
@@ -737,6 +737,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 }
                 this.temp1 = 0;
                 this.temp2 = 0;
+                this.stack = 0;
             }
         },
         afterAttackHit(event) {
@@ -757,6 +758,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 }
                 this.temp1 = 0;
                 this.temp2 = 0;
+                this.stack = 0;
             }
         },
     },
