@@ -29,37 +29,17 @@ app.use(express.json());
 app.get("/", (_, res) => {
     // Test data
     let testCharacter: CharacterInitData = {
-        character_id: "DrugGuy",
+        character_id: "gambler",
         curses: [
-            { "id": "overbright_eyes" },
-            { "id": "hollow_vessel" },
-            { "id": "dirty_blood" },
-            { "id": "glass_nerves" },
-            { "id": "organ_failure" },
-            { "id": "white_rooms" },
+            { "id": "cold_hand" },
+            { "id": "wrong_bet" },
+            { "id": "tilt" },
+            { "id": "sunk_cost" },
+            { "id": "gamblers_fallacy" },
+            { "id": "total_ruin" },
         ],
         equipmets: [
-            // { "id": "loaded_fate" },
-            { "id": "rebound_baton" },
-            { "id": "rusty_dagger" },
-            { "id": "pills" },
-            { "id": "bitter_syrup" },
-            { "id": "night_pill" },
-            { "id": "expired_vitamin" },
-            { "id": "recovery_note" },
-            { "id": "withdrawal_patch" },
-            { "id": "black_market_prescription" },
-            { "id": "neon_inhaler" },
-            { "id": "dream_dust" },
-            { "id": "low_grade_serum" },
-            { "id": "life_monitor_bracelet" },
-            { "id": "routine_pillbox" },
-            { "id": "black_adrenal" },
-            { "id": "overclock_ampoule" },
-            { "id": "white_sun" },
-            { "id": "deadman_protocol" },
-            { "id": "ward_access_card" },
-            { "id": "detox_strap" }
+            { "id": "ge1" },
         ]
     }
 

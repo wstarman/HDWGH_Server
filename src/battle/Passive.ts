@@ -13,6 +13,7 @@ export class Passive extends BaseEffect {
 
 export const characterPassive: Record<string, Array<string>> = {
     "DrugGuy": ["drug_residue", "drug_tolerance", "sobriety"],
+    "gambler": ["against_the_odds", "gamblers_paradox", "hot_streak"]
 }
 
 const passiveDefs: Record<string, PassiveDef> = {
@@ -77,7 +78,7 @@ const passiveDefs: Record<string, PassiveDef> = {
                 this.owner.critRate += 0.2;
                 this.mainTimer = 0;
                 if (this.owner.getEffect("life_monitor_bracelet")) {
-                    this.owner._allDamageTakenMultiplier *= 0.85;
+                    this.owner.allDamageTakenMultiplier *= 0.85;
                 }
                 if (this.owner.getEffect("ward_access_card")) {
                     this.owner.nonAttackSpeed += 0.5;
@@ -97,7 +98,7 @@ const passiveDefs: Record<string, PassiveDef> = {
                 this.owner.attackSpeed -= 0.3;
                 this.owner.critRate -= 0.2;
                 if (this.owner.getEffect("life_monitor_bracelet")) {
-                    this.owner._allDamageTakenMultiplier /= 0.85;
+                    this.owner.allDamageTakenMultiplier /= 0.85;
                     if (this.owner.hasStatus(StatusName.poison)) {
                         this.owner.shield += this.owner.getStatus(StatusName.poison)!.stack * 2
                     }
@@ -113,6 +114,53 @@ const passiveDefs: Record<string, PassiveDef> = {
             this.toggle();
             this.owner.shield += 5;
         }
+    },
+
+    // ---------------- 賭徒 ----------------
+
+    /**逆勢賠率 / Against the Odds
+     * 命中率越低，爆擊率越高。
+    */
+    "against_the_odds": {
+        onAttackHit(event) {
+            event.critRate += Math.max(1 - this.owner.hitRate, 0)
+        },
+    },
+    /**賭徒悖論 / Gambler's Paradox
+     * 每次攻擊未命中，增加下一次命中攻擊的爆擊機率。
+     * 效果可以疊加，攻擊命中後清空。
+     */
+    "gamblers_paradox": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            this.stack++;
+        },
+        onAttackHit(event) {
+            event.critRate += this.stack * 0.01;
+            this.stack = 0;
+        },
+    },
+    /**手氣正旺 / Hot Streak
+     * 每次造成爆擊，永久增加本場戰鬥的爆擊率。效果持續至戰鬥結束。
+     * 相關裝備：老虎機
+     * 效果：每3次攻擊結算一次。三次攻擊結果完全相同時獲得獎勵：三次未命中使 手氣正旺 (被動3)立刻觸發9次；三次爆擊則立刻不消耗耐力攻擊7次。
+     * 
+     * 相關裝備：捲錢跑路
+     * 效果：生命降至0時不直接死亡，清除「手氣正旺」(被動3)在本場戰鬥累積的所有爆擊率(X)，發動一次200%吸血的攻擊(必中並且傷害*X)。每場戰鬥只能觸發一次。
+     */
+    "hot_streak": {
+        beforeStart() {
+            this.temp1 = 0.01;
+        },
+        afterAttakCrit(event) {
+            this.onTrigger!();
+        },
+        onTrigger() {
+            this.stack++;
+            this.owner.critRate += this.temp1;
+        },
     }
 };
 

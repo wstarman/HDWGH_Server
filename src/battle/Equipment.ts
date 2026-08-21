@@ -1,9 +1,10 @@
 import type { BattleCharacter } from "./BattleCharacter.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
-import equipmentData from "../data/equipments.json" with { type: "json" };
+import equipmentDataList from "../data/equipments.json" with { type: "json" };
 import { StatusName } from "./Status.js";
 import { Weapon } from "./Weapon.js";
 import { DamageType } from "../enum/DamageType.js";
+import { Curse } from "./Curse.js";
 
 export interface EquipmentDef extends BaseEffectDef {
 }
@@ -15,10 +16,14 @@ export class Equipment extends BaseEffect {
         }
         else {
             if (!equipmentDataLoaded) {
-                for (const equipment of equipmentData) {
-                    const eid = equipment.id;
-                    if (equipmentDefs[eid] && equipment.tags) {
-                        equipmentDefs[eid].tags = [...equipment.tags];
+                const gradeTable: Record<string, number> = { "low": 0, "mid": 1, "high": 2 };
+                for (const equipmentData of equipmentDataList) {
+                    const eid = equipmentData.id;
+                    if (equipmentDefs[eid] && equipmentData.tags) {
+                        equipmentDefs[eid].tags = [...equipmentData.tags];
+                    }
+                    if (equipmentDefs[eid] && equipmentData.grade) {
+                        equipmentDefs[eid].grade = gradeTable[equipmentData.grade]!;
                     }
                 }
                 equipmentDataLoaded = true;
@@ -144,7 +149,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         afterStatusChange(event) {
             if (event.status.id == StatusName.poison && event.delta < 0) {
                 this.temp1 += -event.delta;
-                if (this.temp1 >= 2) {
+                while (this.temp1 >= 2) {
                     this.owner.shield += 5;
                     this.owner.attackPower += 0.05;
                     this.temp1 -= 2;
@@ -202,7 +207,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.addTimer(4, () => { this.owner.attackSpeed -= 0.2 * effectMultiplier; })
             }
             if (r1 == 2 || r2 == 2) {
-                this.owner.allDamageTakenMultiplier *= r1 == r2 ? 0.4 : 0.8;
+                this.owner.allDamageTakenMultiplier *= r1 == r2 ? 0.7 * 0.7 : 0.8;
                 this.addTimer(4, () => { this.owner.allDamageTakenMultiplier /= r1 == r2 ? 0.4 : 0.8; })
             }
             if (r1 == 3 || r2 == 3) {
@@ -211,8 +216,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 }
             }
             if (r1 == 4 || r2 == 4) {
-                this.owner.toxicDamageTakenMultiplier *= r1 == r2 ? 0.6 : 0.4 * 0.4;
-                this.addTimer(4, () => { this.owner.toxicDamageTakenMultiplier /= r1 == r2 ? 0.6 : 0.4 * 0.4; })
+                this.owner.toxicDamageTakenMultiplier *= r1 == r2 ? 0.4 * 0.4 : 0.6;
+                this.addTimer(4, () => { this.owner.toxicDamageTakenMultiplier /= r1 == r2 ? 0.4 * 0.4 : 0.6; })
             }
             this.addTimer(4, () => { this.toggle(false); })
         },
@@ -268,7 +273,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.owner.attackSpeed += 0.5;
             }
         },
-        onAttackHit(event) {
+        afterAttackHit(event) {
             if (this.enabled2) {
                 this.enabled2 = false;
                 this.owner.attackSpeed -= 0.5;
@@ -292,7 +297,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             const removedPoison = Math.round(this.owner.getStatus(StatusName.poison)!.stack * 0.5);
             this.owner.addStatus(StatusName.poison, -removedPoison);
             this.stack += removedPoison;
-            if (this.stack >= 10) {
+            while (this.stack >= 10) {
                 this.stack -= 10;
                 this.owner.toxicDamageTakenMultiplier *= 0.95;
             }
@@ -382,7 +387,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 })
             })
         },
-        onAttackHit(event) {
+        afterAttackHit(event) {
             if (this.enabled && this.stack < 10) {
                 this.stack++;
                 this.owner.attackSpeed += 0.05;
@@ -423,8 +428,10 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             })
         },
         onAttackMiss() {
-            this.stack++;
-            this.owner.critRate += 0.05;
+            if (this.enabled) {
+                this.stack++;
+                this.owner.critRate += 0.05;
+            }
         },
     },
     /**
@@ -453,7 +460,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 everyEnabledSec();
             }
         },
-        onAttackHit(event) {
+        afterAttackHit(event) {
             if (this.enabled) {
                 event.modifier.flat += 4;
             }
@@ -533,9 +540,307 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 antidoteStack = Math.max(0, reducedHP - this.owner.getStatus(StatusName.poison)!.stack);
             }
             this.owner.maxHp *= 0.9;
-            this.owner.addStatus(StatusName.poison, reducedHP)
+            this.owner.addStatus(StatusName.poison, -reducedHP)
             this.stack += antidoteStack;
         }
+    },
+
+    // ---------------- 賭徒 ---------------- (TODO: 補上ID)
+
+    /**名字：安慰獎籌碼
+     * 效果：未命中時獲得1枚籌碼。爆擊時兌現全部籌碼，每枚增加10%傷害，最多持有5枚。 */
+    "ge1": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            if (this.stack < 5) {
+                this.stack++;
+                this.owner.attackPower += 0.1;
+            }
+        },
+        afterAttakCrit() {
+            this.owner.attackPower -= 0.1 * this.stack;
+            this.stack = 0;
+        }
+    },
+    /**名字：莊家抽水
+     * 效果：爆擊傷害增加40%，但每次爆擊額外消耗1點耐力。耐力不足時不獲得傷害加成。 */
+    "ge2": {
+        onAttackCrit(event) {
+            if (this.owner.stamina >= 1) {
+                this.owner.stamina -= 1;
+                event.critDamage += 0.4;
+            }
+        }
+    },
+    /**名字：未中獎的彩券
+     * 效果：如果攻擊未命中超過第二次，每次攻擊返還25%耐力，直到命中為止 */
+    "ge3": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss(event) {
+            this.stack++;
+            if (this.stack > 2) {
+                this.owner.stamina += event.staminaCost * 0.25;
+            }
+        },
+        afterAttackHit(event) {
+            this.stack = 0;
+        }
+    },
+    /**名字：押冷門
+     * 效果：命中率低於40%的攻擊一旦命中，恢復1點耐力。
+     */
+    "ge4": {
+        afterAttackHit(event) {
+            if (event.hitRate < 0.4) {
+                this.owner.stamina += 1;
+            }
+        }
+    },
+    /**名字：馬丁格爾策略
+     * 效果：每次未命中，使目前的傷害加成依序增加至10%、20%、40%、80%、160%。命中時清空加成；若該次攻擊沒有爆擊，只獲得一半傷害加成。
+     */
+    "ge5": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            this.stack++;
+        },
+        onAttackCrit(event) {
+            if (this.stack > 0) {
+                event.modifier.multiplier += 0.1 * Math.pow(2, this.stack - 1);
+            }
+            this.stack = 0;
+        },
+        onAttackNotCrit(event) {
+            if (this.stack > 0) {
+                event.modifier.multiplier += 0.1 * Math.pow(2, this.stack - 1) * 0.5;
+            }
+            this.stack = 0;
+        },
+    },
+    /**名字：追損客
+     * 效果：每次未命中，使下一次攻擊的傷害與耐力消耗增加20%。效果可以疊加，命中後清空。
+     */
+    "ge6": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            this.stack++;
+            this.owner.staminaCostMultiplier += 0.2;
+        },
+        afterAttackHit(event) {
+            event.modifier.multiplier += this.stack * 0.2;
+            this.stack = 0;
+        }
+    },
+    /**名字：詐領保險
+     * 效果：每連續未命中3次時，回復自己已失去的HP的40%
+     */
+    "ge7": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            this.stack++;
+            if (this.stack >= 3) {
+                this.owner.hp += (this.owner.maxHp - this.owner.hp) * 0.4;
+                this.stack = 0;
+            }
+        },
+        afterAttackHit(event) {
+            this.stack = 0;
+        }
+    },
+    /**名字：Free game
+     * 效果：當你連續命中三次攻擊，觸發連續10次最後一次攻擊[主要指使用的武器](傷害10%，不消耗耐力)
+     */
+    "ge8": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        afterAttackHit(event) {
+            this.stack++;
+            if (this.stack == 3) {
+                const weapon = event.damageSource as BaseEffect;
+                for (let i = 0; i < 10; i++) {
+                    this.owner.attack(weapon, weapon.damage * 0.1, 0);
+                }
+                this.stack = 0;
+            }
+        }
+    },
+    /**名字：做記號的牌
+     * 效果：每次攻擊累積層數，不小於4層後，可以在未命中時消耗4層強制變為命中。觸發後有50%機率使自身在5秒內降低50%爆擊傷害。
+     */
+    "ge9": {
+        // 部分效果寫在character.attack中，記得改id
+        beforeStart() {
+            this.stack = 0;
+        },
+        beforeAttack(event) {
+            this.stack++;
+        },
+    },
+    /**名字：破產清算
+     * 效果：使用武器但耐力不足時，移除一層自身最高等Curse的效果。5秒冷卻。 */
+    "ge10": {
+        // onStaminaInsufficient() {
+        //     let maxStatus = this.owner.statuses[0];
+        //     let chosenCurse: Curse | null = null;
+        //     this.owner.allEffects.forEach(effect => {
+        //         if (effect instanceof Curse) {
+        //             if (!chosenCurse) {
+        //                 chosenCurse = effect;
+        //             } else {
+        //                 if (chosenCurse.grade < effect.grade) {
+        //                     chosenCurse = effect;
+        //                 } else if (chosenCurse.grade = effect.grade)
+        //             }
+        //         }
+        //     })
+        // }
+    },
+    /**名字：幸運硬幣
+     * 效果：受到傷害時有50%機率使該次傷害減半。
+     */
+    "ge11": {
+        beforeDamageTaken(event) {
+            if (Math.random() < 0.5) {
+                event.modifier.multiplier -= 0.25;
+            }
+        },
+    },
+    /**名字：老虎機
+     * 效果：每3次攻擊結算一次。三次攻擊結果完全相同時獲得獎勵：三次未命中使 手氣正旺 (被動3)立刻觸發9次；三次爆擊則立刻不消耗耐力攻擊7次。 */
+    "ge12": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss(event) {
+            this.stack++;
+            this.temp1++;
+            if (this.stack == 3) {
+                if (this.temp1 == 3) {
+                    this.owner.logger.recordCustomEvent(
+                        "獲得[item:ge12]的連續三次未命中獎勵",
+                        "TODO"
+                    )
+                    for (let i = 0; i < 9; i++) {
+                        this.owner.getEffect("hot_streak")?.onTrigger!();
+                    }
+                }
+                this.temp1 = 0;
+                this.temp2 = 0;
+                this.stack = 0;
+            }
+        },
+        afterAttackHit(event) {
+            this.stack++;
+            if (event.isCritHit) {
+                this.temp2++;
+            }
+            if (this.stack == 3) {
+                if (this.temp2 == 3) {
+                    this.owner.logger.recordCustomEvent(
+                        "獲得[item:ge12]的連續三次爆擊獎勵",
+                        "TODO"
+                    )
+                    for (let i = 0; i < 7; i++) {
+                        const weapon = event.damageSource as BaseEffect;
+                        this.owner.attack(weapon, weapon.damage, 0);
+                    }
+                }
+                this.temp1 = 0;
+                this.temp2 = 0;
+                this.stack = 0;
+            }
+        },
+    },
+    /**名字：二十一點
+     * 每次未命中獲得1～6點。爆擊時清空點數，點數越高，該次爆擊傷害越高(傷害倍率 = 1.1 + 3.9 × ((點數 − 1) ÷ 20)² {1.1~5})；點數超過21時立即清空，回復自己的10%maxHP。
+     */
+    "ge13": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss(event) {
+            this.stack += Math.floor(Math.random() * 6 + 1);
+            if (this.stack >= 21) {
+                this.owner.hp += this.owner.maxHp * 0.1;
+            }
+        },
+        onAttackNotCrit(event) {
+            event.critDamage += 0.1 + 3.9 * Math.pow((this.stack - 1) / 20, 2);
+            this.stack = 0;
+        },
+    },
+    /**名字：捲錢跑路
+     * 效果：生命降至0時不直接死亡，清除「手氣正旺」(被動3)在本場戰鬥累積的所有爆擊率(X)，以裝備欄第一個武器發動一次200%吸血的攻擊(必中並且傷害*X)。每場戰鬥只能觸發一次。
+     */
+    "ge14": {
+        beforeStart() {
+            this.enabled = true;
+        },
+        beforeDead() {
+            if (!this.enabled) return;
+            const streak = this.owner.getEffect("hot_streak")!;
+            const streakStack = streak.stack;
+            this.owner.critRate -= streakStack * streak.temp1;
+            streak.stack = 0;
+            let weapon: Weapon | null = null
+            for (let effect of this.owner.allEffects) {
+                if (effect instanceof Weapon) {
+                    weapon = effect;
+                    break;
+                }
+            }
+            if (!weapon) return;
+            this.owner.lifeSteal += 2;
+            weapon.damage *= (1 + streakStack * streak.temp1);
+            weapon.staminaCost -= 999;
+            weapon.onTrigger?.();
+            weapon.damage /= (1 + streakStack * streak.temp1);
+            weapon.staminaCost += 999;
+            this.owner.lifeSteal -= 2;
+            this.enabled = false;
+        },
+    },
+    /**名字：JACKPOT
+     * 效果：每次未命中時都會把該次攻擊的基礎傷害的50%紀錄起來，命中攻擊有7%機率中獎，使該次攻擊必定命中且基礎傷害加入之前紀錄的所有傷害(之後記錄清空)
+     */
+    "ge15": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss(event) {
+            this.stack += event.amount * 0.5;
+        },
+        onAttackHit(event) {
+            if (Math.random() < 0.07) {
+                event.modifier.flat += this.stack;
+                this.stack = 0;
+            }
+        },
+    },
+    /**名字：砸鍋賣鐵
+     * 效果：耐力不足時仍可發動攻擊，每缺少0.5點耐力便失去5%最大生命，並使該次攻擊增加等同於你失去生命值的基礎傷害。
+     */
+    "ge16": {
+        // 效果寫在baseEffect.attack中
+    },
+    /**名字：賭場金庫
+     * 效果：戰鬥開始時獲得相當於最大生命50%的護盾。15秒後或護盾第一次歸零時，； */
+    "ge17": {
+        onStart() {
+            this.owner.shield += this.owner.maxHp * 0.5;
+        },
+        onStatChange(stat, value) {
+        },
     }
 };
-

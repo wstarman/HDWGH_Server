@@ -40,7 +40,8 @@ export class BattleManager {
             else this.result = "lose";
         }
         else if (this.player.hp < 0 && this.enemy.hp < 0 || this.player.hp == this.enemy.hp) {
-            this.result = "draw";
+            // this.result = "draw";
+            this.result = "win"
         }
         else if (this.player.hp > this.enemy.hp) {
             this.result = "win";

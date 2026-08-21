@@ -1,6 +1,8 @@
 import type { BattleCharacter } from "./BattleCharacter.js";
 import { Status, StatusName as StatusName } from "./Status.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
+import type { Weapon } from "./Weapon.js";
+import cursesDataList from "../data/curses.json" with { type: "json" };
 
 interface CurseDef extends BaseEffectDef {
 }
@@ -8,6 +10,13 @@ interface CurseDef extends BaseEffectDef {
 export class Curse extends BaseEffect {
     constructor(owner: BattleCharacter, id: string) {
         super(owner, id, curseDefs);
+        const gradeTable: Record<string, number> = { "low": 0, "mid": 1, "high": 2 };
+        for (const cursesData of cursesDataList) {
+            const cid = cursesData.id;
+            if (curseDefs[cid] && cursesData.grade) {
+                curseDefs[cid].grade = gradeTable[cursesData.grade]!;
+            }
+        }
     }
 }
 
@@ -61,8 +70,6 @@ const curseDefs: Record<string, CurseDef> = {
      * 並且接下來 4 秒內，受到的治療效果降低 20%。(此效果會永久殘留1%) 
      */
     "dirty_blood": {
-        persistent: true,
-        triggerInterval: 4,
         onAnyEffectToggle(effect) {
             if (!effect.hasTag("drug")) return;
             this.owner.healRate -= 0.2;
@@ -150,6 +157,96 @@ const curseDefs: Record<string, CurseDef> = {
                     }
                 }
             }
+        }
+    },
+
+    // ---------------- 賭徒 ----------------
+
+    /**Cold Hand / ㄕㄨㄟ洨,壞手氣
+     * 每次攻擊命中但沒有爆擊時傷害只有80%
+     */
+    "cold_hand": {
+        onAttackNotCrit(event) {
+            if (this.invalid) return;
+            event.amount *= 0.8;
+        },
+    },
+    /**Wrong bet / 看走眼，下錯邊
+     * 每次攻擊未命中的時候都會減少自己的武器抗性20%5秒
+     */
+    "wrong_bet": {
+        onAttackMiss() {
+            if (this.invalid) return;
+            this.owner.weaponDamageTakenMultiplier *= 1.2;
+        },
+    },
+    /**Tilt / 傾斜??? ，失去理智
+     * 每次攻擊命中但沒有爆擊都會立刻觸發一次攻擊自己的事件
+     * (20%傷害且加50%爆擊率，不消耗耐力，可miss，攻擊自己不觸發本效果)
+     */
+    "tilt": {
+        afterAttackHit(event) {
+            if (this.invalid) return;
+            if (event.receiver == this.owner) return;
+            const weapon = event.damageSource as BaseEffect;
+            this.owner.attack(weapon, weapon.damage * 0.2, 0, 1.0, 0.5, weapon.damageType, false, true);
+        }
+    },
+    /**Sunk cost/ 沉沒成本
+     * 每次未命中，下一次的耐力消耗+1(可疊加)直到命中清0
+     */
+    "sunk_cost": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            if (this.invalid) return;
+            this.stack++;
+            this.owner.staminaCostFlat += 1;
+        },
+        onAttackHit(event) {
+            if (this.invalid) return;
+            this.owner.staminaCostFlat -= 1 * this.stack;
+            this.stack = 0;
+        },
+        onInvalid() {
+            this.owner.staminaCostFlat -= 1 * this.stack;
+            this.stack = 0;
+        }
+    },
+    /**Gambler's Fallacy / 賭徒謬誤
+     * 每次攻擊未爆擊，減少爆擊率20%
+     * (重置條件:爆擊率完全歸0,立刻爆擊自己一次(必中），刷新此效果)
+     */
+    "gamblers_fallacy": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        afterAttackHit(event) {
+            if (this.invalid) return;
+            if (!event.isCritHit) {
+                this.stack++;
+                this.owner.critRate -= 0.2;
+                if (this.owner.critRate <= 0) {
+                    const weapon = event.damageSource as BaseEffect;
+                    this.owner.attack(weapon, weapon.damage, 0, Infinity, Infinity, weapon.damageType, false, true);
+                    this.owner.critRate += 0.2 * this.stack;
+                    this.stack = 0;
+                }
+            }
+        },
+        onInvalid() {
+            this.owner.critRate += 0.2 * this.stack;
+            this.stack = 0;
+        }
+    },
+    /**Total Ruin / 一敗塗地
+     * 若連續5次攻擊未命中，使自身暈眩5秒
+    */
+    "total_ruin": {
+        onAttackMiss() {
+            if (this.invalid) return;
+            // TODO
         }
     }
 };

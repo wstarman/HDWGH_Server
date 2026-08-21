@@ -5,6 +5,7 @@ import { type AttackEvent, type DamageEvent, type StatusChangeEvent } from "./Ev
 import { StatusName } from "./Status.js";
 
 interface EffectCallbacks {
+    // 系統事件
     // 每一個tick，用於驅動臨時計時器或檢測狀態
     everyTick?(this: BaseEffect, deltaTime: number): void;
     // 在onStart之前，通常用於給自己上狀態或加基礎數值
@@ -13,26 +14,44 @@ interface EffectCallbacks {
     onStart?(this: BaseEffect): void;
     // 計時器達到 triggerInterval 時，也用於武器攻擊
     onTrigger?(this: BaseEffect): void;
+    // 遺言
+    beforeDead?(this: BaseEffect): void;
+    // 被移除/無效時
+    onInvalid?(this: BaseEffect): void;
+
+    // 攻擊、傷害相關事件
+    // 耐力不足時
+    onStaminaInsufficient?(this: BaseEffect): void;
     // 自身的攻擊開始前，用於改變命中率等
     beforeAttack?(this: BaseEffect, event: AttackEvent): void;
-    // 攻擊命中時，用於給攻擊附加效果和改變傷害。
+    // 攻擊命中時，用於給攻擊附加效果、改變傷害或爆擊率。
     onAttackHit?(this: BaseEffect, event: AttackEvent): void;
+    // 攻擊命中且爆擊成功時，接在onAttackHit之後，用於改變爆擊傷害等。
+    onAttackCrit?(this: BaseEffect, event: AttackEvent): void;
+    // 攻擊命中且未爆擊時，接在onAttackHit之後，用於改變未爆擊時的傷害等。
+    onAttackNotCrit?(this: BaseEffect, event: AttackEvent): void;
     // 攻擊未命中時
-    onAttackMiss?(this: BaseEffect): void;
-    // 對方攻擊未命中時，會接在對方的onAttackMisses之後
+    onAttackMiss?(this: BaseEffect, event: AttackEvent): void;
+    // 對方攻擊未命中時，會接在對方的onAttackMiss之後
     onDodge?(this: BaseEffect): void;
-    // 自身受到的傷害計算前，被攻擊時會在對手的onAttackHit之後，可在此改變受到的傷害
+    // 自身受到的傷害計算前，接在對手的onAttack(Not)Crit之後，可在此改變受到的傷害
     beforeDamageTaken?(this: BaseEffect, event: DamageEvent): void;
     // 受到傷害後
     afterDamageTaken?(this: BaseEffect, event: DamageEvent): void;
+    // 攻擊命中且爆擊後，接在對手受到傷害之後
+    afterAttakCrit?(this: BaseEffect, event: AttackEvent): void;
+    // 攻擊命中且未爆擊後，接在對手受到傷害之後
+    afterAttakNotCrit?(this: BaseEffect, event: AttackEvent): void;
+    // 攻擊命中對手後，接在afterAttak(Not)Crit之後，用於需要記錄自身造成傷害的裝備
+    afterAttackHit?(this: BaseEffect, event: AttackEvent): void;
+
+    // 狀態相關事件
     // 異常狀態層數改變後，包含新增或移除
     afterStatusChange?(this: BaseEffect, event: StatusChangeEvent): void;
     // 任何效果觸發時，通常會在該效果處理之前，且僅包含主動觸發效果
     onAnyEffectToggle?(this: BaseEffect, effect: BaseEffect): void;
-    // 己方狀態改變時
+    // 己方狀態(攻守數值等)改變時
     onStatChange?(this: BaseEffect, stat: StatIdType, value: number): void;
-    // 遺言
-    beforeDead?(this: BaseEffect): void;
 }
 
 export interface BaseEffectDef extends EffectCallbacks {
@@ -41,6 +60,7 @@ export interface BaseEffectDef extends EffectCallbacks {
     persistent?: boolean;
     tags?: Array<string>;
     isUnique?: boolean;
+    grade?: number;  // "low" = 0, "mid" = 1, "high" = 2
 }
 
 export abstract class BaseEffect {
@@ -54,8 +74,9 @@ export abstract class BaseEffect {
     triggerInterval = Infinity;
     _stack: number = -1; // 會顯示在前端的通用暫時變數，為負數時不顯示
     tags: string[] = [];
+    grade: number = 0;  // "low" = 0, "mid" = 1, "high" = 2
 
-    isUniqui: boolean = false;
+    isUnique: boolean = false;
     damage: number = 0;
     staminaCost: number = 0;
     damageType: DamageType = DamageType.Physical;
@@ -65,21 +86,30 @@ export abstract class BaseEffect {
     temp1 = 0;
     temp2 = 0;
     triggerProhibited = false;
+    invalid = false;
 
     everyTick?: EffectCallbacks["everyTick"];
     beforeStart?: EffectCallbacks["beforeStart"];
     onStart?: EffectCallbacks["onStart"];
     onTrigger?: EffectCallbacks["onTrigger"];
+    onStaminaInsufficient?: EffectCallbacks["onStaminaInsufficient"];
     beforeAttack?: EffectCallbacks["beforeAttack"];
     onAttackHit?: EffectCallbacks["onAttackHit"];
+    onAttackCrit: EffectCallbacks["onAttackCrit"];
+    onAttackNotCrit: EffectCallbacks["onAttackNotCrit"];
     onAttackMiss?: EffectCallbacks["onAttackMiss"];
     onDodge?: EffectCallbacks["onDodge"];
     beforeDamageTaken?: EffectCallbacks["beforeDamageTaken"];
     afterDamageTaken?: EffectCallbacks["afterDamageTaken"];
+    afterAttakCrit?: EffectCallbacks["afterAttakCrit"];
+    afterAttakNotCrit?: EffectCallbacks["afterAttakNotCrit"];
+    afterAttackHit?: EffectCallbacks["afterAttackHit"];
     afterStatusChange?: EffectCallbacks["afterStatusChange"];
     onAnyEffectToggle?: EffectCallbacks["onAnyEffectToggle"];
     onStatChange?: EffectCallbacks["onStatChange"];
     beforeDead?: EffectCallbacks["beforeDead"];
+
+    onInvalid?: EffectCallbacks["onInvalid"];
 
     constructor(owner: BattleCharacter, id: string, deflist: Record<string, BaseEffectDef>) {
         this.owner = owner;
@@ -124,14 +154,36 @@ export abstract class BaseEffect {
         return this.tags.includes(tag);
     }
 
-    attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): boolean {
-        if (this.owner.attackProhibited) return false;
-        if (this.owner.stamina >= staminaCost) {
+    /**相關裝備：砸鍋賣鐵(賭徒)
+     * 效果：耐力不足時仍可發動攻擊，每缺少0.5點耐力便失去相當於5%最大生命的生命，並使該次攻擊增加等同於你失去生命值的基礎傷害。
+     */
+    attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): attackResult {
+        staminaCost = Math.max(0, staminaCost * this.owner.staminaCostMultiplier + this.owner.staminaCostFlat);
+        let result: attackResult = {
+            used: false,
+            hit: false
+        }
+        if (this.owner.attackProhibited) return result;
+        let staminaEnough = this.owner.stamina >= staminaCost;
+        if (!staminaEnough) {
+            if (this.owner.getEffect("ge16")) {
+                const effectNumber = this.owner.getEffectNumber("ge16");
+                const lostHp = Math.ceil((staminaCost - this.owner.stamina) / 0.5) * (0.05 * this.owner.maxHp) * effectNumber;
+                this.owner.hp -= lostHp;
+                damage += lostHp;
+                staminaEnough = true;
+            }
+        }
+        if (staminaEnough) {
             this.toggle();
             this.owner.stamina -= staminaCost;
-            return this.owner.attack(this, damage, hitRate);
+            result.used = true;
+            result.hit = this.owner.attack(this, damage, staminaCost, hitRate);
+            return result;
+        } else {
+            this.owner.allEffects.forEach((effect) => effect.onStaminaInsufficient?.());
         }
-        return false;
+        return result;
     }
 
     addTimer(durationSec: number, callBack: () => void) {
@@ -175,11 +227,15 @@ class TimerManager {
     }
 }
 
+interface attackResult {
+    used: boolean;
+    hit: boolean;
+}
+/*
 function wrapCallbacks<T extends object>(obj: T, name: string): T {
     const result = {} as T;
     for (const key in obj) {
         const value = obj[key];
-
         if (typeof value === "function") {
             result[key] = function (this: BaseEffect, ...args: any[]) {
                 const successful = value.apply(this, args);
@@ -193,3 +249,4 @@ function wrapCallbacks<T extends object>(obj: T, name: string): T {
     }
     return result;
 }
+*/

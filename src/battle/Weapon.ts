@@ -2,7 +2,7 @@ import type { BattleCharacter } from "./BattleCharacter.js";
 import { BaseEffect, type BaseEffectDef } from "./BaseEffect.js";
 import { DamageType } from "../enum/DamageType.js";
 import { Equipment, type EquipmentDef } from "./Equipment.js";
-import weaponData from "../data/weapons.json" with { type: "json" };
+import weaponDataList from "../data/weapons.json" with { type: "json" };
 import { StatusName } from "./Status.js";
 
 interface WeaponDef extends EquipmentDef {
@@ -15,16 +15,18 @@ interface WeaponDef extends EquipmentDef {
 export class Weapon extends Equipment {
     constructor(owner: BattleCharacter, id: string, index: number) {
         if (!weaponDataLoaded) {
-            for (const weapon of weaponData) {
-                const wid = weapon.id;
+            const gradeTable: Record<string, number> = { "low": 0, "mid": 1, "high": 2 };
+            for (const weaponData of weaponDataList) {
+                const wid = weaponData.id;
                 if (weaponDefs[wid]) {
-                    weaponDefs[wid].damage = weapon.damage || 0
-                    weaponDefs[wid].staminaCost = weapon.stamina_cost || 0
-                    weaponDefs[wid].triggerInterval = weapon.attack_interval || Infinity
+                    weaponDefs[wid].damage = weaponData.damage ?? 0
+                    weaponDefs[wid].staminaCost = weaponData.stamina_cost ?? 0
+                    weaponDefs[wid].triggerInterval = weaponData.attack_interval ?? Infinity
+                    weaponDefs[wid].grade = gradeTable[weaponData.grade] ?? 0;
                     // if (weaponDefs[wid] && weapon.tags) {
                     //     weaponDefs[wid].tags = [...weapon.tags];
                     // }
-                    // weaponDefs[wid]!.damageType = weapon.damageType || DamageType.Physical
+                    // weaponDefs[wid]!.damageType = weapon.damageType ?? DamageType.Physical
                 }
             }
             weaponDataLoaded = true;
@@ -48,13 +50,15 @@ export const weaponDefs: Record<string, WeaponDef> = {
         onTrigger() {
             if (Math.random() > 1 / this.stack!) {
                 // miss
-                if (this.attack(this.damage, -Infinity)) {
+                const result = this.attack(this.damage, -Infinity)
+                if (result.used) {
                     this.stack! -= 1;
                 }
 
             } else {
                 // hit
-                if (this.attack(this.damage, Infinity)) {
+                const result = this.attack(this.damage, Infinity)
+                if (result.used) {
                     this.stack = 6;
                     this.mainTimer = -2;
                 }
@@ -75,8 +79,8 @@ export const weaponDefs: Record<string, WeaponDef> = {
             if (event.damageSource instanceof Weapon) {
                 this.stack += 1;
                 if (this.stack >= 4) {
-                    this.attack(this.damage, this.hitRate, this.staminaCost / 2);
                     this.stack -= 4;
+                    this.attack(this.damage, this.hitRate, this.staminaCost / 2);
                 }
             }
         }
@@ -86,7 +90,8 @@ export const weaponDefs: Record<string, WeaponDef> = {
      */
     "rusty_dagger": {
         onTrigger() {
-            if (this.attack() && Math.random() > 0.5) {
+            const result = this.attack();
+            if (result.hit && Math.random() > 0.5) {
                 this.owner.opponent.addStatus(StatusName.poison, 1);
             }
         },
