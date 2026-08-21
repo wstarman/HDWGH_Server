@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import type { Character } from "@prisma/client";
 import { BattleManager } from "./battle/BattleManager.js";
 import { Shop } from "./Shop.js";
+import type { BattleLog } from "./battle/BattleLogger.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -15,6 +16,11 @@ export interface CharacterInitData {
     character_id: string,
     curses: IdObject[],
     equipmets: IdObject[]
+}
+
+interface SimulationResult{
+    result: string
+    battleLog: BattleLog[]
 }
 
 
@@ -244,6 +250,59 @@ app.post("/battle", async (req, res) => {
         res.status(500).json({ error: 'Internal server error failed to initialize battle' });
     }
 });
+
+app.post("/test", async (req, res) => {
+    const { data } = req.body;
+
+    const player = data.player_character
+
+    const enemy = data.opponent_character
+
+    console.log(player)
+
+    console.log(enemy)
+
+    const playerInitData: CharacterInitData = {
+        character_id: player.character_id,
+        curses: player.curses,
+        equipmets: player.equipmets
+    }
+
+    const enemyInitData: CharacterInitData = {
+        character_id: enemy.character_id,
+        curses: enemy.curses,
+        equipmets: enemy.equipmets
+    }
+
+    try {
+        let simulationResult: SimulationResult[] = []
+
+        for (let round = 0; round < data.simulation_round; round++) {
+            let bm: BattleManager = new BattleManager(playerInitData, enemyInitData)
+            bm.run()
+
+            let result: SimulationResult = {
+                result: bm.result,
+                battleLog: bm.logger.battleLog
+            }
+            
+            simulationResult.push(result)
+        }
+        
+        res.json({
+            data: {
+                player_character: playerInitData,
+                opponent_character: enemyInitData,
+                simulation_battlelogs: simulationResult,
+            }
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error failed to initialize battle' });
+    }
+});
+
 
 const port = Number(process.env.PORT ?? 3000);
 
