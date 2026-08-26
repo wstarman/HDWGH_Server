@@ -1,93 +1,171 @@
 [
-    {
-        "id": "phantom_dose",
-        "icon_name": "phantom_dose",
-        "english_name": "Phantom Dose",
-        "chinese_name": "幻毒",
-        "english_description": "They will think they inhaled something they should not have.",
-        "chinese_description": "我要記得改",
-        "grade": "mid",
-        "slots": 4,
-        "characters": [
+	{
+		"id": "phantom_dose",
+		"icon_name": "phantom_dose",
+		"english_name": "Phantom Dose",
+		"chinese_name": "幻毒",
+		"english_description": "They will think they inhaled something they should not have.",
+		"chinese_description": "我要記得改",
+		"grade": "mid",
+		"slots": 4,
+		"characters": [
             "DrugGuy"
-        ]
-    },
-    {
-        "id": "overbright_eyes",
-        "icon_name": "overbright_eyes",
-        "english_name": "Overbright Eyes",
-        "chinese_name": "Overbright Eyes",
-        "english_description": "Gain 1 stack of Sensory Overload each time a drug effect is triggered. Each stack of Sensory Overload increases the miss chance of the next attack. Clear all Sensory Overload after an attack misses.",
-        "chinese_description": "每次觸發藥物效果時，獲得 1 層感官過載。每層感官過載使下一次攻擊增加miss機率。攻擊miss後清除所有感官過載。",
-        "grade": "low",
-        "slots": 2,
-        "characters": [
+		]
+	},
+	{
+		"id": "overbright_eyes",
+		"icon_name": "overbright_eyes",
+		"english_name": "Overbright Eyes",
+		"chinese_name": "Overbright Eyes",
+		"english_description": "Gain 1 stack of Sensory Overload each time a drug effect is triggered. Each stack of Sensory Overload increases the miss chance of the next attack. Clear all Sensory Overload after an attack misses.",
+		"chinese_description": "每次觸發藥物效果時，獲得 1 層感官過載。每層感官過載使下一次攻擊增加 miss 機率。攻擊 miss 後清除所有感官過載。",
+		"grade": "low",
+		"slots": 2,
+		"characters": [
             "DrugGuy"
-        ]
-    },
-    {
-        "id": "hollow_vessel",
-        "icon_name": "hollow_vessel",
-        "english_name": "Hollow Vessel",
-        "chinese_name": "Hollow Vessel",
-        "english_description": "Whenever Poison stacks decrease by more than 5, enter Stun for 1 second. After this effect triggers, it has a 3-second cooldown, and the threshold required for the next trigger increases by 10.",
-        "chinese_description": "毒層數每減少超過5，進入一秒昏厥期，此效果觸發後有3秒的冷卻並且每次觸發下次需要的數值+10",
-        "grade": "low",
-        "slots": 2,
-        "characters": [
+		]
+	},
+	{
+		"id": "hollow_vessel",
+		"icon_name": "hollow_vessel",
+		"english_name": "Hollow Vessel",
+		"chinese_name": "Hollow Vessel",
+		"english_description": "Whenever {poision} stacks decrease by more than 5, enter {stun} for 1 second. After this effect triggers, it has a 3-second cooldown, and the threshold required for the next trigger increases by 10.",
+		"chinese_description": "{poision}層數每減少超過5，進入{stun}一秒，此效果觸發後有3秒的冷卻並且每次觸發下次需要的數值+10。",
+		"grade": "low",
+		"slots": 2,
+		"characters": [
             "DrugGuy"
-        ]
-    },
-    {
-        "id": "dirty_blood",
-        "icon_name": "dirty_blood",
-        "english_name": "Dirty Blood",
-        "chinese_name": "汙血",
-        "english_description": "Gain 2 additional stacks of Poison each time a drug effect is triggered. For the next 4 seconds, received healing is reduced by 20%. This effect permanently retains 1%.",
-        "chinese_description": "每次觸發藥物效果時，額外獲得 2 層中毒。並且接下來 4 秒內，受到的治療效果降低 20%。(此效果會永久殘留1%)",
-        "grade": "mid",
-        "slots": 4,
-        "characters": [
+		]
+	},
+	{
+		"id": "dirty_blood",
+		"icon_name": "dirty_blood",
+		"english_name": "Dirty Blood",
+		"chinese_name": "汙血",
+		"english_description": "Gain 2 additional stacks of {poision} each time a drug effect is triggered. For the next 4 seconds, received healing is reduced by 20%. This effect permanently retains 1%.",
+		"chinese_description": "每次觸發藥物效果時，額外獲得 2 層{poision}。並且接下來 4 秒內，受到的治療效果降低 20%。(此效果會永久殘留1%)",
+		"grade": "mid",
+		"slots": 4,
+		"characters": [
             "DrugGuy"
-        ]
-    },
-    {
-        "id": "glass_nerves",
-        "icon_name": "glass_nerves",
-        "english_name": "Glass Nerves",
-        "chinese_name": "易碎感官",
-        "english_description": "Whenever the character loses 10 Poison stacks by any means or enters Sober, damage reduction decreases by 10%. If triggered by entering Sober, this effect is doubled.",
-        "chinese_description": "當角色以任何方式減少10層毒或者進入清醒狀態時，減傷-10%(如果是進入清醒狀態觸發，效力2x)",
-        "grade": "mid",
-        "slots": 4,
-        "characters": [
+		]
+	},
+	{
+		"id": "glass_nerves",
+		"icon_name": "glass_nerves",
+		"english_name": "Glass Nerves",
+		"chinese_name": "易碎感官",
+		"english_description": "Whenever the character loses 10 {poision} stacks by any means or enters Sober, {allRes} decreases by 10%. If triggered by entering Sober, this effect is doubled.",
+		"chinese_description": "當角色以任何方式減少10層{poision}或者進入清醒狀態時，{allRes}-10%(如果是進入清醒狀態觸發，效力2x)",
+		"grade": "mid",
+		"slots": 4,
+		"characters": [
             "DrugGuy"
-        ]
-    },
-    {
-        "id": "organ_failure",
-        "icon_name": "organ_failure",
-        "english_name": "Organ Failure",
-        "chinese_name": "器官衰竭",
-        "english_description": "Gain 1 stack of Organ Failure each time a drug effect is triggered. Each stack of organ strain reduces maximum health by 4% until the end of the battle. Stacks up to 20 times (-80%).",
-        "chinese_description": "每次觸發藥物效果時，獲得 1 層器官衰竭。每層器官負荷使最大生命值降低 4%，持續到本場戰鬥結束。最多疊加 20 層(-80%)。",
-        "grade": "high",
-        "slots": 6,
-        "characters": [
+		]
+	},
+	{
+		"id": "organ_failure",
+		"icon_name": "organ_failure",
+		"english_name": "Organ Failure",
+		"chinese_name": "器官衰竭",
+		"english_description": "Gain 1 stack of Organ Failure each time a drug effect is triggered. Each stack of organ strain reduces {maxHp} by 4% until the end of the battle. Stacks up to 20 times (-80%).",
+		"chinese_description": "每次觸發藥物效果時，獲得 1 層器官衰竭。每層器官負荷使{maxHp}降低 4%，持續到本場戰鬥結束。最多疊加 20 層(-80%)。",
+		"grade": "high",
+		"slots": 6,
+		"characters": [
             "DrugGuy"
-        ]
-    },
-    {
-        "id": "white_rooms",
-        "icon_name": "white_room",
-        "english_name": "White Rooms",
-        "chinese_name": "白色房間",
-        "english_description": "At the start of battle, all drugs trigger at the same time. Their effects are not applied, but Poison stacks are counted; in other words, all Poison is applied once. After this effect, Poison stacks are multiplied by 1.5. Before entering Sober for the first time, detoxification speed is increased. Until the first time you enter Sober, all your drugs stop triggering and you cannot attack.",
-        "chinese_description": "戰鬥開始時:所有藥物同時觸發，效果不計算但是毒層數計算(簡單來說就是全部的毒上一次)，此效果後毒層數1.5倍 ; 在進入第一次清醒狀態前排毒速度增加，未進入第一次清醒狀態前，你的所有藥物停止觸發，並且你無法攻擊",
-        "grade": "high",
-        "slots": 6,
-        "characters": [
+		]
+	},
+	{
+		"id": "white_rooms",
+		"icon_name": "white_room",
+		"english_name": "White Rooms",
+		"chinese_name": "白色房間",
+		"english_description": "At the start of battle, all drugs trigger at the same time. Their effects are not applied, but {poision} stacks are counted; in other words, all {poision} is applied once. After this effect, {poision} stacks are multiplied by 1.5. Before entering Sober for the first time, detoxification speed is increased. Until the first time you enter Sober, all your drugs stop triggering and you cannot attack.",
+		"chinese_description": "戰鬥開始時：所有藥物同時觸發，效果不計算但是{poision}層數計算（簡單來說就是全部的{poision}上一次），此效果後{poision}層數1.5倍；在進入第一次清醒狀態前排毒速度增加，未進入第一次清醒狀態前，你的所有藥物停止觸發，並且你無法攻擊。",
+		"grade": "high",
+		"slots": 6,
+		"characters": [
             "DrugGuy"
-        ]
-    }
+		]
+	},
+	{
+		"id": "cold_hand",
+		"icon_name": "cold_hand",
+		"english_name": "Cold Hand",
+		"chinese_name": "壞手氣",
+		"english_description": "Whenever an attack hits without being a critical hit, it deals only 80% damage.",
+		"chinese_description": "每次攻擊命中但沒有爆擊時，該次攻擊只造成 80% 傷害。",
+		"grade": "low",
+		"slots": 2,
+		"characters": [
+			"Gambler"
+		]
+	},
+	{
+		"id": "wrong_bet",
+		"icon_name": "wrong_bet",
+		"english_name": "Wrong Bet",
+		"chinese_name": "下錯注",
+		"english_description": "Whenever an attack misses, {weaponRes} -20% for 5 seconds.",
+		"chinese_description": "每次攻擊未命中時，自身{weaponRes} -20%，持續 5 秒。",
+		"grade": "low",
+		"slots": 2,
+		"characters": [
+			"Gambler"
+		]
+	},
+	{
+		"id": "tilt",
+		"icon_name": "tilt",
+		"english_name": "Tilt",
+		"chinese_name": "徹底瘋狂",
+		"english_description": "Whenever an attack hits without being a critical hit, immediately trigger an attack against yourself. This self-attack deals 20% damage, gains +50% {critRate}, consumes no {stamina}, and can miss. Attacking yourself does not trigger this effect.",
+		"chinese_description": "每次攻擊命中但沒有爆擊時，立即觸發一次攻擊自己的事件。該次自我攻擊造成 20% 傷害、{critRate} +50%、不消耗{stamina}，且可以未命中。攻擊自己不會觸發本效果。",
+		"grade": "mid",
+		"slots": 4,
+		"characters": [
+			"Gambler"
+		]
+	},
+	{
+		"id": "sunk_cost",
+		"icon_name": "sunk_cost",
+		"english_name": "Sunk Cost",
+		"chinese_name": "沉沒成本",
+		"english_description": "Each miss increases the next attack's {stamina} cost by 1. This effect stacks and is cleared when an attack hits.",
+		"chinese_description": "每次未命中，使下一次攻擊的{stamina}消耗 +1。效果可以疊加，命中時清空。",
+		"grade": "mid",
+		"slots": 4,
+		"characters": [
+			"Gambler"
+		]
+	},
+	{
+		"id": "gamblers_fallacy",
+		"icon_name": "gamblers_fallacy",
+		"english_name": "Gambler's Fallacy",
+		"chinese_name": "賭徒謬誤",
+		"english_description": "Whenever an attack is not a critical hit, {critRate} -20%. Reset condition: when {critRate} reaches 0, immediately perform a guaranteed critical hit against yourself, then reset this effect.",
+		"chinese_description": "每次攻擊未爆擊時，{critRate} -20%。重置條件：{critRate}完全歸 0 時，立刻對自己造成一次必定命中的爆擊，並刷新本效果。",
+		"grade": "high",
+		"slots": 6,
+		"characters": [
+			"Gambler"
+		]
+	},
+	{
+		"id": "total_ruin",
+		"icon_name": "total_ruin",
+		"english_name": "Total Ruin",
+		"chinese_name": "一敗塗地",
+		"english_description": "After 5 consecutive attacks miss, all positive effects related to equipment stacks are disabled for 5 seconds.",
+		"chinese_description": "連續 5 次攻擊未命中時，所有與裝備層數相關的正面效果失效 5 秒。",
+		"grade": "high",
+		"slots": 6,
+		"characters": [
+			"Gambler"
+		]
+	}
 ]

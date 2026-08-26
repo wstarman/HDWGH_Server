@@ -1,0 +1,50 @@
+[
+	{
+		"id": "drug_residue",
+		"icon_name": "drug_residue",
+		"english_name": "Drug Residue",
+		"chinese_name": "藥物殘留",
+		"english_description": "Start the battle with 5 stacks of {poision}.",
+		"chinese_description": "開場自帶5層{poision}在身上"
+	},
+	{
+		"id": "drug_tolerance",
+		"icon_name": "drug_tolerance",
+		"english_name": "Drug Tolerance",
+		"chinese_name": "抗藥性",
+		"english_description": "Naturally gain 20% {toxicRes}. Lose 2 stacks of {poision} every second.",
+		"chinese_description": "自然獲得20%{toxicRes}，每秒減少兩層{poision}"
+	},
+	{
+		"id": "sobriety",
+		"icon_name": "sobriety",
+		"english_name": "Sobriety",
+		"chinese_name": "清醒",
+		"english_description": "Whenever the character's {poision} stacks reach 0 during battle, immediately enter Sober. After gaining any {poision} stacks, Sober remains for 1 second before ending.\nSober effects:\n\t{attackSpeed} +30%\n\t{critRate} +20%\n\tGain 5 {shield} per second.",
+		"chinese_description": "戰鬥途中每次身上{poision}層數歸零立刻進入清醒模式，有任何{poision}層數後滯留一秒消失。\n清醒效果:\n\t{attackSpeed}+30%\n\t{critRate}+20%\n\t每秒獲得5{shield}"
+	},
+	{
+		"id": "against_the_odds",
+		"icon_name": "against_the_odds",
+		"english_name": "Against the Odds",
+		"chinese_name": "逆勢賠率",
+		"english_description": "The lower the character's {hitRate}, the higher their {critRate}.",
+		"chinese_description": "{hitRate}越低，{critRate}越高。"
+	},
+	{
+		"id": "gamblers_paradox",
+		"icon_name": "gamblers_paradox",
+		"english_name": "Gambler's Paradox",
+		"chinese_name": "賭徒悖論",
+		"english_description": "Each missed attack increases the {critRate} of the next attack that hits. This effect stacks and is cleared after an attack hits.",
+		"chinese_description": "每次攻擊未命中，增加下一次命中攻擊的{critRate}。效果可以疊加，攻擊命中後清空。"
+	},
+	{
+		"id": "hot_streak",
+		"icon_name": "hot_streak",
+		"english_name": "Hot Streak",
+		"chinese_name": "手氣正旺",
+		"english_description": "Each critical hit permanently increases {critRate} for the current battle.",
+		"chinese_description": "每次造成爆擊，永久增加本場戰鬥的{critRate}。"
+	}
+]

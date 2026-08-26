@@ -5,23 +5,24 @@
         "english_name": "Loaded Fate",
         "chinese_name": "命在弦上",
         "english_description": "Fires once every 1 second. Like Russian roulette, attacks can be empty shots until a real shot is fired. Empty shots count as normal attacks and are marked as miss. A real shot always hits, ignoring miss chance, then requires a fixed 2-second reset period before repeating the cycle.",
-        "chinese_description": "(ps.這好像應該丟中階，到時候再補)每 1 秒射擊一次，跟俄羅斯輪盤一樣有機會空槍，一直到射中為止。空槍算正常攻擊，並被標註為 miss。實際開槍必定命中，不受 miss 率影響，並且需要固定 2 秒的重置期，重置後往復以上循環。",
+        "chinese_description": "每 1 秒射擊一次，跟俄羅斯輪盤一樣有機會空槍，一直到射中為止。空槍算正常攻擊，並被標註為 miss。實際開槍必定命中，不受 miss 率影響，並且需要固定 2 秒的重置期，重置後往復以上循環。",
         "stamina_cost": 2,
         "attack_interval": 1,
         "damage": 30,
         "price": 10,
-        "grade": "low",
+        "grade": "mid",
         "characters": [
             "Common"
-        ]
+        ],
+        "tags": ["weapon"]
     },
     {
         "id": "rebound_baton",
         "icon_name": "rebound_baton",
         "english_name": "Rebound Baton",
         "chinese_name": "回彈警棍",
-        "english_description": "After taking 4 weapon damage events, immediately attack once and consume half stamina. Damage over time such as Poison or Burn does not count toward the received attack count.",
-        "chinese_description": "每受到 4 次武器傷害事件後，立即攻擊一次，消耗一半耐力。中毒、燃燒等持續傷害不計入受到攻擊次數。",
+        "english_description": "After taking 4 weapon damage events, immediately attack once and consume half {stamina}. Damage over time such as {poision} does not count toward the received attack count.",
+        "chinese_description": "每受到 4 次武器傷害事件後，立即攻擊一次，消耗一半{stamina}。{poision}等持續傷害不計入受到攻擊次數。",
         "stamina_cost": 6,
         "attack_interval": 4,
         "damage": 10,
@@ -29,22 +30,24 @@
         "grade": "low",
         "characters": [
             "Common"
-        ]
+        ],
+        "tags": ["weapon"]
     },
     {
         "id": "rusty_dagger",
         "icon_name": "rusty_dagger",
         "english_name": "Rusty Dagger",
         "chinese_name": "生鏽匕首",
-        "english_description": "Each attack has a 50% chance to apply +1 Poison to the opponent.",
-        "chinese_description": "每次攻擊時有 50% 的機率造成對手 +1 中毒。",
-        "stamina_cost": 0,
+        "english_description": "Each attack has a 50% chance to apply +1 {poision} to the opponent.",
+        "chinese_description": "每次攻擊時有 50% 的機率造成對手 +1 {poision}。",
+        "stamina_cost": 3,
         "attack_interval": 1.5,
         "damage": 3,
         "price": 5,
         "grade": "low",
         "characters": [
             "Common"
-        ]
+        ],
+        "tags": ["weapon"]
     }
 ]

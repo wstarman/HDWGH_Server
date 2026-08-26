@@ -1,254 +1,632 @@
 [
-    {
-        "id": "pills",
-        "icon_name": "pills",
-        "english_name": "White Tablet",
-        "chinese_name": "白色小藥片",
-        "english_description": "Triggers every 5 seconds. On trigger, gain 1 Poison stack and randomly gain one of the following effects for 4 seconds:\n\tAttack +15%\n\tAttack speed +10%\n\tWeapon damage taken -10%",
-        "chinese_description": "每 5 秒觸發一次。觸發時，獲得 1 層中毒，並隨機獲得以下一種效果，持續 4 秒：\n\t攻擊力 +15%\n\t攻擊速度 +10%\n\t受到武器傷害 -10%",
-        "price": 5,
-        "grade": "low",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "bitter_syrup",
-        "icon_name": "cold_syrup",
-        "english_name": "Bitter Syrup",
-        "chinese_name": "苦味糖漿",
-        "english_description": "Takes effect at the start of battle. Recover 3 HP every 1 second and reduce Poison damage taken by 10%. At the start of battle and every 3 seconds afterward, gain 1 Poison stack.",
-        "chinese_description": "開始時生效，每 1 秒回復 3 HP，並使受到的中毒傷害降低 10%。開場時以及之後每 3 秒獲得 1 層中毒。",
-        "price": 5,
-        "grade": "low",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "night_pill",
-        "icon_name": "sleeping_pill",
-        "english_name": "Night Pill",
-        "chinese_name": "安眠藥",
-        "english_description": "Battle-wide passive. Triggers every 3 seconds. For the next 2 seconds, weapon damage taken is reduced by 50%. When the effect ends, gain 1 Poison stack and return 40% of the damage.",
-        "chinese_description": "全場被動。每 3 秒觸發一次。接下來 2 秒內，受到的武器傷害降低 50%，但是在效果結束時獲得 1 層中毒並且返還 40% 傷害。",
-        "price": 10,
-        "grade": "low",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "expired_vitamin",
-        "icon_name": "vitamin_c",
-        "english_name": "Expired Vitamin",
-        "chinese_name": "過期維他命",
-        "english_description": "Passive: maximum health gain +10%. Triggers every 4 seconds. On trigger, gain 10 max HP and 1 Poison stack. For the next 5 seconds, attack speed +20%.",
-        "chinese_description": "被動：最大生命值獲取量 +10%。每 4 秒觸發一次。觸發時，獲得 10 max HP、 1 層中毒。接下來 5 秒內，攻擊速度 +20%。",
-        "price": 10,
-        "grade": "low",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "recovery_note",
-        "icon_name": "quit_drug_note",
-        "english_name": "Recovery Note",
-        "chinese_name": "戒毒小紙條",
-        "english_description": "Battle-wide passive. Whenever the character reduces Poison by 2 stacks by any means, gain 5 Shield and +5% damage.",
-        "chinese_description": "全場被動。角色每次以任何手段減少 2 層毒，獲得 5 護盾並且傷害 +5%。",
-        "price": 5,
-        "grade": "low",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": []
-    },
-    {
-        "id": "withdrawal_patch",
-        "icon_name": "withdrawal_patches",
-        "english_name": "Withdrawal Patch",
-        "chinese_name": "戒斷貼片",
-        "english_description": "Battle-wide passive. If the character takes Poison damage, 10% of that damage is converted into Shield. Increases the character's natural Poison decay speed by 20%. This effect does not apply while Poison stacks are below 5.",
-        "chinese_description": "全場被動。如果角色因為中毒受傷，其中的 10% 轉化為護盾。此外，當中毒層數大於 4 層時，增加「抗藥性」的中毒衰減速度 20%。",
-        "price": 5,
-        "grade": "low",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": []
-    },
-    {
-        "id": "black_market_prescription",
-        "icon_name": "sus_pills",
-        "english_name": "Black Market Prescription",
-        "chinese_name": "黑市處方",
-        "english_description": "Triggers every 4 seconds. On trigger, gain 3 Poison stacks and randomly gain two of the following effects for 4 seconds:\n\tAttack +30%\n\tAttack speed +20%\n\tDamage taken -20%\n\tGain 2 Shield per second\n\tPoison damage taken -40%\n\nIf the same effect is rolled more than once, that effect's value is increased by 50%. For example, rolling Attack twice results in (30% + 30%) x 1.5 = +90%.",
-        "chinese_description": "每 4 秒觸發一次。觸發時，獲得 3 層中毒，並隨機獲得以下兩種效果，持續 4 秒：\n\t攻擊力 +30%\n\t攻擊速度 +20%\n\t受到傷害 -20%\n\t每秒增加 2 點護盾\n\t中毒傷害降低 40%\n\n如果隨機到重複效果，該效果數值提高 50%。例如抽到兩次攻擊力，最後效果是 (30% + 30%) x 1.5 = +90%。",
-        "price": 15,
-        "grade": "mid",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "neon_inhaler",
-        "icon_name": "inhaler2",
-        "english_name": "Neon Inhaler",
-        "chinese_name": "霓虹吸入器",
-        "english_description": "Triggers every 5 seconds. On trigger, gain 2 Poison stacks. For the next 3 seconds, attack speed +30%.\n\nWhile the drug effect is active, each successful attack deals a small amount of additional damage. This damage is not affected by multipliers. After the drug effect ends, attack speed -20% for 2 seconds.",
-        "chinese_description": "每 5 秒觸發一次。觸發時，獲得 2 層中毒。接下來 3 秒內，攻擊速度 +30%。\n\n藥效期間，每次攻擊命中時，額外造成一次小量傷害（這個傷害不參加倍數計算）。藥效結束後，攻擊速度 -20%，持續 2 秒。",
-        "price": 15,
-        "grade": "mid",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "dream_dust",
-        "icon_name": "dream_dust",
-        "english_name": "Dream Dust",
-        "chinese_name": "幻塵",
-        "english_description": "Consumed at the start of battle, gaining 6 Poison stacks. Dodge chance +20% and miss chance +20%.\n\nWhenever you successfully dodge, gain 5 Shield. Whenever an attack misses, attack speed +50% until the next successful hit.",
-        "chinese_description": "開場食用，獲得 6 層毒。閃避率 +20%，miss 率 +20%。\n\n每次成功閃避時，獲得 5 護盾。每次攻擊落空，攻擊速度 +50%（直到下次攻擊命中）。",
-        "price": 15,
-        "grade": "mid",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "low_grade_serum",
-        "icon_name": "serum",
-        "english_name": "Degraded Serum",
-        "chinese_name": "劣質血清",
-        "english_description": "Triggers every 8 seconds. On trigger, gain 20 Poison stacks. Immediately remove 50% of current Poison stacks. For every 10 Poison stacks removed, reduce Poison damage taken in this battle by 5%.",
-        "chinese_description": "每 8 秒觸發一次。觸發時，獲得 20 層中毒。立刻移除目前 50% 的中毒層數，每移除 10 層，本場戰鬥受到的毒傷害 -5%。",
-        "price": 15,
-        "grade": "mid",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "life_monitor_bracelet",
-        "icon_name": "life_bracelet",
-        "english_name": "Life Monitor Bracelet",
-        "chinese_name": "生命監測手環",
-        "english_description": "Battle-wide passive. While the character is Sober, all damage taken is reduced by 15%. Whenever the character leaves Sober, gain Shield equal to current Poison stacks x 2.",
-        "chinese_description": "全場被動。角色清醒狀態時，受到的所有傷害降低 15%。每次脫離清醒狀態的時候，獲得當前毒層數 x 2 的護盾。",
-        "price": 15,
-        "grade": "mid",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": []
-    },
-    {
-        "id": "routine_pillbox",
-        "icon_name": "regular_pillbox",
-        "english_name": "Routine Pillbox",
-        "chinese_name": "規律藥盒",
-        "english_description": "Battle-wide passive. Whenever the character takes 5 Poison damage, gain 1 Routine stack, up to 5 stacks. Each Routine stack increases natural Poison decay speed by 5%.",
-        "chinese_description": "全場被動。角色每受到 5 中毒傷害時，獲得 1 層規律，最多 5 層。每層規律使「抗藥性」的中毒衰減速度 +5%。",
-        "price": 15,
-        "grade": "mid",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": []
-    },
-    {
-        "id": "black_adrenal",
-        "icon_name": "black_adrenal",
-        "english_name": "Black Adrenal",
-        "chinese_name": "黑色腺素",
-        "english_description": "Triggers every 9 seconds. On trigger, gain 20 Poison stacks. For the next 5 seconds, attack +25%, attack speed +25%, and attacks gain 50% lifesteal.\n\nAfter the drug effect ends, lose 20% of current HP plus 10% of max HP.",
-        "chinese_description": "每 9 秒觸發一次。觸發時，獲得 20 層中毒。接下來 5 秒內，攻擊力 +25%，攻擊速度 +25%，並且攻擊增加 50% 吸血。\n\n藥效結束後，失去目前生命值的 20% + 最大生命的 10%。",
-        "price": 25,
-        "grade": "high",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "overclock_ampoule",
-        "icon_name": "bottled_lightning",
-        "english_name": "Overclock Ampoule",
-        "chinese_name": "超頻安瓿",
-        "english_description": "Triggers every 8 seconds. For the next 5 seconds, attack speed +50%.\n\nWhile the drug effect is active, gain 1 Overclock stack after each attack. Each Overclock stack further increases attack speed by 5%, up to 10 stacks. After the drug effect ends, clear all Overclock stacks and enter Neural Burn for 3 seconds. During Neural Burn, each attack grants 2 Poison stacks.",
-        "chinese_description": "每 8 秒觸發一次。接下來 5 秒內，攻擊速度 +50%。\n\n藥效期間，每次攻擊後，額外獲得 1 層超頻。每層超頻使攻擊速度再 +5%，最多 10 層。藥效結束後，清除所有超頻，並進入神經燒灼 3 秒。神經燒灼期間，每次攻擊獲得兩層中毒。",
-        "price": 25,
-        "grade": "high",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "white_sun",
-        "icon_name": "white_sun",
-        "english_name": "White Sun",
-        "chinese_name": "白日",
-        "english_description": "Triggers every 7 seconds. On trigger, gain 5 Poison stacks. For the next 4 seconds, miss chance +50% and critical chance +50%.\n\nWhile the drug effect is active, each miss increases critical chance by another 5%. After the drug effect ends, enter Whiteout Vision for 2 seconds. During Whiteout Vision, each attack has a 25% chance to miss.",
-        "chinese_description": "每 7 秒觸發一次。觸發時，獲得 5 層中毒。接下來 4 秒內，miss 率 +50%，爆擊率 +50%。\n\n藥效期間，每次 miss 都會讓爆擊率再加上 5%。藥效結束後，進入白化視界 2 秒。白化視界期間，每次攻擊有 25% 機率落空。",
-        "price": 25,
-        "grade": "high",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "deadman_protocol",
-        "icon_name": "deadman_protocol",
-        "english_name": "Deadman Protocol",
-        "chinese_name": "死人協議",
-        "english_description": "Passive effect. Automatically triggers when the character takes fatal damage. Can trigger only once per battle.\n\nOn trigger, gain 150 Poison stacks and gain an effect that reduces Poison by 50 stacks per second. The character cannot die until Poison returns to 0. All attacks deal additional damage.\n\nWhen the drug effect ends, if the enemy is still alive, the character dies immediately.",
-        "chinese_description": "被動效果。角色受到致命傷害時自動觸發。每場戰鬥只能觸發一次。\n\n觸發時，獲得 150 層中毒，獲得每秒降低 50 層毒的效果。接下來角色無法死亡，直到毒回到 0 結束。所有攻擊附帶額外傷害。\n\n藥效結束時，如果敵人仍然存活，角色直接死亡。",
-        "price": 25,
-        "grade": "high",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": ["drug"]
-    },
-    {
-        "id": "ward_access_card",
-        "icon_name": "access_card",
-        "english_name": "Ward Access Card",
-        "chinese_name": "病房門卡",
-        "english_description": "Battle-wide passive. While Sober, all non-weapon equipment triggers 50% faster. Whenever the character's Poison stacks exceed 20, enter Ward.\n\nDuring Ward:\n\tForce Sober.\n\tThe character loses 10 Poison stacks per second.\n\tFor every 10 Poison stacks reduced during this time, lose HP equal to 5% of max HP.\n\tIf Poison reaches 0 during this time, Ward lingers for 1 second before ending.",
-        "chinese_description": "全場被動。清醒狀態時所有非武器裝備觸發快 50%。角色每次身上中毒超過 20 層後，進入病房狀態。\n\n病房狀態期間：\n\t強制清醒\n\t角色每秒減少 10 層毒\n\t此期間每減少 10 層毒扣除等量 5% 最大生命值的 HP\n\t若毒在此期間到達 0，病房狀態將會滯留 1 秒後解除",
-        "price": 25,
-        "grade": "high",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": []
-    },
-    {
-        "id": "detox_strap",
-        "icon_name": "strap",
-        "english_name": "Detox Strap",
-        "chinese_name": "淨斷束帶",
-        "english_description": "While Sober, damage reduction +15%. Whenever the character leaves Sober, reduce max HP by 10% and immediately reduce Poison stacks by an equal amount. If there are no Poison stacks to reduce, gain Antidote stacks, causing the next N Poison stacks to be nullified.",
-        "chinese_description": "清醒狀態減傷 +15%。每次角色脫離清醒狀態，降低 10% 最大 HP，立刻減少等量的毒層數，若無層數可減，獲得解毒劑層數（使接下來 N 層毒失效）。",
-        "price": 25,
-        "grade": "high",
-        "characters": [
-            "DrugGuy"
-        ],
-        "tags": []
-    }
+	{
+		"id": "pills",
+		"icon_name": "pills",
+		"english_name": "White Tablet",
+		"chinese_name": "白色小藥片",
+		"english_description": "Triggers every 5 seconds. On trigger, gain 1 {poision} stack and randomly gain one of the following effects for 4 seconds:\n\t{atk} +15%\n\t{attackSpeed} +10%\n\t{weaponRes} -10%",
+		"chinese_description": "每 5 秒觸發一次。觸發時，獲得 1 層{poision}，並隨機獲得以下一種效果，持續 4 秒：\n\t{atk} +15%\n\t{attackSpeed} +10%\n\t{weaponRes} -10%",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "bitter_syrup",
+		"icon_name": "cold_syrup",
+		"english_name": "Bitter Syrup",
+		"chinese_name": "苦味糖漿",
+		"english_description": "Takes effect at the start of battle. Recover 3 {hp} every 1 second and encrease {toxicRes} by 10%. At the start of battle and every 3 seconds afterward, gain 1 {poision} stack.",
+		"chinese_description": "開始時生效，每 1 秒回復 3 {hp}，並使{toxicRes} +10%。開場時以及之後每 3 秒加 1 層{poision}。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "night_pill",
+		"icon_name": "sleeping_pill",
+		"english_name": "Night Pill",
+		"chinese_name": "安眠藥",
+		"english_description": "Battle-wide passive. Triggers every 3 seconds. For the next 2 seconds, {weaponRes} +50%. When the effect ends, gain 1 {poision} stack and return 40% of the damage.",
+		"chinese_description": "全場被動。每 3 秒觸發一次。接下來 2 秒內，{weaponRes} +50%，但是在效果結束時獲得一層{poision}並且返還 40% 傷害。",
+		"price": 10,
+		"grade": "low",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "expired_vitamin",
+		"icon_name": "vitamin_c",
+		"english_name": "Expired Vitamin",
+		"chinese_name": "過期維他命",
+		"english_description": "Passive: {maxHp} gain +10%. Triggers every 4 seconds. On trigger, gain 10 {maxHp} and 1 {poision} stack. For the next 5 seconds, {attackSpeed} +20%.",
+		"chinese_description": "被動：{maxHp}獲取量 +10%。每 4 秒觸發一次。觸發時，獲得 10 {maxHp}、一層{poision}。接下來 5 秒內，{attackSpeed} +20%。",
+		"price": 10,
+		"grade": "low",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "recovery_note",
+		"icon_name": "quit_drug_note",
+		"english_name": "Recovery Note",
+		"chinese_name": "戒毒小紙條",
+		"english_description": "Battle-wide passive. Whenever the character reduces {poision} by 2 stacks by any means, gain 5 {shield} and +5% damage.",
+		"chinese_description": "全場被動。角色每次以任何手段減少 2 層{poision}，獲得 5 {shield} 並且傷害 +5%。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": []
+	},
+	{
+		"id": "withdrawal_patch",
+		"icon_name": "withdrawal_patches",
+		"english_name": "Withdrawal Patch",
+		"chinese_name": "戒斷貼片",
+		"english_description": "Battle-wide passive. If the character takes {poision} damage, 10% of that damage is converted into {shield}. Increases the character's natural {poision} decay speed by 20%. This effect does not apply while {poision} stacks are below 5.",
+		"chinese_description": "全場被動。如果角色因為{poision}受傷，其中的 10% 轉化為{shield}。增加「抗藥性」的{poision}衰減速度20%，此效果在{poision}層數低於 5 時不生效。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": []
+	},
+	{
+		"id": "black_market_prescription",
+		"icon_name": "sus_pills",
+		"english_name": "Black Market Prescription",
+		"chinese_name": "黑市處方",
+		"english_description": "Triggers every 4 seconds. On trigger, gain 3 {poision} stacks and randomly gain two of the following effects for 4 seconds:\n\t{atk} +30%\n\t{attackSpeed} +20%\n\t{allRes} +20%\n\tGain 2 {shield} per second\n\t{toxicRes} +40%\n\nIf the same effect is rolled more than once, that effect's value is increased by 50%. For example, rolling {atk} twice results in (30% + 30%) x 1.5 = +90%.",
+		"chinese_description": "每 4 秒觸發一次。觸發時，獲得 3 層{poision}，並隨機獲得以下兩種效果，持續 4 秒：\n\t{atk} +30%\n\t{attackSpeed} +20%\n\t{allRes} +20%\n\t每秒增加 2 點{shield}\n\t{toxicRes} +40%\n\n如果隨機到重複效果，該效果數值提高 50%。例如抽到兩次{atk}，最後效果是 (30% + 30%) x 1.5 = +90%。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "neon_inhaler",
+		"icon_name": "inhaler2",
+		"english_name": "Neon Inhaler",
+		"chinese_name": "霓虹吸入器",
+		"english_description": "Triggers every 5 seconds. On trigger, gain 2 {poision} stacks. For the next 3 seconds, {attackSpeed} +30%.\n\nWhile the drug effect is active, each successful attack deals a small amount of additional damage. This damage is not affected by multipliers. After the drug effect ends, {attackSpeed} -20% for 2 seconds.",
+		"chinese_description": "每 5 秒觸發一次。觸發時，獲得 2 層{poision}。接下來 3 秒內，{attackSpeed} +30%。\n\n藥效期間，每次攻擊命中時，額外造成1點傷害（這個傷害不參加倍數計算）。藥效結束後，{attackSpeed} -20%，持續 2 秒。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "dream_dust",
+		"icon_name": "dream_dust",
+		"english_name": "Dream Dust",
+		"chinese_name": "幻塵",
+		"english_description": "Consumed at the start of battle, gaining 6 {poision} stacks. {evasion} +20% and {hitRate} -20%.\n\nWhenever you successfully dodge, gain 5 {shield}. Whenever an attack misses, {attackSpeed} +50% until the next successful hit.",
+		"chinese_description": "開場食用，獲得 6 層{poision}。{evasion} +20%，{hitRate} -20%。\n\n每次成功閃避時，獲得 5 {shield}。每次攻擊落空，{attackSpeed} +50%（直到下次攻擊命中）。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "low_grade_serum",
+		"icon_name": "serum",
+		"english_name": "Degraded Serum",
+		"chinese_name": "劣質血清",
+		"english_description": "Triggers every 8 seconds. On trigger, gain 20 {poision} stacks. Immediately remove 50% of current {poision} stacks. For every 10 {poision} stacks removed, increase {toxicRes} in this battle by 5%.",
+		"chinese_description": "每 8 秒觸發一次。觸發時，獲得 20 層{poision}。立刻移除目前 50% 的{poision}層數，每移除 10 層，本場戰鬥{toxicRes} +5%。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "life_monitor_bracelet",
+		"icon_name": "life_bracelet",
+		"english_name": "Life Monitor Bracelet",
+		"chinese_name": "生命監測手環",
+		"english_description": "Battle-wide passive. While the character is Sober, {allRes} +15%. Whenever the character leaves Sober, gain {shield} equal to current {poision} stacks x 2.",
+		"chinese_description": "全場被動。角色清醒狀態時，{allRes} +15%。每次脫離清醒狀態的時候，獲得當前{poision}層數 x 2 的{shield}。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": []
+	},
+	{
+		"id": "routine_pillbox",
+		"icon_name": "regular_pillbox",
+		"english_name": "Routine Pillbox",
+		"chinese_name": "規律藥盒",
+		"english_description": "Battle-wide passive. Whenever the character takes 5 Poison damage, gain 1 Routine stack, up to 5 stacks. Each Routine stack increases natural Poison decay speed by 5%.",
+		"chinese_description": "全場被動。角色每受到 5 點{toxic}傷害時，獲得 1 層規律，最多 5 層。每層規律使「抗藥性」的{poision}衰減速度 +5%。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": []
+	},
+	{
+		"id": "black_adrenal",
+		"icon_name": "black_adrenal",
+		"english_name": "Black Adrenal",
+		"chinese_name": "黑色腺素",
+		"english_description": "Triggers every 9 seconds. On trigger, gain 20 {poision} stacks. For the next 5 seconds, {atk} +25%, {attackSpeed} +25%, and attacks gain 50% lifesteal.\n\nAfter the drug effect ends, lose 20% of current {hp} plus 10% of {maxHp}.",
+		"chinese_description": "每 9 秒觸發一次。觸發時，獲得 20 層{poision}。接下來 5 秒內，{atk} +25%，{attackSpeed} +25%，並且攻擊增加 50% 吸血。\n\n藥效結束後，失去目前{hp}的 20% + {maxHp}的 10%。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "overclock_ampoule",
+		"icon_name": "bottled_lightning",
+		"english_name": "Overclock Ampoule",
+		"chinese_name": "超頻安瓿",
+		"english_description": "Triggers every 8 seconds. For the next 5 seconds, {attackSpeed} +50%.\n\nWhile the drug effect is active, gain 1 Overclock stack after each attack. Each Overclock stack further increases {attackSpeed} by 5%, up to 10 stacks. After the drug effect ends, clear all Overclock stacks and enter Neural Burn for 3 seconds. During Neural Burn, each attack grants 2 {poision} stacks.",
+		"chinese_description": "每 8 秒觸發一次。接下來 5 秒內，{attackSpeed} +50%。\n\n藥效期間，每次攻擊後，額外獲得 1 層超頻。每層超頻使{attackSpeed}再 +5%，最多 10 層。藥效結束後，清除所有超頻，並進入神經燒灼 3 秒。神經燒灼期間，每次攻擊獲得兩層{poision}。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "white_sun",
+		"icon_name": "white_sun",
+		"english_name": "White Sun",
+		"chinese_name": "白日",
+		"english_description": "Triggers every 7 seconds. On trigger, gain 5 {poision} stacks. For the next 4 seconds, {hitRate} -50% and {critRate} +50%.\n\nWhile the drug effect is active, each miss increases {critRate} by another 5%. After the drug effect ends, enter Whiteout Vision for 2 seconds. During Whiteout Vision, {missRate} increased by 25%.",
+		"chinese_description": "每 7 秒觸發一次。觸發時，獲得 5 層{poision}。接下來 4 秒內，{hitRate} -50%，{critRate} +50%。\n\n藥效期間，每次 miss 都會讓{critRate}再加上 5%。藥效結束後，進入白化視界 2 秒。白化視界期間，{hitRate}降低25%。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "deadman_protocol",
+		"icon_name": "deadman_protocol",
+		"english_name": "Deadman Protocol",
+		"chinese_name": "死人協議",
+		"english_description": "Passive effect. Automatically triggers when the character takes fatal damage. Can trigger only once per battle.\n\nOn trigger, gain 150 {poision} stacks and gain an effect that reduces {poision} by 50 stacks per second. The character cannot die until {poision} returns to 0. All attacks deal additional damage.\n\nWhen the drug effect ends, if the enemy is still alive, the character dies immediately.",
+		"chinese_description": "被動效果。角色受到致命傷害時自動觸發。每場戰鬥只能觸發一次。\n\n觸發時，獲得 150 層{poision}，獲得每秒降低 50 層{poision}的效果。接下來角色無法死亡，直到{poision}回到 0 結束。所有攻擊附帶4點額外傷害。\n\n藥效結束時，如果敵人仍然存活，角色直接死亡。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": ["drug"]
+	},
+	{
+		"id": "ward_access_card",
+		"icon_name": "access_card",
+		"english_name": "Ward Access Card",
+		"chinese_name": "病房門卡",
+		"english_description": "Battle-wide passive. While Sober, all non-weapon equipment triggers 50% faster. Whenever the character's {poision} stacks exceed 20, enter Ward.\n\nDuring Ward:\n\tForce Sober.\n\tThe character loses 10 {poision} stacks per second.\n\tFor every 10 {poision} stacks reduced during this time, lose HP equal to 5% of {maxHp}.\n\tIf {poision} reaches 0 during this time, Ward lingers for 1 second before ending.",
+		"chinese_description": "全場被動。清醒狀態時所有非武器裝備觸發快 50%。角色每次身上{poision}超過 20 層後，進入病房狀態。\n\n病房狀態期間：\n\t強制清醒\n\t角色每秒減少 10 層{poision}\n\t此期間每減少 10 層{poision}扣除相當於 5% {maxHp}的 {hp}\n\t若{poision}在此期間到達 0，病房狀態將會滯留 1 秒後解除",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": []
+	},
+	{
+		"id": "detox_strap",
+		"icon_name": "strap",
+		"english_name": "Detox Strap",
+		"chinese_name": "淨斷束帶",
+		"english_description": "While Sober, {allRes} +15%. Whenever the character leaves Sober, reduce {maxHp} by 10% and immediately reduce {poision} stacks by an equal amount. If there are no {poision} stacks to reduce, gain Antidote stacks, causing the next N {poision} stacks to be nullified.",
+		"chinese_description": "清醒狀態{allRes} +15%。每次角色脫離清醒狀態，降低 10% {maxHp}，立刻減少等量的{poision}層數，若無層數可減，獲得解毒劑層數（使接下來 N 層{poision}失效）。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"DrugGuy"
+		],
+		"tags": []
+	},
+	{
+		"id": "consolation_chip",
+		"icon_name": "consolation_chip",
+		"english_name": "Consolation Chip",
+		"chinese_name": "安慰獎籌碼",
+		"english_description": "Whenever an attack misses, gain 1 Chip. On a critical hit, cash in all Chips. Each Chip increases that attack's damage by 10%. Hold up to 5 Chips.",
+		"chinese_description": "攻擊未命中時，獲得 1 枚籌碼。爆擊時兌現全部籌碼，每枚使該次攻擊的傷害增加 10%。最多持有 5 枚。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "house_cut",
+		"icon_name": "house_cut",
+		"english_name": "House Cut",
+		"chinese_name": "莊家抽水",
+		"english_description": "Critical damage +40%, but each critical hit consumes 1 additional {stamina}. If there is not enough {stamina}, the damage bonus does not apply.",
+		"chinese_description": "爆擊傷害 +40%，但每次爆擊額外消耗 1 點{stamina}。{stamina}不足時，不獲得傷害加成。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "losing_lottery_ticket",
+		"icon_name": "losing_lottery_ticket",
+		"english_name": "Losing Lottery Ticket",
+		"chinese_name": "未中獎的彩券",
+		"english_description": "After more than 2 consecutive misses, each attack refunds 25% of its {stamina} cost until an attack hits.",
+		"chinese_description": "連續未命中超過 2 次後，每次攻擊返還 25% 的{stamina}消耗，直到攻擊命中為止。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "long_shot_bet",
+		"icon_name": "long_shot_bet",
+		"english_name": "Long Shot Bet",
+		"chinese_name": "押冷門",
+		"english_description": "When an attack with less than 40% {hitRate} hits, recover 1 {stamina}.",
+		"chinese_description": "{hitRate}低於 40% 的攻擊一旦命中，回復 1 點{stamina}。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "martingale_strategy",
+		"icon_name": "martingale_strategy",
+		"english_name": "Martingale Strategy",
+		"chinese_name": "馬丁格爾策略",
+		"english_description": "Each miss increases the current damage bonus in sequence to 10%, 20%, 40%, 80%, and 160%. Clear the bonus when an attack hits. If that attack is not a critical hit, only half of the damage bonus applies.",
+		"chinese_description": "每次未命中，使目前的傷害加成依序增加至 10%、20%、40%、80%、160%。命中時清空加成；若該次攻擊沒有爆擊，只獲得一半的傷害加成。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "loss_chaser",
+		"icon_name": "loss_chaser",
+		"english_name": "Loss Chaser",
+		"chinese_name": "追損客",
+		"english_description": "Each miss increases the next attack's damage and {stamina} cost by 20%. This effect stacks and is cleared when an attack hits.",
+		"chinese_description": "每次未命中，使下一次攻擊的傷害與{stamina}消耗增加 20%。效果可以疊加，命中後清空。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "insurance_fraud",
+		"icon_name": "insurance_fraud",
+		"english_name": "Insurance Fraud",
+		"chinese_name": "詐領保險",
+		"english_description": "After every 3 consecutive misses, recover 40% of missing {hp}.",
+		"chinese_description": "每連續未命中 3 次時，回復已失去{hp}的 40%。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "free_game",
+		"icon_name": "free_game",
+		"english_name": "Free Game",
+		"chinese_name": "Free game",
+		"english_description": "After 3 consecutive attacks hit, repeat the last attack 10 times. Each repeated attack deals 10% damage and consumes no {stamina}. The repeated attack primarily refers to the equipped weapon's attack.",
+		"chinese_description": "連續命中 3 次攻擊時，連續觸發 10 次最後一次攻擊（主要指使用的武器）；每次造成 10% 傷害，且不消耗{stamina}。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "marked_cards",
+		"icon_name": "marked_cards",
+		"english_name": "Marked Cards",
+		"chinese_name": "做記號的牌",
+		"english_description": "Gain 1 Mark stack with each attack. At 4 or more stacks, consume 4 stacks when an attack misses to force it to hit. After this triggers, there is a 50% chance to reduce your critical damage by 50% for 5 seconds.",
+		"chinese_description": "每次攻擊累積 1 層記號。持有至少 4 層時，可在攻擊未命中時消耗 4 層，強制使該次攻擊變為命中。觸發後有 50% 機率使自身的爆擊傷害降低 50%，持續 5 秒。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "bankruptcy_liquidation",
+		"icon_name": "bankruptcy_liquidation",
+		"english_name": "Bankruptcy Liquidation",
+		"chinese_name": "破產清算",
+		"english_description": "When attempting to use a weapon without enough {stamina}, remove 1 stack of your highest-grade Curse. 5-second cooldown.",
+		"chinese_description": "使用武器但{stamina}不足時，移除 1 層自身最高等級 Curse 的效果。冷卻時間 5 秒。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "lucky_coin",
+		"icon_name": "lucky_coin",
+		"english_name": "Lucky Coin",
+		"chinese_name": "幸運硬幣",
+		"english_description": "When taking damage, there is a 50% chance to halve that damage.",
+		"chinese_description": "受到傷害時，有 50% 機率使該次傷害減半。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "slot_machine",
+		"icon_name": "slot_machine",
+		"english_name": "Slot Machine",
+		"chinese_name": "老虎機",
+		"english_description": "Resolve the results after every 3 attacks. If all 3 results are identical, gain a reward: 3 misses immediately trigger Hot Hand (Passive 3) 9 times; 3 critical hits immediately perform 7 attacks without consuming {stamina}.",
+		"chinese_description": "每 3 次攻擊結算一次。3 次攻擊結果完全相同時獲得獎勵：3 次未命中，使「手氣正旺」（被動 3）立刻觸發 9 次；3 次爆擊，則立刻進行 7 次不消耗{stamina}的攻擊。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "blackjack",
+		"icon_name": "blackjack",
+		"english_name": "Blackjack",
+		"chinese_name": "二十一點",
+		"english_description": "Each miss grants 1-6 points. A critical hit clears all points; the more points held, the higher that critical hit's damage (damage multiplier = 1.1 + 3.9 x ((points - 1) / 20)^2, ranging from 1.1 to 5). If points exceed 21, immediately clear them and recover 10% of {maxHp}.",
+		"chinese_description": "每次未命中獲得 1～6 點。爆擊時清空點數；點數越高，該次爆擊傷害越高（傷害倍率 = 1.1 + 3.9 × ((點數 − 1) ÷ 20)²，範圍為 1.1～5）。點數超過 21 時，立即清空點數並回復 10% {maxHp}。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "cash_and_dash",
+		"icon_name": "cash_and_dash",
+		"english_name": "Cash and Dash",
+		"chinese_name": "捲錢跑路",
+		"english_description": "When {hp} reaches 0, do not die immediately. Clear all {critRate} (X) accumulated by Hot Hand (Passive 3) during this battle, then perform an attack with 200% lifesteal. This attack is guaranteed to hit and its damage is multiplied by X. Can trigger only once per battle.",
+		"chinese_description": "{hp}降至 0 時不直接死亡。清除「手氣正旺」（被動 3）在本場戰鬥累積的所有{critRate}（X），並發動一次具有 200% 吸血的攻擊；該次攻擊必定命中，且傷害乘以 X。每場戰鬥只能觸發一次。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "jackpot",
+		"icon_name": "jackpot",
+		"english_name": "JACKPOT",
+		"chinese_name": "JACKPOT",
+		"english_description": "Whenever an attack misses, record 50% of that attack's base damage. Each attack that hits has a 7% chance to hit the jackpot, making it guaranteed to hit and adding all previously recorded damage to its base damage. Clear the recorded damage afterward.",
+		"chinese_description": "每次未命中時，記錄該次攻擊基礎傷害的 50%。命中的攻擊有 7% 機率中獎，使該次攻擊必定命中，且其基礎傷害加入先前記錄的所有傷害；之後清空記錄。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "pawn_it_all",
+		"icon_name": "pawn_it_all",
+		"english_name": "Pawn It All",
+		"chinese_name": "砸鍋賣鐵",
+		"english_description": "Attacks can still be performed without enough {stamina}. For every 0.5 missing {stamina}, lose 5% of {maxHp} and add base damage equal to the {hp} lost to that attack.",
+		"chinese_description": "{stamina}不足時仍可發動攻擊。每缺少 0.5 點{stamina}，便失去 5% {maxHp}，並使該次攻擊增加等同於所失去{hp}的基礎傷害。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "bracer",
+		"icon_name": "bracer",
+		"english_name": "Bracer",
+		"chinese_name": "護腕",
+		"english_description": "{maxHp} +10%. Recover 0.5 {hp} per second.",
+		"chinese_description": "{maxHp} +10%。每秒回復 0.5 {hp}。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "pendant",
+		"icon_name": "pendant",
+		"english_name": "Pendant",
+		"chinese_name": "掛墜",
+		"english_description": "{maxStamina} +20%. {stamina} recovery +0.5 per second.",
+		"chinese_description": "{maxStamina} +20%。{stamina}回復速度每秒 +0.5。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "band",
+		"icon_name": "band",
+		"english_name": "Band",
+		"chinese_name": "系帶",
+		"english_description": "{weaponRes} +10%. {attackSpeed} +5%.",
+		"chinese_description": "{weaponRes} +10%。{attackSpeed} +5%。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "backup_battery",
+		"icon_name": "backup_battery",
+		"english_name": "Backup Battery",
+		"chinese_name": "備用電池",
+		"english_description": "The first time {stamina} reaches 0 in each battle, immediately recover 2 {stamina}.",
+		"chinese_description": "每場戰鬥第一次{stamina}降至 0 時，立即回復 2 點{stamina}。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "kinetic_energy_recycler",
+		"icon_name": "kinetic_energy_recycler",
+		"english_name": "Kinetic Energy Recycler",
+		"chinese_name": "動能回收器",
+		"english_description": "For every 50 damage taken, recover 1 {stamina}.",
+		"chinese_description": "每受到 50 點傷害，回復 1 點{stamina}。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "perfect_timing",
+		"icon_name": "perfect_timing",
+		"english_name": "Perfect Timing",
+		"chinese_name": "完美對拍",
+		"english_description": "Every third attack consumes no {stamina}.",
+		"chinese_description": "每第 3 次攻擊不消耗{stamina}。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "nuclear_core",
+		"icon_name": "nuclear_core",
+		"english_name": "Nuclear Core",
+		"chinese_name": "核動力核心",
+		"english_description": "When {stamina} reaches 0, immediately recover all {stamina}. 12-second cooldown.",
+		"chinese_description": "{stamina}降至 0 時，立即回復全部{stamina}。冷卻時間 12 秒。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "overdrive_engine",
+		"icon_name": "overdrive_engine",
+		"english_name": "Overdrive Engine",
+		"chinese_name": "超載引擎",
+		"english_description": "While {hp} is below 50%, recover 5 additional {stamina} per second.",
+		"chinese_description": "{hp}低於 50% 時，{stamina}回復速度每秒 +5。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "cowards_shell",
+		"icon_name": "cowards_shell",
+		"english_name": "Coward's Shell",
+		"chinese_name": "膽小龜殼",
+		"english_description": "While {hp} is at or below 25%, damage taken -50% and weapon damage -50%.",
+		"chinese_description": "{hp}不高於 25% 時，受到的傷害 -50%，武器攻擊力 -50%。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "vampire_pendant",
+		"icon_name": "vampire_pendant",
+		"english_name": "Vampire Pendant",
+		"chinese_name": "吸血鬼吊墜",
+		"english_description": "Attacks gain 50% lifesteal.",
+		"chinese_description": "攻擊吸血 +50%。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	},
+	{
+		"id": "dragon_heart",
+		"icon_name": "dragon_heart",
+		"english_name": "Dragon Heart",
+		"chinese_name": "龍心",
+		"english_description": "Recover 2.5% of {maxHp} per second. This effect becomes stronger as {hp} decreases, up to 5% of {maxHp} per second.",
+		"chinese_description": "每秒回復 2.5% {maxHp}。{hp}越低時效果越強，最高每秒回復 5% {maxHp}。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Common"
+		],
+		"tags": []
+	}
 ]
