@@ -18,12 +18,12 @@ export interface CharacterInitData {
     equipmets: IdObject[]
 }
 
-interface PlayerInfo{
+interface PlayerInfo {
     max_hp: number,
     hp: number
 }
 
-interface SimulationResult{
+interface SimulationResult {
     result: string,
     time_spent: number,
     player_info: PlayerInfo
@@ -183,7 +183,7 @@ app.post("/battle", async (req, res) => {
         let finalMoney = data.money
         let result = "continue";
 
-        if (bm.result == "win") {
+        if (bm.result == "win" || bm.result == "draw") {
             await prisma.character.create({
                 data: {
                     game_id: game.game_id,
@@ -280,10 +280,10 @@ app.post("/test", async (req, res) => {
                 },
                 battle_log: bm.logger.battleLog
             }
-            
+
             simulationResult.push(result)
         }
-        
+
         res.json({
             data: {
                 player_character: playerInitData,
