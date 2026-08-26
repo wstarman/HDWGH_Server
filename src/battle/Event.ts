@@ -45,3 +45,8 @@ export interface StatusChangeEvent {
     status: Status,
     delta: number
 }
+
+export interface StaminaCostEvent {
+    costFlat: number,
+    costMultiplier: number,
+}

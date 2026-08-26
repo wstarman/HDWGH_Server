@@ -93,14 +93,14 @@ export class BattleCharacter extends BattleCharacterData {
             /**名字：做記號的牌
              * 效果：每次攻擊累積層數，不小於4層後，可以在未命中時消耗4層強制變為命中。觸發後有50%機率使自身在5秒內降低50%爆擊傷害。
              */
-            if (this.getEffect("ge9")) {
-                for (const ge9 of this.getEffects("ge9")) {
-                    if (ge9.stack >= 4) {
-                        ge9.stack -= 4;
+            if (this.getEffect("marked_cards")) {
+                for (const marked_cards of this.getEffects("marked_cards")) {
+                    if (marked_cards.stack >= 4) {
+                        marked_cards.stack -= 4;
                         hit = true;
                         if (Math.random() < 0.5) {
                             this.critDamage -= 0.5;
-                            ge9.addTimer(5, () => {
+                            marked_cards.addTimer(5, () => {
                                 this.critDamage += 0.5;
                             })
                         }

@@ -5,6 +5,7 @@ import { StatusName } from "./Status.js";
 import { Weapon } from "./Weapon.js";
 import { DamageType } from "../enum/DamageType.js";
 import { Curse } from "./Curse.js";
+import { initialCharacterValue } from "./BattleCharacterData.js";
 
 export interface EquipmentDef extends BaseEffectDef {
 }
@@ -549,7 +550,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
 
     /**名字：安慰獎籌碼
      * 效果：未命中時獲得1枚籌碼。爆擊時兌現全部籌碼，每枚增加10%傷害，最多持有5枚。 */
-    "ge1": {
+    "consolation_chip": {
         beforeStart() {
             this.stack = 0;
         },
@@ -566,7 +567,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     },
     /**名字：莊家抽水
      * 效果：爆擊傷害增加40%，但每次爆擊額外消耗1點耐力。耐力不足時不獲得傷害加成。 */
-    "ge2": {
+    "house_cut": {
         onAttackCrit(event) {
             if (this.owner.stamina >= 1) {
                 this.owner.stamina -= 1;
@@ -576,7 +577,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     },
     /**名字：未中獎的彩券
      * 效果：如果攻擊未命中超過第二次，每次攻擊返還25%耐力，直到命中為止 */
-    "ge3": {
+    "losing_lottery_ticket": {
         beforeStart() {
             this.stack = 0;
         },
@@ -593,7 +594,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：押冷門
      * 效果：命中率低於40%的攻擊一旦命中，恢復1點耐力。
      */
-    "ge4": {
+    "long_shot_bet": {
         afterAttackHit(event) {
             if (event.hitRate < 0.4) {
                 this.owner.stamina += 1;
@@ -603,7 +604,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：馬丁格爾策略
      * 效果：每次未命中，使目前的傷害加成依序增加至10%、20%、40%、80%、160%。命中時清空加成；若該次攻擊沒有爆擊，只獲得一半傷害加成。
      */
-    "ge5": {
+    "martingale_strategy": {
         beforeStart() {
             this.stack = 0;
         },
@@ -626,7 +627,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：追損客
      * 效果：每次未命中，使下一次攻擊的傷害與耐力消耗增加20%。效果可以疊加，命中後清空。
      */
-    "ge6": {
+    "loss_chaser": {
         beforeStart() {
             this.stack = 0;
         },
@@ -642,7 +643,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：詐領保險
      * 效果：每連續未命中3次時，回復自己已失去的HP的40%
      */
-    "ge7": {
+    "insurance_fraud": {
         beforeStart() {
             this.stack = 0;
         },
@@ -660,7 +661,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：Free game
      * 效果：當你連續命中三次攻擊，觸發連續10次最後一次攻擊[主要指使用的武器](傷害10%，不消耗耐力)
      */
-    "ge8": {
+    "free_game": {
         beforeStart() {
             this.stack = 0;
         },
@@ -678,7 +679,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：做記號的牌
      * 效果：每次攻擊累積層數，不小於4層後，可以在未命中時消耗4層強制變為命中。觸發後有50%機率使自身在5秒內降低50%爆擊傷害。
      */
-    "ge9": {
+    "marked_cards": {
         // 部分效果寫在character.attack中，記得改id
         beforeStart() {
             this.stack = 0;
@@ -689,7 +690,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     },
     /**名字：破產清算
      * 效果：使用武器但耐力不足時，移除一層自身最高等Curse的效果。5秒冷卻。 */
-    "ge10": {
+    "bankruptcy_liquidation": {
         // onStaminaInsufficient() {
         //     let maxStatus = this.owner.statuses[0];
         //     let chosenCurse: Curse | null = null;
@@ -709,7 +710,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：幸運硬幣
      * 效果：受到傷害時有50%機率使該次傷害減半。
      */
-    "ge11": {
+    "lucky_coin": {
         beforeDamageTaken(event) {
             if (Math.random() < 0.5) {
                 event.modifier.multiplier -= 0.25;
@@ -718,7 +719,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     },
     /**名字：老虎機
      * 效果：每3次攻擊結算一次。三次攻擊結果完全相同時獲得獎勵：三次未命中使 手氣正旺 (被動3)立刻觸發9次；三次爆擊則立刻不消耗耐力攻擊7次。 */
-    "ge12": {
+    "slot_machine": {
         beforeStart() {
             this.stack = 0;
         },
@@ -728,7 +729,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             if (this.stack == 3) {
                 if (this.temp1 == 3) {
                     this.owner.logger.recordCustomEvent(
-                        "獲得[item:ge12]的連續三次未命中獎勵",
+                        "獲得[item:slot_machine]的連續三次未命中獎勵",
                         "TODO"
                     )
                     for (let i = 0; i < 9; i++) {
@@ -748,7 +749,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             if (this.stack == 3) {
                 if (this.temp2 == 3) {
                     this.owner.logger.recordCustomEvent(
-                        "獲得[item:ge12]的連續三次爆擊獎勵",
+                        "獲得[item:slot_machine]的連續三次爆擊獎勵",
                         "TODO"
                     )
                     for (let i = 0; i < 7; i++) {
@@ -765,7 +766,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：二十一點
      * 每次未命中獲得1～6點。爆擊時清空點數，點數越高，該次爆擊傷害越高(傷害倍率 = 1.1 + 3.9 × ((點數 − 1) ÷ 20)² {1.1~5})；點數超過21時立即清空，回復自己的10%maxHP。
      */
-    "ge13": {
+    "blackjack": {
         beforeStart() {
             this.stack = 0;
         },
@@ -783,7 +784,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：捲錢跑路
      * 效果：生命降至0時不直接死亡，清除「手氣正旺」(被動3)在本場戰鬥累積的所有爆擊率(X)，以裝備欄第一個武器發動一次200%吸血的攻擊(必中並且傷害*X)。每場戰鬥只能觸發一次。
      */
-    "ge14": {
+    "cash_and_dash": {
         beforeStart() {
             this.enabled = true;
         },
@@ -814,7 +815,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：JACKPOT
      * 效果：每次未命中時都會把該次攻擊的基礎傷害的50%紀錄起來，命中攻擊有7%機率中獎，使該次攻擊必定命中且基礎傷害加入之前紀錄的所有傷害(之後記錄清空)
      */
-    "ge15": {
+    "jackpot": {
         beforeStart() {
             this.stack = 0;
         },
@@ -831,7 +832,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     /**名字：砸鍋賣鐵
      * 效果：耐力不足時仍可發動攻擊，每缺少0.5點耐力便失去5%最大生命，並使該次攻擊增加等同於你失去生命值的基礎傷害。
      */
-    "ge16": {
+    "pawn_it_all": {
         // 效果寫在baseEffect.attack中
     },
     /**名字：賭場金庫
@@ -842,5 +843,145 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         onStatChange(stat, value) {
         },
-    }
+    },
+    /**名字：護腕
+     * 效果：最大HP增加10%，每秒回復0.5HP。
+     */
+    "bracer": {
+        triggerInterval: 1,
+        beforeStart() {
+            this.owner.maxHp += initialCharacterValue.hp * 0.1;
+        },
+        onTrigger() {
+            this.toggle();
+            this.owner.hp += 0.5;
+        },
+    },
+    /**名字：掛墜
+     * 效果：最大耐力增加20%，耐力回復加快0.5。
+     */
+    "pendant": {
+        beforeStart() {
+            this.owner.maxStamina += initialCharacterValue.stamina * 0.2;
+            this.owner.staminaRecover += 0.5;
+        },
+    },
+    /**名字：系帶
+     * 效果：武器抗性增加10%，攻擊速度加快5%。
+     */
+    "band": {
+        beforeStart() {
+            this.owner.weaponDamageTakenMultiplier *= 0.9;
+            this.owner.attackSpeed *= 0.5;
+        },
+    },
+    /**名字：備用電池
+     * 效果：每場戰鬥第一次耐力降至0時，立即恢復2點耐力。
+     */
+    "backup_battery":
+    {
+        onStaminaInsufficient() {
+            if (this.temp1 == 0) {
+                this.temp1 = 1;
+                this.owner.stamina += 2;
+            }
+        },
+    },
+    /**名字：動能回收器
+     * 效果：每受到50點傷害回復1點耐力。
+     */
+    "kinetic_energy_recycler": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        afterDamageTaken(event) {
+            this.stack += event.amount;
+            if (this.stack >= 50) {
+                this.stack -= 50;
+                this.owner.stamina += 1;
+            }
+        },
+    },
+    /**名字：完美對拍
+     * 效果：每3次攻擊不消耗耐力。
+     */
+    "perfect_timing": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        beforeUseStamina(event) {
+            this.stack++;
+            if (this.stack == 3) {
+                this.stack = 0;
+                event.costMultiplier = 0;
+            }
+        }
+    },
+    /**名字：核動力核心
+     * 效果：耐力不足立即恢復全部耐力。12秒冷卻。
+     */
+    "nuclear_core": {
+        onStaminaInsufficient() {
+            if (this.temp1 == 0) {
+                this.owner.stamina = this.owner.maxStamina;
+                this.temp1 = 1;
+                this.addTimer(12, () => this.temp1 = 0);
+            }
+        },
+    },
+    /**名字：超載引擎
+     * 效果：生命值低於50%的時候，耐力回復+2.5/s。
+     */
+    "overdrive_engine": {
+        persistent: true,
+        onStatChange(stat, value) {
+            if (stat == "hp" || stat == "maxHp") {
+                if (this.owner.hp < this.owner.maxHp * 0.5 && !this.enabled) {
+                    this.toggle(true);
+                    this.owner.staminaRecover += 2.5;
+                }
+                else if (this.owner.hp >= this.owner.maxHp * 0.5 && this.enabled) {
+                    this.toggle(false);
+                    this.owner.staminaRecover -= 2.5;
+                }
+            }
+        },
+    },
+    /**名字：膽小龜殼
+     * 效果：生命不高於25%時，受到的傷害降低50%，武器攻擊力-50%。
+     */
+    "cowards_shell": {
+        persistent: true,
+        onStatChange(stat, value) {
+            if (stat == "hp" || stat == "maxHp") {
+                if (this.owner.hp <= this.owner.maxHp * 0.25 && !this.enabled) {
+                    this.toggle(true);
+                    this.owner.allDamageTakenMultiplier *= 0.5;
+                    this.owner.attackPower -= 0.5;
+                }
+                else if (this.owner.hp > this.owner.maxHp * 0.25 && this.enabled) {
+                    this.toggle(false);
+                    this.owner.allDamageTakenMultiplier /= 0.5;
+                    this.owner.attackPower += 0.5;
+                }
+            }
+        },
+    },
+    /**名字：吸血鬼吊墜
+     * 效果：攻擊吸血+50%。
+     */
+    "vampire_pendant": {
+        beforeStart() {
+            this.owner.lifeSteal += 0.5;
+        },
+    },
+    /**名字：龍心G
+     * 效果：每秒恢復2.5%最大生命；效果在血量越低時越強，最高5%。
+     */
+    "dragon_heart": {
+        triggerInterval: 1,
+        onTrigger() {
+            this.owner.hp += this.owner.maxHp * (0.025 + 0.025 * (1 - this.owner.hp / this.owner.maxHp));
+        },
+    },
 };

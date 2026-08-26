@@ -22,6 +22,13 @@ export type StatIdType =
     | "attackSpeed"
     | "totalSpeed";
 
+export const initialCharacterValue = {
+    hp: 100,
+    stamina: 10,
+    staminaRecover: 1.0,
+    attackPower: 1,
+}
+
 export class BattleCharacterData {
     id!: string;
     statuses: Status[] = [];
@@ -34,11 +41,11 @@ export class BattleCharacterData {
     opponent!: BattleCharacter;
 
     // Combat Stat
-    _maxHp: number = 100.0;
-    _hp: number = 100.0;
-    _maxStamina: number = 10.0;
-    _stamina: number = 10.0;
-    _staminaRecover: number = 1.0;
+    _maxHp: number = initialCharacterValue.hp;
+    _hp: number = initialCharacterValue.hp;
+    _maxStamina: number = initialCharacterValue.stamina;
+    _stamina: number = initialCharacterValue.stamina;
+    _staminaRecover: number = initialCharacterValue.staminaRecover;
     _shield: number = 0.0;
 
     _allDamageTakenMultiplier: number = 1.0;
@@ -46,7 +53,7 @@ export class BattleCharacterData {
     _physicalDamageTakenMultiplier: number = 1.0;
     _toxicDamageTakenMultiplier: number = 1.0;
 
-    _attackPower: number = 1.0;
+    _attackPower: number = initialCharacterValue.attackPower;
     _critRate: number = 0.0;
     _critDamage: number = 2.0;
     _hitRate: number = 1.0;

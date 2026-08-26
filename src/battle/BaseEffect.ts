@@ -1,7 +1,7 @@
 import { DamageType } from "../enum/DamageType.js";
 import type { BattleCharacter } from "./BattleCharacter.js";
 import type { StatIdType } from "./BattleCharacterData.js";
-import { type AttackEvent, type DamageEvent, type StatusChangeEvent } from "./Event.js";
+import { type AttackEvent, type DamageEvent, type StaminaCostEvent, type StatusChangeEvent } from "./Event.js";
 import { StatusName } from "./Status.js";
 
 interface EffectCallbacks {
@@ -20,7 +20,9 @@ interface EffectCallbacks {
     onInvalid?(this: BaseEffect): void;
 
     // 攻擊、傷害相關事件
-    // 耐力不足時
+    // 嘗試消耗耐力時，可改變耐力消耗
+    beforeUseStamina?(this: BaseEffect, event: StaminaCostEvent): void;
+    // 耐力不足時，若此時將耐力補充至充足，則可繼續發動攻擊
     onStaminaInsufficient?(this: BaseEffect): void;
     // 自身的攻擊開始前，用於改變命中率等
     beforeAttack?(this: BaseEffect, event: AttackEvent): void;
@@ -92,6 +94,7 @@ export abstract class BaseEffect {
     beforeStart?: EffectCallbacks["beforeStart"];
     onStart?: EffectCallbacks["onStart"];
     onTrigger?: EffectCallbacks["onTrigger"];
+    beforeUseStamina?: EffectCallbacks["beforeUseStamina"];
     onStaminaInsufficient?: EffectCallbacks["onStaminaInsufficient"];
     beforeAttack?: EffectCallbacks["beforeAttack"];
     onAttackHit?: EffectCallbacks["onAttackHit"];
@@ -158,7 +161,12 @@ export abstract class BaseEffect {
      * 效果：耐力不足時仍可發動攻擊，每缺少0.5點耐力便失去相當於5%最大生命的生命，並使該次攻擊增加等同於你失去生命值的基礎傷害。
      */
     attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): attackResult {
-        staminaCost = Math.max(0, staminaCost * this.owner.staminaCostMultiplier + this.owner.staminaCostFlat);
+        const staminaCostEvent: StaminaCostEvent = {
+            costFlat: 0.0,
+            costMultiplier: 1.0
+        }
+        this.owner.allEffects.forEach(effect => effect.beforeUseStamina?.(staminaCostEvent));
+        staminaCost = Math.max(0, staminaCost * this.owner.staminaCostMultiplier * staminaCostEvent.costMultiplier + this.owner.staminaCostFlat + staminaCostEvent.costFlat);
         let result: attackResult = {
             used: false,
             hit: false
@@ -166,12 +174,23 @@ export abstract class BaseEffect {
         if (this.owner.attackProhibited) return result;
         let staminaEnough = this.owner.stamina >= staminaCost;
         if (!staminaEnough) {
-            if (this.owner.getEffect("ge16")) {
-                const effectNumber = this.owner.getEffectNumber("ge16");
+            if (this.owner.getEffect("pawn_it_all")) {
+                const effectNumber = this.owner.getEffectNumber("pawn_it_all");
                 const lostHp = Math.ceil((staminaCost - this.owner.stamina) / 0.5) * (0.05 * this.owner.maxHp) * effectNumber;
                 this.owner.hp -= lostHp;
                 damage += lostHp;
                 staminaEnough = true;
+            }
+        }
+        if (!staminaEnough) {
+            for (const effect of this.owner.allEffects) {
+                if (effect.onStaminaInsufficient) {
+                    effect.onStaminaInsufficient();
+                    staminaEnough = this.owner.stamina >= staminaCost;
+                    if (staminaEnough) {
+                        break;
+                    }
+                }
             }
         }
         if (staminaEnough) {
@@ -180,8 +199,6 @@ export abstract class BaseEffect {
             result.used = true;
             result.hit = this.owner.attack(this, damage, staminaCost, hitRate);
             return result;
-        } else {
-            this.owner.allEffects.forEach((effect) => effect.onStaminaInsufficient?.());
         }
         return result;
     }
