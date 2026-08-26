@@ -1,0 +1,20 @@
+[
+	{
+		"id": "DrugGuy",
+		"icon_name": "walter",
+		"english_name": "",
+		"chinese_name": "爪格‧蓋",
+		"english_description": "",
+		"chinese_description": "(O-O)",
+		"passive_skills": ["drug_residue", "drug_tolerance", "sobriety"]
+	},
+	{
+		"id": "GGG",
+		"icon_name": "pinkman",
+		"english_name": "",
+		"chinese_name": "Test",
+		"english_description": "",
+		"chinese_description": "placeholder",
+		"passive_skills": ["drug_residue", "drug_residue", "drug_residue"]
+	}
+]
