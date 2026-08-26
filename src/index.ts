@@ -18,9 +18,17 @@ export interface CharacterInitData {
     equipmets: IdObject[]
 }
 
+interface PlayerInfo{
+    max_hp: number,
+    hp: number
+}
+
 interface SimulationResult{
-    result: string
-    battleLog: BattleLog[]
+    result: string,
+    time_spent: number,
+    player_info: PlayerInfo
+    enemy_info: PlayerInfo
+    battle_log: BattleLog[]
 }
 
 
@@ -238,10 +246,6 @@ app.post("/test", async (req, res) => {
 
     const enemy = data.opponent_character
 
-    console.log(player)
-
-    console.log(enemy)
-
     const playerInitData: CharacterInitData = {
         character_id: player.character_id,
         curses: player.curses,
@@ -261,9 +265,20 @@ app.post("/test", async (req, res) => {
             let bm: BattleManager = new BattleManager(playerInitData, enemyInitData)
             bm.run()
 
+            console.log(bm.result)
+
             let result: SimulationResult = {
                 result: bm.result,
-                battleLog: bm.logger.battleLog
+                time_spent: bm.elapsedTime,
+                player_info: {
+                    max_hp: bm.player.maxHp,
+                    hp: bm.player.hp
+                },
+                enemy_info: {
+                    max_hp: bm.enemy.maxHp,
+                    hp: bm.enemy.hp
+                },
+                battle_log: bm.logger.battleLog
             }
             
             simulationResult.push(result)
@@ -273,7 +288,7 @@ app.post("/test", async (req, res) => {
             data: {
                 player_character: playerInitData,
                 opponent_character: enemyInitData,
-                simulation_battlelogs: simulationResult,
+                simulation_results: simulationResult,
             }
         });
     }
