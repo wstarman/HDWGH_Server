@@ -141,11 +141,17 @@ export abstract class BaseEffect {
         }
     }
 
-    protected toggle(enabled?: boolean) {
+    toggle(enabled?: boolean) {
+        this.owner.logger.recordEffectToggleEvent(this, true, enabled !== undefined, enabled ?? true);
         if (enabled !== undefined) {
             this.enabled = enabled;
+        } else {
+            this.owner.onEffectToggle(this);
         }
-        this.owner.onEffectToggle(this, enabled);
+    }
+
+    togglePassive(enabled?: boolean) {
+        this.owner.logger.recordEffectToggleEvent(this, false, enabled !== undefined, enabled ?? true);
     }
 
     update(deltaTime: number): void {
@@ -184,8 +190,11 @@ export abstract class BaseEffect {
         let staminaEnough = this.owner.stamina >= staminaCost;
         if (!staminaEnough) {
             if (this.owner.getEffect("pawn_it_all")) {
-                const effectNumber = this.owner.getEffectNumber("pawn_it_all");
+                const pias = this.owner.getEffects("pawn_it_all")
+                pias.forEach(pia => pia.togglePassive());
+                const effectNumber = pias.length;
                 const lostHp = Math.ceil((staminaCost - this.owner.stamina) / 0.5) * (0.05 * this.owner.maxHp) * effectNumber;
+                staminaCost -= Math.floor((staminaCost - this.owner.stamina) / 0.5) * 0.5
                 this.owner.hp -= lostHp;
                 damage += lostHp;
                 staminaEnough = true;

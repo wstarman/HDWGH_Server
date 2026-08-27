@@ -104,6 +104,7 @@ export class BattleCharacter extends BattleCharacterData {
             if (this.getEffect("marked_cards")) {
                 for (const marked_cards of this.getEffects("marked_cards")) {
                     if (marked_cards.stack >= 4) {
+                        marked_cards.togglePassive();
                         marked_cards.stack -= 4;
                         hit = true;
                         if (Math.random() < 0.5) {
@@ -268,11 +269,8 @@ export class BattleCharacter extends BattleCharacterData {
         return result
     }
 
-    onEffectToggle(effect: BaseEffect, enabled: boolean = true) {
-        this.logger.recordEffectToggleEvent(effect)
-        if (enabled) {
-            this.allEffects.forEach(p => p.onAnyEffectToggle?.(effect));
-        }
+    onEffectToggle(effect: BaseEffect) {
+        this.allEffects.forEach(p => p.onAnyEffectToggle?.(effect));
     }
     onStatusToggle(status: Status) { }
 

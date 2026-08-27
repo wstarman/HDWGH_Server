@@ -151,6 +151,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             if (event.status.id == StatusName.poison && event.delta < 0) {
                 this.temp1 += -event.delta;
                 while (this.temp1 >= 2) {
+                    this.togglePassive();
                     this.owner.shield += 5;
                     this.owner.attackPower += 0.05;
                     this.temp1 -= 2;
@@ -167,14 +168,17 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         isUnique: true,
         afterStatusChange(event) {
             if (event.status.stack >= 5 && !this.enabled2) {
+                this.togglePassive(true);
                 this.enabled2 = true;
                 this.owner.getEffect("drug_tolerance")!.speed += 0.2;
             } else if (event.status.stack < 5 && this.enabled2) {
+                this.togglePassive(false);
                 this.owner.getEffect("drug_tolerance")!.speed -= 0.2;
             }
         },
         afterDamageTaken(event) {
             if (event.damageSource.id == StatusName.poison) {
+                this.togglePassive();
                 this.owner.shield += event.amount * 0.1;
             }
         },
@@ -261,21 +265,25 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      */
     "dream_dust": {
         beforeStart() {
+            this.toggle();
             this.owner.addStatus(StatusName.poison, 6);
             this.owner.evasion += 0.2;
             this.owner.hitRate -= 0.2;
         },
         onDodge() {
+            this.togglePassive();
             this.owner.shield += 5;
         },
         onAttackMiss() {
             if (!this.enabled2) {
+                this.togglePassive(true);
                 this.enabled2 = true;
                 this.owner.attackSpeed += 0.5;
             }
         },
         afterAttackHit(event) {
             if (this.enabled2) {
+                this.togglePassive(false);
                 this.enabled2 = false;
                 this.owner.attackSpeed -= 0.5;
             }
@@ -331,8 +339,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.temp1 += event.amount;
                 while (this.temp1 >= 5 && this.stack < 5) {
                     this.temp1 -= 5;
-                    this.owner.getEffect("drug_tolerance")!.speed += 0.05;
                     this.stack++;
+                    this.owner.getEffect("drug_tolerance")!.speed += 0.05;
                 }
             }
         }
@@ -430,6 +438,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         onAttackMiss() {
             if (this.enabled) {
+                this.togglePassive();
                 this.stack++;
                 this.owner.critRate += 0.05;
             }
@@ -518,6 +527,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.temp1 += this.owner.battleManager.tickTime * this.owner.totalSpeed;
                 if (this.temp1 >= 1) {
                     this.temp1 -= 1;
+                    this.toggle();
                     this.owner.addStatus(StatusName.poison, -10);
                 }
             }
@@ -535,6 +545,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             this.stack = 0;
         },
         onTrigger() {
+            this.togglePassive();
             const reducedHP = Math.floor(this.owner.maxHp * 0.1);
             let antidoteStack = reducedHP
             if (this.owner.getStatus(StatusName.poison)) {
@@ -546,7 +557,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         }
     },
 
-    // ---------------- 賭徒 ---------------- (TODO: 補上ID)
+    // ---------------- 賭徒 ----------------
 
     /**名字：安慰獎籌碼
      * 效果：未命中時獲得1枚籌碼。爆擊時兌現全部籌碼，每枚增加10%傷害，最多持有5枚。 */
@@ -556,11 +567,13 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         onAttackMiss() {
             if (this.stack < 5) {
+                this.togglePassive();
                 this.stack++;
                 this.owner.attackPower += 0.1;
             }
         },
         afterAttackCrit() {
+            this.togglePassive();
             this.owner.attackPower -= 0.1 * this.stack;
             this.stack = 0;
         }
@@ -570,6 +583,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "house_cut": {
         onAttackCrit(event) {
             if (this.owner.stamina >= 1) {
+                this.togglePassive();
                 this.owner.stamina -= 1;
                 event.critDamage += 0.4;
             }
@@ -584,6 +598,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         onAttackMiss(event) {
             this.stack++;
             if (this.stack > 2) {
+                this.togglePassive();
                 this.owner.stamina += event.staminaCost * 0.25;
             }
         },
@@ -597,6 +612,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "long_shot_bet": {
         afterAttackHit(event) {
             if (event.hitRate < 0.4) {
+                this.togglePassive();
                 this.owner.stamina += 1;
             }
         }
@@ -613,12 +629,14 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         onAttackCrit(event) {
             if (this.stack > 0) {
+                this.togglePassive();
                 event.modifier.multiplier += 0.1 * Math.pow(2, this.stack - 1);
             }
             this.stack = 0;
         },
         onAttackNotCrit(event) {
             if (this.stack > 0) {
+                this.togglePassive();
                 event.modifier.multiplier += 0.1 * Math.pow(2, this.stack - 1) * 0.5;
             }
             this.stack = 0;
@@ -632,11 +650,14 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             this.stack = 0;
         },
         onAttackMiss() {
+            this.togglePassive();
             this.stack++;
             this.owner.staminaCostMultiplier += 0.2;
         },
         afterAttackHit(event) {
+            this.togglePassive();
             event.modifier.multiplier += this.stack * 0.2;
+            this.owner.staminaCostMultiplier -= 0.2 * this.stack;
             this.stack = 0;
         }
     },
@@ -650,6 +671,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         onAttackMiss() {
             this.stack++;
             if (this.stack >= 3) {
+                this.togglePassive();
                 this.owner.hp += (this.owner.maxHp - this.owner.hp) * 0.4;
                 this.stack = 0;
             }
@@ -668,6 +690,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         afterAttackHit(event) {
             this.stack++;
             if (this.stack == 3) {
+                this.togglePassive();
                 const weapon = event.damageSource as BaseEffect;
                 for (let i = 0; i < 10; i++) {
                     this.owner.attack(weapon, weapon.damage * 0.1, 0);
@@ -690,29 +713,30 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     },
     /**名字：破產清算
      * 效果：使用武器但耐力不足時，移除一層自身最高等Curse的效果。5秒冷卻。 */
-    "bankruptcy_liquidation": {
-        // onStaminaInsufficient() {
-        //     let maxStatus = this.owner.statuses[0];
-        //     let chosenCurse: Curse | null = null;
-        //     this.owner.allEffects.forEach(effect => {
-        //         if (effect instanceof Curse) {
-        //             if (!chosenCurse) {
-        //                 chosenCurse = effect;
-        //             } else {
-        //                 if (chosenCurse.grade < effect.grade) {
-        //                     chosenCurse = effect;
-        //                 } else if (chosenCurse.grade = effect.grade)
-        //             }
-        //         }
-        //     })
-        // }
-    },
+    // "bankruptcy_liquidation": {
+    //     onStaminaInsufficient() {
+    //         let maxStatus = this.owner.statuses[0];
+    //         let chosenCurse: Curse | null = null;
+    //         this.owner.allEffects.forEach(effect => {
+    //             if (effect instanceof Curse) {
+    //                 if (!chosenCurse) {
+    //                     chosenCurse = effect;
+    //                 } else {
+    //                     if (chosenCurse.grade < effect.grade) {
+    //                         chosenCurse = effect;
+    //                     }
+    //                 }
+    //             }
+    //         })
+    //     }
+    // },
     /**名字：幸運硬幣
-     * 效果：受到傷害時有50%機率使該次傷害減半。
+     * 效果：受到傷害時有50%機率使該次傷害減少25%。
      */
     "lucky_coin": {
         beforeDamageTaken(event) {
             if (Math.random() < 0.5) {
+                this.togglePassive();
                 event.modifier.multiplier -= 0.25;
             }
         },
@@ -772,11 +796,14 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         onAttackMiss(event) {
             this.stack += Math.floor(Math.random() * 6 + 1);
-            if (this.stack >= 21) {
+            if (this.stack > 21) {
+                this.togglePassive();
                 this.owner.hp += this.owner.maxHp * 0.1;
+                this.stack = 0;
             }
         },
-        onAttackNotCrit(event) {
+        onAttackCrit(event) {
+            this.togglePassive();
             event.critDamage += 0.1 + 3.9 * Math.pow((this.stack - 1) / 20, 2);
             this.stack = 0;
         },
@@ -790,7 +817,9 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         beforeDead() {
             if (!this.enabled) return;
-            const streak = this.owner.getEffect("hot_streak")!;
+            this.toggle();
+            const streak = this.owner.getEffect("hot_streak");
+            if (!streak) return;
             const streakStack = streak.stack;
             this.owner.critRate -= streakStack * streak.temp1;
             streak.stack = 0;
@@ -813,7 +842,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
     },
     /**名字：JACKPOT
-     * 效果：每次未命中時都會把該次攻擊的基礎傷害的50%紀錄起來，命中攻擊有7%機率中獎，使該次攻擊必定命中且基礎傷害加入之前紀錄的所有傷害(之後記錄清空)
+     * 效果：每次未命中時都會把該次攻擊的基礎傷害的50%紀錄起來，命中攻擊有7%機率中獎，使該次攻擊基礎傷害加入之前紀錄的所有傷害(之後記錄清空)
      */
     "jackpot": {
         beforeStart() {
@@ -824,6 +853,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         onAttackHit(event) {
             if (Math.random() < 0.07) {
+                this.togglePassive();
                 event.modifier.flat += this.stack;
                 this.stack = 0;
             }
@@ -837,19 +867,20 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     },
     /**名字：賭場金庫
      * 效果：戰鬥開始時獲得相當於最大生命50%的護盾。15秒後或護盾第一次歸零時，； */
-    "ge17": {
-        onStart() {
-            this.owner.shield += this.owner.maxHp * 0.5;
-        },
-        onStatChange(stat, value) {
-        },
-    },
+    // "ge17": {
+    //     onStart() {
+    //         this.owner.shield += this.owner.maxHp * 0.5;
+    //     },
+    //     onStatChange(stat, value) {
+    //     },
+    // },
     /**名字：護腕
      * 效果：最大HP增加10%，每秒回復0.5HP。
      */
     "bracer": {
         triggerInterval: 1,
         beforeStart() {
+            this.toggle();
             this.owner.maxHp += initialCharacterValue.hp * 0.1;
         },
         onTrigger() {
@@ -862,6 +893,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      */
     "pendant": {
         beforeStart() {
+            this.toggle();
             this.owner.maxStamina += initialCharacterValue.stamina * 0.2;
             this.owner.staminaRecover += 0.5;
         },
@@ -871,8 +903,9 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      */
     "band": {
         beforeStart() {
+            this.toggle();
             this.owner.weaponDamageTakenMultiplier *= 0.9;
-            this.owner.attackSpeed *= 0.5;
+            this.owner.attackSpeed += 0.05;
         },
     },
     /**名字：備用電池
@@ -882,6 +915,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     {
         onStaminaInsufficient() {
             if (this.temp1 == 0) {
+                this.togglePassive();
                 this.temp1 = 1;
                 this.owner.stamina += 2;
             }
@@ -896,7 +930,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         },
         afterDamageTaken(event) {
             this.stack += event.amount;
-            if (this.stack >= 50) {
+            while (this.stack >= 50) {
+                this.togglePassive();
                 this.stack -= 50;
                 this.owner.stamina += 1;
             }
@@ -910,11 +945,14 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             this.stack = 0;
         },
         beforeUseStamina(event) {
-            this.stack++;
-            if (this.stack == 3) {
-                this.stack = 0;
+            if (this.stack >= 2) {
+                this.togglePassive();
+                this.stack = -1;
                 event.costMultiplier = 0;
             }
+        },
+        beforeAttack(event) {
+            this.stack++;
         }
     },
     /**名字：核動力核心
@@ -923,6 +961,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "nuclear_core": {
         onStaminaInsufficient() {
             if (this.temp1 == 0) {
+                this.togglePassive();
                 this.owner.stamina = this.owner.maxStamina;
                 this.temp1 = 1;
                 this.addTimer(12, () => this.temp1 = 0);
@@ -972,6 +1011,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      */
     "vampire_pendant": {
         beforeStart() {
+            this.toggle();
             this.owner.lifeSteal += 0.5;
         },
     },
@@ -981,6 +1021,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "dragon_heart": {
         triggerInterval: 1,
         onTrigger() {
+            this.toggle();
             this.owner.hp += this.owner.maxHp * (0.025 + 0.025 * (1 - this.owner.hp / this.owner.maxHp));
         },
     },

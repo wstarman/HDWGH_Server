@@ -74,6 +74,8 @@ const curseDefs: Record<string, CurseDef> = {
     "dirty_blood": {
         onAnyEffectToggle(effect) {
             if (!effect.hasTag("drug")) return;
+            this.togglePassive();
+            this.owner.addStatus(StatusName.poison, 1);
             this.owner.healRate -= 0.2;
             this.addTimer(4, () => { this.owner.healRate += 0.19 });
         },
@@ -91,6 +93,7 @@ const curseDefs: Record<string, CurseDef> = {
             if (event.status.id == "poison" && event.delta < 0) {
                 this.stack += -event.delta;
                 if (this.stack >= 10) {
+                    this.togglePassive();
                     this.stack -= 10;
                     this.owner.allDamageTakenMultiplier *= 1.1;
                 }
@@ -116,6 +119,7 @@ const curseDefs: Record<string, CurseDef> = {
         onAnyEffectToggle(effect) {
             if (!effect.hasTag("drug")) return;
             if (this.stack < 20) {
+                this.togglePassive();
                 this.stack += 1;
                 const beforeHpMultiplier = 1 - (this.stack - 1) * 0.04;
                 const afterHpMultiplier = 1 - this.stack * 0.04;
@@ -130,6 +134,7 @@ const curseDefs: Record<string, CurseDef> = {
      */
     "white_rooms": {
         onStart() {
+            this.toggle();
             this.enabled = true;
             const equipmentAddedPoision: Record<string, number> = {
                 "pills": 1,
@@ -178,6 +183,7 @@ const curseDefs: Record<string, CurseDef> = {
     "cold_hand": {
         onAttackNotCrit(event) {
             if (this.invalid) return;
+            this.togglePassive();
             event.amount *= 0.8;
         },
     },
@@ -187,6 +193,7 @@ const curseDefs: Record<string, CurseDef> = {
     "wrong_bet": {
         onAttackMiss() {
             if (this.invalid) return;
+            this.togglePassive();
             this.owner.weaponDamageTakenMultiplier *= 1.2;
             this.addTimer(5, () => {
                 this.owner.weaponDamageTakenMultiplier /= 1.2;
@@ -201,6 +208,7 @@ const curseDefs: Record<string, CurseDef> = {
         afterAttackHit(event) {
             if (this.invalid) return;
             if (event.receiver == this.owner || event.isCritHit) return;
+            this.togglePassive();
             const weapon = event.damageSource as BaseEffect;
             this.owner.attack(weapon, weapon.damage * 0.2, 0, 1.0, 0.5, weapon.damageType, false, true);
         }
@@ -215,6 +223,7 @@ const curseDefs: Record<string, CurseDef> = {
         },
         onAttackMiss() {
             if (this.invalid) return;
+            this.togglePassive();
             this.stack++;
             this.owner.staminaCostFlat += 1;
         },
@@ -240,6 +249,7 @@ const curseDefs: Record<string, CurseDef> = {
         afterAttackHit(event) {
             if (this.invalid) return;
             if (!event.isCritHit) {
+                this.togglePassive();
                 this.stack++;
                 this.owner.critRate -= 0.2;
                 if (this.owner.critRate <= 0) {

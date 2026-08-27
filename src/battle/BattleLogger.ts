@@ -29,6 +29,7 @@ export interface BattleLog {
     equipmentSlot?: number;
     persistent?: boolean;
     enabled?: boolean;
+    active?: boolean;
 
     statId?: string;
     target?: number;
@@ -95,15 +96,16 @@ export class BattleLogger {
         this.battleLog.push(log);
     }
 
-    recordEffectToggleEvent(item: BaseEffect) {
+    recordEffectToggleEvent(item: BaseEffect, active: boolean, persistent: boolean, enabled: boolean) {
         const log: BattleLog = {
             time: this.getTime(),
             eventType: "equipment_toggle",
             owner: item.owner.index,
             equipmentId: item.id,
             equipmentSlot: item.index,
-            persistent: item.persistent,
-            enabled: item.enabled
+            persistent: persistent,
+            enabled: enabled,
+            active
         }
         this.battleLog.push(log);
     }

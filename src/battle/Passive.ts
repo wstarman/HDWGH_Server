@@ -141,6 +141,7 @@ const passiveDefs: Record<string, PassiveDef> = {
             this.stack++;
         },
         onAttackHit(event) {
+            this.togglePassive();
             event.critRate += this.stack * 0.01;
             this.stack = 0;
         },

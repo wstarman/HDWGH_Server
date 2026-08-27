@@ -82,6 +82,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
             if (event.damageSource instanceof Weapon) {
                 this.stack += 1;
                 if (this.stack >= 4) {
+                    this.togglePassive();
                     this.stack -= 4;
                     this.attack(this.damage, this.hitRate, this.staminaCost / 2);
                 }
@@ -212,6 +213,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
         },
         afterDamageTaken(event) {
             if (event.amount > this.owner.maxHp * 0.25) {
+                this.togglePassive();
                 let maxCurse: Curse | null = null
                 for (const curse of this.owner.allEffects) {
                     if (curse.hasNegativeStack) {
@@ -236,6 +238,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
         },
         afterDamageTaken(event) {
             if (event.amount > 0 && event.damageSource instanceof Weapon && Math.random() < 0.25) {
+                this.togglePassive();
                 this.attack(this.damage, this.hitRate, 0, true);
             }
         },
