@@ -172,7 +172,7 @@ const curseDefs: Record<string, CurseDef> = {
 
     // ---------------- 賭徒 ----------------
 
-    /**Cold Hand / ㄕㄨㄟ洨,壞手氣
+    /**Cold Hand / 壞手氣
      * 每次攻擊命中但沒有爆擊時傷害只有80%
      */
     "cold_hand": {
@@ -188,6 +188,9 @@ const curseDefs: Record<string, CurseDef> = {
         onAttackMiss() {
             if (this.invalid) return;
             this.owner.weaponDamageTakenMultiplier *= 1.2;
+            this.addTimer(5, () => {
+                this.owner.weaponDamageTakenMultiplier /= 1.2;
+            });
         },
     },
     /**Tilt / 傾斜??? ，失去理智
@@ -197,7 +200,7 @@ const curseDefs: Record<string, CurseDef> = {
     "tilt": {
         afterAttackHit(event) {
             if (this.invalid) return;
-            if (event.receiver == this.owner) return;
+            if (event.receiver == this.owner || event.isCritHit) return;
             const weapon = event.damageSource as BaseEffect;
             this.owner.attack(weapon, weapon.damage * 0.2, 0, 1.0, 0.5, weapon.damageType, false, true);
         }

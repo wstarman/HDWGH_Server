@@ -122,8 +122,11 @@ const passiveDefs: Record<string, PassiveDef> = {
      * 命中率越低，爆擊率越高。
     */
     "against_the_odds": {
-        onAttackHit(event) {
-            event.critRate += Math.max(1 - this.owner.hitRate, 0)
+        onStatChange(stat, value) {
+            if (stat == "hitRate") {
+                this.owner.critRate += this.temp1 - this.owner.hitRate;
+                this.temp1 = this.owner.hitRate;
+            }
         },
     },
     /**賭徒悖論 / Gambler's Paradox
@@ -154,7 +157,7 @@ const passiveDefs: Record<string, PassiveDef> = {
         beforeStart() {
             this.temp1 = 0.01;
         },
-        afterAttakCrit(event) {
+        afterAttackCrit(event) {
             this.onTrigger!();
         },
         onTrigger() {

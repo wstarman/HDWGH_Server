@@ -41,9 +41,9 @@ interface EffectCallbacks {
     // 受到傷害後
     afterDamageTaken?(this: BaseEffect, event: DamageEvent): void;
     // 攻擊命中且爆擊後，接在對手受到傷害之後
-    afterAttakCrit?(this: BaseEffect, event: AttackEvent): void;
+    afterAttackCrit?(this: BaseEffect, event: AttackEvent): void;
     // 攻擊命中且未爆擊後，接在對手受到傷害之後
-    afterAttakNotCrit?(this: BaseEffect, event: AttackEvent): void;
+    afterAttackNotCrit?(this: BaseEffect, event: AttackEvent): void;
     // 攻擊命中對手後，接在afterAttak(Not)Crit之後，用於需要記錄自身造成傷害的裝備
     afterAttackHit?(this: BaseEffect, event: AttackEvent): void;
 
@@ -111,8 +111,8 @@ export abstract class BaseEffect {
     onDodge?: EffectCallbacks["onDodge"];
     beforeDamageTaken?: EffectCallbacks["beforeDamageTaken"];
     afterDamageTaken?: EffectCallbacks["afterDamageTaken"];
-    afterAttakCrit?: EffectCallbacks["afterAttakCrit"];
-    afterAttakNotCrit?: EffectCallbacks["afterAttakNotCrit"];
+    afterAttakCrit?: EffectCallbacks["afterAttackCrit"];
+    afterAttakNotCrit?: EffectCallbacks["afterAttackNotCrit"];
     afterAttackHit?: EffectCallbacks["afterAttackHit"];
     afterStatusChange?: EffectCallbacks["afterStatusChange"];
     onAnyEffectToggle?: EffectCallbacks["onAnyEffectToggle"];
@@ -168,7 +168,7 @@ export abstract class BaseEffect {
     /**相關裝備：砸鍋賣鐵(賭徒)
      * 效果：耐力不足時仍可發動攻擊，每缺少0.5點耐力便失去相當於5%最大生命的生命，並使該次攻擊增加等同於你失去生命值的基礎傷害。
      */
-    attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost): attackResult {
+    attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost, isTrueDamage: boolean = false): attackResult {
         const staminaCostEvent: StaminaCostEvent = {
             costFlat: 0.0,
             costMultiplier: 1.0
@@ -206,7 +206,7 @@ export abstract class BaseEffect {
             this.toggle();
             this.owner.stamina -= staminaCost;
             result.used = true;
-            result.event = this.owner.attack(this, damage, staminaCost, hitRate);
+            result.event = this.owner.attack(this, damage, staminaCost, hitRate, 0, DamageType.Physical, isTrueDamage);
             result.hit = result.event.hit;
             return result;
         }

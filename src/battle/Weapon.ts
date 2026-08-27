@@ -153,7 +153,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
         onTrigger() {
             if (this.owner.attackProhibited) return;
             const result = this.attack();
-            if (result.used && result.hit) {
+            if (result.used && !result.hit) {
                 this.owner.logger.recordCustomEvent(
                     `[side:${this.owner.index}]受到了終極羞辱！暫停攻擊3秒`,
                     `TODO`
@@ -179,7 +179,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
                     const event = result.event!
                     this.owner.calculateDamage(
                         this.owner,
-                        event.amount * 0.5,
+                        this.damage * 1.25,
                         this.damageType,
                         this,
                         event.isCritHit
@@ -220,11 +220,14 @@ export const weaponDefs: Record<string, WeaponDef> = {
                         }
                     }
                 }
+                if (maxCurse) {
+                    maxCurse.onClearNegativeStack?.(0, 0.5);
+                }
             }
         },
     },
     /**名字：復仇巨斧
-     * 效果：每次受到攻擊有25%機會，此武器發動一次無耐耗攻擊，此次攻擊無視武器抗性
+     * 效果：每次受到攻擊有25%機會，此武器發動一次無耐耗攻擊，此次攻擊無視抗性
      */
     "cw9": {
         onTrigger() {
@@ -232,9 +235,8 @@ export const weaponDefs: Record<string, WeaponDef> = {
             this.attack();
         },
         afterDamageTaken(event) {
-            if (event.amount > 0 && Math.random() > 0.25) {
-                this.attack(this.damage, this.hitRate, 0);
-                // TODO: 無視抗性
+            if (event.amount > 0 && event.damageSource instanceof Weapon && Math.random() < 0.25) {
+                this.attack(this.damage, this.hitRate, 0, true);
             }
         },
     },
@@ -250,7 +252,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
             const result = this.attack();
             if (result.used) {
                 this.stack++;
-                this.triggerInterval = this.basicTriggerInterval * Math.max(0, 1 - 0.1 * this.stack);
+                this.triggerInterval *= 0.9;
             }
         },
         onStaminaInsufficient() {

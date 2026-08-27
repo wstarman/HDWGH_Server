@@ -296,8 +296,9 @@ class BuffTimer {
 class BuffTimerManager {
     private timers: BuffTimer[] = [];
     add(id: string, durationSec: number, callback: () => void): BuffTimer {
-        const existingTimer = this.timers.find(timer => timer.id == id)
+        const existingTimer = this.timers.find(timer => timer.id === id)
         if (existingTimer) {
+            existingTimer.time = 0;
             existingTimer.duration = durationSec;
             existingTimer.callback = callback;
             return existingTimer;
@@ -307,8 +308,8 @@ class BuffTimerManager {
             return timer;
         }
     }
-    has(id: String) {
-        return this.timers.findIndex(timer => timer.id == id) != -1;
+    has(id: string) {
+        return this.timers.findIndex(timer => timer.id === id) != -1;
     }
     remove(timer: BuffTimer): void {
         const index = this.timers.indexOf(timer);

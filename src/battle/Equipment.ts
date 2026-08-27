@@ -560,7 +560,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.owner.attackPower += 0.1;
             }
         },
-        afterAttakCrit() {
+        afterAttackCrit() {
             this.owner.attackPower -= 0.1 * this.stack;
             this.stack = 0;
         }
