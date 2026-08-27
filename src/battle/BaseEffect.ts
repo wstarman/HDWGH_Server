@@ -63,6 +63,7 @@ export interface BaseEffectDef extends EffectCallbacks {
     tags?: Array<string>;
     isUnique?: boolean;
     grade?: number;  // "low" = 0, "mid" = 1, "high" = 2
+    hasNegativeStack?: boolean
 }
 
 export abstract class BaseEffect {
@@ -74,9 +75,11 @@ export abstract class BaseEffect {
     enabled2: boolean = false;
     mainTimer = 0;
     triggerInterval = Infinity;
+    basicTriggerInterval = Infinity;
     _stack: number = -1; // 會顯示在前端的通用暫時變數，為負數時不顯示
     tags: string[] = [];
     grade: number = 0;  // "low" = 0, "mid" = 1, "high" = 2
+    hasNegativeStack: boolean = false;
 
     isUnique: boolean = false;
     damage: number = 0;
@@ -94,6 +97,10 @@ export abstract class BaseEffect {
     beforeStart?: EffectCallbacks["beforeStart"];
     onStart?: EffectCallbacks["onStart"];
     onTrigger?: EffectCallbacks["onTrigger"];
+    beforeDead?: EffectCallbacks["beforeDead"];
+    onInvalid?: EffectCallbacks["onInvalid"];
+    onClearNegativeStack?: (this: BaseEffect, clearFlat: number, clearRate: number) => void;
+
     beforeUseStamina?: EffectCallbacks["beforeUseStamina"];
     onStaminaInsufficient?: EffectCallbacks["onStaminaInsufficient"];
     beforeAttack?: EffectCallbacks["beforeAttack"];
@@ -110,14 +117,15 @@ export abstract class BaseEffect {
     afterStatusChange?: EffectCallbacks["afterStatusChange"];
     onAnyEffectToggle?: EffectCallbacks["onAnyEffectToggle"];
     onStatChange?: EffectCallbacks["onStatChange"];
-    beforeDead?: EffectCallbacks["beforeDead"];
-
-    onInvalid?: EffectCallbacks["onInvalid"];
 
     constructor(owner: BattleCharacter, id: string, deflist: Record<string, BaseEffectDef>) {
         this.owner = owner;
         this.id = id;
         Object.assign(this, deflist[id]);
+        this.basicTriggerInterval = this.triggerInterval;
+        if (this.hasNegativeStack) {
+            this.onClearNegativeStack = this._clearNegativeStack;
+        }
     }
 
     get enabled() { return this._enabled; }
@@ -169,7 +177,8 @@ export abstract class BaseEffect {
         staminaCost = Math.max(0, staminaCost * this.owner.staminaCostMultiplier * staminaCostEvent.costMultiplier + this.owner.staminaCostFlat + staminaCostEvent.costFlat);
         let result: attackResult = {
             used: false,
-            hit: false
+            hit: false,
+            event: null
         }
         if (this.owner.attackProhibited) return result;
         let staminaEnough = this.owner.stamina >= staminaCost;
@@ -197,7 +206,8 @@ export abstract class BaseEffect {
             this.toggle();
             this.owner.stamina -= staminaCost;
             result.used = true;
-            result.hit = this.owner.attack(this, damage, staminaCost, hitRate);
+            result.event = this.owner.attack(this, damage, staminaCost, hitRate);
+            result.hit = result.event.hit;
             return result;
         }
         return result;
@@ -205,6 +215,10 @@ export abstract class BaseEffect {
 
     addTimer(durationSec: number, callBack: () => void) {
         this.subTimers.add(durationSec, callBack);
+    }
+
+    _clearNegativeStack(clearFlat: number, clearRate: number) {
+        this.stack = Math.max(0, this.stack * (1 - clearRate) - clearFlat);
     }
 }
 
@@ -245,8 +259,9 @@ class TimerManager {
 }
 
 interface attackResult {
-    used: boolean;
-    hit: boolean;
+    used: boolean,
+    hit: boolean,
+    event: AttackEvent | null
 }
 /*
 function wrapCallbacks<T extends object>(obj: T, name: string): T {

@@ -27,7 +27,8 @@ export interface AttackEvent {
     damageSource: DamageSource,
     isCritHit: boolean,
     isTrueDamage: boolean,
-    staminaCost: number
+    staminaCost: number,
+    hit: boolean
 }
 
 export interface DamageEvent {

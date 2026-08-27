@@ -10,6 +10,7 @@ import { Curse } from "./Curse.js";
 import { Equipment, equipmentDefs } from "./Equipment.js";
 
 export class BattleCharacter extends BattleCharacterData {
+    _buffTimer: BuffTimerManager = new BuffTimerManager();
     constructor(manager: BattleManager, index: number, cid: string, curseses: string[] = [], equipments: string[] = []) {
         super(manager);
         this.battleManager = manager;
@@ -44,18 +45,20 @@ export class BattleCharacter extends BattleCharacterData {
         this.allEffects.forEach(effect => { effect.onStart?.() });
     }
     update(): void {
-        this._stamina += Math.min(this.maxStamina - this.stamina, this.staminaRecover * this.battleManager.tickTime); // 避免log
+        const deltaTime = this.totalSpeed * this.battleManager.tickTime;
+        this._stamina += Math.min(this.maxStamina - this.stamina, this.staminaRecover * deltaTime); // 避免log
+        this._buffTimer.update(deltaTime);
         this.statuses.forEach(status => {
             if (this.alive) {
-                status.update(this.totalSpeed * this.battleManager.tickTime);
+                status.update(deltaTime);
             }
         });
         this.allEffects.forEach(effect => {
             if (this.alive) {
                 if (effect instanceof Weapon) {
-                    effect.update(this.totalSpeed * this.attackSpeed * this.battleManager.tickTime);
+                    effect.update(deltaTime * this.attackSpeed);
                 } else {
-                    effect.update(this.totalSpeed * this.nonAttackSpeed * this.battleManager.tickTime);
+                    effect.update(deltaTime * this.nonAttackSpeed);
                 }
             }
         });
@@ -85,10 +88,15 @@ export class BattleCharacter extends BattleCharacterData {
             damageSource: weapon,
             isCritHit: false,
             isTrueDamage,
-            staminaCost
+            staminaCost,
+            hit: true,
         }
         this.allEffects.forEach(effect => effect.beforeAttack?.(event));
+        if (weapon.id == "cw6") {
+            event.hitRate = 0.95;
+        }
         let hit = Math.random() < event.hitRate;
+        event.hit = hit;
         if (!hit) {
             /**名字：做記號的牌
              * 效果：每次攻擊累積層數，不小於4層後，可以在未命中時消耗4層強制變為命中。觸發後有50%機率使自身在5秒內降低50%爆擊傷害。
@@ -110,12 +118,11 @@ export class BattleCharacter extends BattleCharacterData {
             }
         }
         if (hit) {
-            // hit
             this.allEffects.forEach(effect => effect.onAttackHit?.(event));
             if (Math.random() < event.critRate) {
                 event.isCritHit = true;
-            }
-            if (event.isCritHit) {
+                if (event.isCritHit) {
+                }
                 this.allEffects.forEach(effect => effect.onAttackCrit?.(event));
             } else {
                 this.allEffects.forEach(effect => effect.onAttackNotCrit?.(event));
@@ -128,7 +135,7 @@ export class BattleCharacter extends BattleCharacterData {
                 this.allEffects.forEach(effect => effect.afterAttakNotCrit?.(event));
             }
             this.allEffects.forEach(effect => effect.afterAttackHit?.(event));
-            return true
+            return event
         } else {
             // miss
             const missEvent: DamageEvent = {
@@ -139,7 +146,7 @@ export class BattleCharacter extends BattleCharacterData {
                 },
                 attacker: this,
                 receiver,
-                amount: -1,
+                amount: 0,
                 type: damageType,
                 damageSource: weapon,
                 isCritHit: false
@@ -147,7 +154,7 @@ export class BattleCharacter extends BattleCharacterData {
             this.logger.recordDamageEvent(missEvent, "miss");
             this.allEffects.forEach(effect => effect.onAttackMiss?.(event));
             receiver.allEffects.forEach(effect => effect.onDodge?.())
-            return false
+            return event
         }
     }
     calculateDamage(attacker: BattleCharacter, amount: number, type: DamageType, damageSource: DamageSource,
@@ -268,6 +275,59 @@ export class BattleCharacter extends BattleCharacterData {
         }
     }
     onStatusToggle(status: Status) { }
+
+    // 用於不可疊加但可刷新的效果
+    addBuff(id: string, durationSec: number, callback: () => void) {
+        return this._buffTimer.add(id, durationSec, callback);
+    }
+    hasBuff(id: string) {
+        return this._buffTimer.has(id);
+    }
 }
 
-
+class BuffTimer {
+    time = 0;
+    constructor(
+        public id: string,
+        public duration: number,
+        public callback: () => void
+    ) { }
+}
+class BuffTimerManager {
+    private timers: BuffTimer[] = [];
+    add(id: string, durationSec: number, callback: () => void): BuffTimer {
+        const existingTimer = this.timers.find(timer => timer.id == id)
+        if (existingTimer) {
+            existingTimer.duration = durationSec;
+            existingTimer.callback = callback;
+            return existingTimer;
+        } else {
+            const timer = new BuffTimer(id, durationSec, callback);
+            this.timers.push(timer);
+            return timer;
+        }
+    }
+    has(id: String) {
+        return this.timers.findIndex(timer => timer.id == id) != -1;
+    }
+    remove(timer: BuffTimer): void {
+        const index = this.timers.indexOf(timer);
+        if (index !== -1) {
+            this.timers.splice(index, 1);
+        }
+    }
+    clear(): void {
+        this.timers.length = 0;
+    }
+    update(deltaTime: number): void {
+        for (let i = this.timers.length - 1; i >= 0; i--) {
+            const timer = this.timers[i];
+            if (!timer) continue;
+            timer.time += deltaTime;
+            if (timer.time >= timer.duration) {
+                this.timers.splice(i, 1);
+                timer.callback();
+            }
+        }
+    }
+}

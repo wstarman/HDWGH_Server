@@ -28,6 +28,7 @@ const curseDefs: Record<string, CurseDef> = {
         攻擊miss後清除所有感官過載 
      */
     "overbright_eyes": {
+        hasNegativeStack: true,
         beforeStart() {
             this.stack = 0;
         },
@@ -48,6 +49,7 @@ const curseDefs: Record<string, CurseDef> = {
         此效果觸發後有3秒的冷卻並且每次觸發下次需要的數值+10
      */
     "hollow_vessel": {
+        hasNegativeStack: true,
         beforeStart() {
             this.stack = 0;
             this.temp1 = 5;
@@ -81,6 +83,10 @@ const curseDefs: Record<string, CurseDef> = {
      * 當角色以任何方式減少10層毒或者進入清醒狀態時，減傷-10%(如果是進入清醒狀態觸發，效力2x)
      */
     "glass_nerves": {
+        hasNegativeStack: true,
+        beforeStart() {
+            this.stack = 0;
+        },
         afterStatusChange(event) {
             if (event.status.id == "poison" && event.delta < 0) {
                 this.stack += -event.delta;
@@ -103,6 +109,10 @@ const curseDefs: Record<string, CurseDef> = {
      * 最多疊加 20 層(-80%)。
      */
     "organ_failure": {
+        hasNegativeStack: true,
+        beforeStart() {
+            this.stack = 0;
+        },
         onAnyEffectToggle(effect) {
             if (!effect.hasTag("drug")) return;
             if (this.stack < 20) {
@@ -196,6 +206,7 @@ const curseDefs: Record<string, CurseDef> = {
      * 每次未命中，下一次的耐力消耗+1(可疊加)直到命中清0
      */
     "sunk_cost": {
+        hasNegativeStack: true,
         beforeStart() {
             this.stack = 0;
         },
@@ -219,6 +230,7 @@ const curseDefs: Record<string, CurseDef> = {
      * (重置條件:爆擊率完全歸0,立刻爆擊自己一次(必中），刷新此效果)
      */
     "gamblers_fallacy": {
+        hasNegativeStack: true,
         beforeStart() {
             this.stack = 0;
         },
@@ -244,6 +256,7 @@ const curseDefs: Record<string, CurseDef> = {
      * 若連續5次攻擊未命中，使自身暈眩5秒
     */
     "total_ruin": {
+        hasNegativeStack: true,
         onAttackMiss() {
             if (this.invalid) return;
             // TODO
