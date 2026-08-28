@@ -156,6 +156,8 @@ export const weaponDefs: Record<string, WeaponDef> = {
             const result = this.attack();
             if (result.used && !result.hit) {
                 this.owner.logger.recordCustomEvent(
+                    this.owner.index,
+                    this.id,
                     `[side:${this.owner.index}]受到了終極羞辱！暫停攻擊3秒`,
                     `TODO`
                 );

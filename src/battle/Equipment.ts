@@ -753,6 +753,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             if (this.stack == 3) {
                 if (this.temp1 == 3) {
                     this.owner.logger.recordCustomEvent(
+                        this.owner.index,
+                        this.id,
                         `[side:${this.owner.index}]獲得[item:slot_machine]的連續三次未命中獎勵`,
                         `TODO`
                     )
@@ -773,6 +775,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             if (this.stack == 3) {
                 if (this.temp2 == 3) {
                     this.owner.logger.recordCustomEvent(
+                        this.owner.index,
+                        this.id,
                         `[side:${this.owner.index}]獲得[item:slot_machine]的連續三次爆擊獎勵`,
                         `TODO`
                     )

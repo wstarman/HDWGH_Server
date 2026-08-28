@@ -133,10 +133,12 @@ export class BattleLogger {
         this.battleLog.push(log);
     }
 
-    recordCustomEvent(chinese: string, english: string) {
+    recordCustomEvent(targetIndex: number, relatedEffect: string, chinese: string, english: string) {
         const log: BattleLog = {
             time: this.getTime(),
             eventType: "custom",
+            target: targetIndex,
+            sourceId: relatedEffect,
             chineseDescription: chinese,
             englishDescription: english
         }
