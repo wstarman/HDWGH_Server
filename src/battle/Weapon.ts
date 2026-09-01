@@ -159,7 +159,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
                     this.owner.index,
                     this.id,
                     `[side:${this.owner.index}]受到了終極羞辱！暫停攻擊3秒`,
-                    `TODO`
+                    `[side:${this.owner.index}] has suffered the ultimate humiliation! Attack paused for 3 seconds.`
                 );
                 this.owner.attackProhibited = true;
                 this.addTimer(3, () => this.owner.attackProhibited = false);

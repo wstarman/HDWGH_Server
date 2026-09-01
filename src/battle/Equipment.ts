@@ -756,7 +756,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                         this.owner.index,
                         this.id,
                         `[side:${this.owner.index}]獲得[item:slot_machine]的連續三次未命中獎勵`,
-                        `TODO`
+                        `[side:${this.owner.index}] receives a reward for three consecutive misses of [item:slot_machine].`
                     )
                     for (let i = 0; i < 9; i++) {
                         this.owner.getEffect("hot_streak")?.onTrigger!();
@@ -778,7 +778,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                         this.owner.index,
                         this.id,
                         `[side:${this.owner.index}]獲得[item:slot_machine]的連續三次爆擊獎勵`,
-                        `TODO`
+                        `[side:${this.owner.index}] grants three consecutive critical hits as a reward for [item:slot_machine].`
                     )
                     for (let i = 0; i < 7; i++) {
                         const weapon = event.damageSource as BaseEffect;
