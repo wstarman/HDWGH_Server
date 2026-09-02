@@ -13,7 +13,7 @@ export class Passive extends BaseEffect {
 
 export const characterPassive: Record<string, Array<string>> = {
     "DrugGuy": ["drug_residue", "drug_tolerance", "sobriety"],
-    "gambler": ["against_the_odds", "gamblers_paradox", "hot_streak"]
+    "Gambler": ["against_the_odds", "gamblers_paradox", "hot_streak"]
 }
 
 const passiveDefs: Record<string, PassiveDef> = {

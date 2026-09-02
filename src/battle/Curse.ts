@@ -246,7 +246,7 @@ const curseDefs: Record<string, CurseDef> = {
         beforeStart() {
             this.stack = 0;
         },
-        afterAttackHit(event) {
+        afterAttackNotCrit(event) {
             if (this.invalid) return;
             if (!event.isCritHit) {
                 this.togglePassive();
@@ -254,9 +254,9 @@ const curseDefs: Record<string, CurseDef> = {
                 this.owner.critRate -= 0.2;
                 if (this.owner.critRate <= 0) {
                     const weapon = event.damageSource as BaseEffect;
-                    this.owner.attack(weapon, weapon.damage, 0, Infinity, Infinity, weapon.damageType, false, true);
                     this.owner.critRate += 0.2 * this.stack;
                     this.stack = 0;
+                    this.owner.attack(weapon, weapon.damage, 0, Infinity, Infinity, weapon.damageType, false, true);
                 }
             }
         },

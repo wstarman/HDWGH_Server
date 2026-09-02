@@ -56,11 +56,11 @@ export class BattleManager {
                 break;
             }
         }
-        if (this.player.hp < 0 && this.enemy.hp < 0 && this.player.undead != this.enemy.undead) {
+        if (this.player.hp <= 0 && this.enemy.hp <= 0 && this.player.undead != this.enemy.undead) {
             if (this.player.undead) this.result = "win";
             else this.result = "lose";
         }
-        else if (this.player.hp < 0 && this.enemy.hp < 0 || this.player.hp == this.enemy.hp) {
+        else if (this.player.hp <= 0 && this.enemy.hp <= 0 || this.player.hp == this.enemy.hp) {
             this.result = "draw";
         }
         else if (this.player.hp > this.enemy.hp) {
@@ -75,7 +75,7 @@ export class BattleManager {
     }
 
     check_ending(): boolean {
-        return !this.player.alive || !this.enemy.alive || this.elapsedTime >= 60;
+        return !this.player.checkAlive() || !this.enemy.checkAlive() || this.elapsedTime >= 60;
     }
 
     getFibonacci(n: number): number {

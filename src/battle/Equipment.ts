@@ -144,18 +144,16 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "recovery_note": {
         isUnique: true,
         beforeStart() {
-            this.temp1 = 0;
             this.stack = 0;
         },
         afterStatusChange(event) {
             if (event.status.id == StatusName.poison && event.delta < 0) {
-                this.temp1 += -event.delta;
-                while (this.temp1 >= 2) {
+                this.stack += -event.delta;
+                while (this.stack >= 2) {
                     this.togglePassive();
                     this.owner.shield += 5;
                     this.owner.attackPower += 0.05;
-                    this.temp1 -= 2;
-                    this.stack += 1;
+                    this.stack -= 2;
                 }
             }
         },
@@ -462,6 +460,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.temp1 = 1;
                 this.toggle(true);
                 this.owner.undead = true;
+                this.owner.lifeLock = true;
+                this.owner.hp = Math.max(this.owner.hp, 1);
                 this.owner.addStatus(StatusName.poison, 150);
                 const everyEnabledSec = () => this.addTimer(1, () => {
                     this.owner.addStatus(StatusName.poison, -50);
@@ -479,9 +479,8 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             if (event.status.id == StatusName.poison && event.status.stack <= 0) {
                 this.toggle(false);
                 this.owner.undead = false;
-                if (this.owner.opponent.alive) {
-                    this.owner.hp = -99999;
-                }
+                this.owner.lifeLock = false;
+                this.owner.hp = 0;
             }
         },
     },
@@ -688,13 +687,16 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             this.stack = 0;
         },
         afterAttackHit(event) {
+            if (this.triggerProhibited) return;
             this.stack++;
             if (this.stack == 3) {
                 this.togglePassive();
+                this.triggerProhibited = true;
                 const weapon = event.damageSource as BaseEffect;
                 for (let i = 0; i < 10; i++) {
                     this.owner.attack(weapon, weapon.damage * 0.1, 0);
                 }
+                this.triggerProhibited = false;
                 this.stack = 0;
             }
         }
@@ -816,14 +818,13 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      * 效果：生命降至0時不直接死亡，清除「手氣正旺」(被動3)在本場戰鬥累積的所有爆擊率(X)，以裝備欄第一個武器發動一次200%吸血的攻擊(必中並且傷害*X)。每場戰鬥只能觸發一次。
      */
     "cash_and_dash": {
-        beforeStart() {
-            this.enabled = true;
-        },
         beforeDead() {
-            if (!this.enabled) return;
+            if (this.temp1 != 0) return;
             this.toggle();
+            this.temp1 = 1;
             const streak = this.owner.getEffect("hot_streak");
             if (!streak) return;
+            this.owner.undead = true;
             const streakStack = streak.stack;
             this.owner.critRate -= streakStack * streak.temp1;
             streak.stack = 0;
@@ -834,15 +835,16 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                     break;
                 }
             }
-            if (!weapon) return;
-            this.owner.lifeSteal += 2;
-            weapon.damage *= (1 + streakStack * streak.temp1);
-            weapon.staminaCost -= 999;
-            weapon.onTrigger?.();
-            weapon.damage /= (1 + streakStack * streak.temp1);
-            weapon.staminaCost += 999;
-            this.owner.lifeSteal -= 2;
-            this.enabled = false;
+            if (weapon) {
+                this.owner.lifeSteal += 2;
+                weapon.attack(
+                    weapon.damage * (1 + streakStack * streak.temp1),
+                    Infinity,
+                    0
+                )
+                this.owner.lifeSteal -= 2;
+            }
+            this.owner.undead = false;
         },
     },
     /**名字：JACKPOT
@@ -945,6 +947,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
      * 效果：每3次攻擊不消耗耐力。
      */
     "perfect_timing": {
+        isUnique: true,
         beforeStart() {
             this.stack = 0;
         },

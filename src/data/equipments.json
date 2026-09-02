@@ -214,7 +214,7 @@
 		"icon_name": "deadman_protocol",
 		"english_name": "Deadman Protocol",
 		"chinese_name": "死人協議",
-		"english_description": "Passive effect. Automatically triggers when the character takes fatal damage. Can trigger only once per battle.\n\nOn trigger, gain 150 {poision} stacks and gain an effect that reduces {poision} by 50 stacks per second. The character cannot die until {poision} returns to 0. All attacks deal additional damage.\n\nWhen the drug effect ends, if the enemy is still alive, the character dies immediately.",
+		"english_description": "Passive effect. Automatically triggers when the character takes fatal damage. Can trigger only once per battle.\n\nOn trigger, gain 150 {poision} stacks and gain an effect that reduces {poision} by 50 stacks per second. The character cannot die until {poision} returns to 0. All attacks deal additional damage.\n\nWhen the drug effect ends, if the enemy is still checkAlive(), the character dies immediately.",
 		"chinese_description": "被動效果。角色受到致命傷害時自動觸發。每場戰鬥只能觸發一次。\n\n觸發時，獲得 150 層{poision}，獲得每秒降低 50 層{poision}的效果。接下來角色無法死亡，直到{poision}回到 0 結束。所有攻擊附帶4點額外傷害。\n\n藥效結束時，如果敵人仍然存活，角色直接死亡。",
 		"price": 25,
 		"grade": "high",

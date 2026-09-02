@@ -66,6 +66,7 @@ export class BattleCharacterData {
     attackProhibited = false;
     lifeSteal = 0.0;
     undead = false;
+    lifeLock = false
     beforeDeadTriggered = false;    // 是否觸發過beforeDead
     nonAttackSpeed = 1.0;
     staminaCostMultiplier = 1.0;
@@ -88,7 +89,7 @@ export class BattleCharacterData {
         this.hp = Math.min(this.hp, this.maxHp);
     }
     get hp() { return this._hp; }
-    set hp(value: number) { this.setStat("hp", Math.max(Math.min(value, this.maxHp), 0)); }
+    set hp(value: number) { this.setStat("hp", Math.max(Math.min(value, this.maxHp), this.lifeLock ? 1 : 0)); }
     get maxStamina() { return this._maxStamina; }
     set maxStamina(value: number) { this.setStat("maxStamina", value); }
     get stamina() { return this._stamina; }

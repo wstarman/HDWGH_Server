@@ -175,17 +175,18 @@ export abstract class BaseEffect {
      * 效果：耐力不足時仍可發動攻擊，每缺少0.5點耐力便失去相當於5%最大生命的生命，並使該次攻擊增加等同於你失去生命值的基礎傷害。
      */
     attack(damage: number = this.damage, hitRate: number = this.hitRate, staminaCost: number = this.staminaCost, isTrueDamage: boolean = false): attackResult {
+        let result: attackResult = {
+            used: false,
+            hit: false,
+            event: null
+        }
+        if (!this.owner.checkAlive()) return result;
         const staminaCostEvent: StaminaCostEvent = {
             costFlat: 0.0,
             costMultiplier: 1.0
         }
         this.owner.allEffects.forEach(effect => effect.beforeUseStamina?.(staminaCostEvent));
         staminaCost = Math.max(0, staminaCost * this.owner.staminaCostMultiplier * staminaCostEvent.costMultiplier + this.owner.staminaCostFlat + staminaCostEvent.costFlat);
-        let result: attackResult = {
-            used: false,
-            hit: false,
-            event: null
-        }
         if (this.owner.attackProhibited) return result;
         let staminaEnough = this.owner.stamina >= staminaCost;
         if (!staminaEnough) {

@@ -36,7 +36,16 @@ export class BattleCharacter extends BattleCharacterData {
             i += 1;
         });
     }
-    get alive() { return this.hp > 0 || this.undead; }
+    checkAlive() {
+        const result = this.hp > 0 || this.undead;
+        if (!result) {
+            this.allEffects.forEach(effect => {
+                effect.beforeDead?.()
+            });
+            this.beforeDeadTriggered = true;
+        }
+        return this.hp > 0 || this.undead;
+    }
 
     beforeStart() {
         this.allEffects.forEach(effect => { effect.beforeStart?.() });
@@ -49,12 +58,12 @@ export class BattleCharacter extends BattleCharacterData {
         this._stamina += Math.min(this.maxStamina - this.stamina, this.staminaRecover * deltaTime); // 避免log
         this._buffTimer.update(deltaTime);
         this.statuses.forEach(status => {
-            if (this.alive) {
+            if (this.checkAlive()) {
                 status.update(deltaTime);
             }
         });
         this.allEffects.forEach(effect => {
-            if (this.alive) {
+            if (this.checkAlive()) {
                 if (effect instanceof Weapon) {
                     effect.update(deltaTime * this.attackSpeed);
                 } else {
@@ -62,12 +71,6 @@ export class BattleCharacter extends BattleCharacterData {
                 }
             }
         });
-        if (!this.alive && !this.beforeDeadTriggered) {
-            this.allEffects.forEach(effect => {
-                effect.beforeDead?.()
-            });
-            this.beforeDeadTriggered = true;
-        }
     }
     // return true if hit
     attack(weapon: BaseEffect, damage: number, staminaCost: number, baseHitRate = 1.0, baseCritRate = 0.0, damageType = weapon.damageType, isTrueDamage = false, toSelf = false) {
@@ -128,7 +131,7 @@ export class BattleCharacter extends BattleCharacterData {
             } else {
                 this.allEffects.forEach(effect => effect.onAttackNotCrit?.(event));
             }
-            event.amount *= event.critRate;
+            event.amount *= event.critDamage;
             receiver.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
             if (event.isCritHit) {
                 this.allEffects.forEach(effect => effect.afterAttakCrit?.(event));
@@ -206,7 +209,7 @@ export class BattleCharacter extends BattleCharacterData {
     }
 
     heal(value: number) {
-        this.hp += Math.min(this.maxHp - this.hp, value) * Math.max(this.healRate, 0);
+        this.hp += Math.min(this.maxHp - this.hp, value * Math.max(this.healRate, 0));
     }
 
     hasStatus(id: string): boolean {
