@@ -96,18 +96,22 @@ app.post("/new_game", async (req, res) => {
     }
 
     try {
+        const initHp = 5;
+        const initMoney = 50;
         const newGame = await prisma.game.create({
             data: {
                 character_id: character_id,
                 round: 1,
-                hp: 3,
-                money: 100
+                hp: initHp,
+                money: initMoney
             }
         });
 
         res.json({
             data: {
-                uuid: newGame.game_id
+                uuid: newGame.game_id,
+                hp: initHp,
+                money: initMoney
             }
         });
     }
