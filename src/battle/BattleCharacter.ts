@@ -111,6 +111,11 @@ export class BattleCharacter extends BattleCharacterData {
                         marked_cards.stack -= 4;
                         hit = true;
                         if (Math.random() < 0.5) {
+                            this.logger.recordCustomEvent(
+                                this.index, "marked_cards",
+                                `[side:${this.index}]的[item:marked_cards]降低了[side:${this.index}]的50%爆擊傷害`,
+                                `[side:${this.index}]'s [item:marked_cards] reduces [side:${this.index}]'s critical damage by 50%`
+                            )
                             this.critDamage -= 0.5;
                             marked_cards.addTimer(5, () => {
                                 this.critDamage += 0.5;
