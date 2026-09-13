@@ -7,7 +7,6 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio"
   },
   "keywords": [],

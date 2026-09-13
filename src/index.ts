@@ -69,24 +69,6 @@ app.get("/", (_, res) => {
     });
 });
 
-app.get("/Character/:id", async (req, res) => {
-    const { id } = req.params;
-
-    console.log(id);
-
-    try {
-        const character = await prisma.character.findUnique({
-            where: { id: parseInt(id) }
-        });
-
-        if (character) res.json(character);
-        else res.status(404).json({ error: 'Character not found' });
-    }
-    catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 app.post("/new_game", async (req, res) => {
     const { data } = req.body;
     const { character_id } = data;
@@ -124,6 +106,10 @@ app.post("/new_game", async (req, res) => {
 app.get("/shop", async (req, res) => {
     const { uuid } = req.query;
 
+    if (typeof uuid !== "string") {
+        return res.status(400).json({ error: "uuid is required." });
+    }
+
     const game = await prisma.game.findUnique({
         where: {
             game_id: uuid,
@@ -148,11 +134,19 @@ app.get("/shop", async (req, res) => {
 app.post("/battle", async (req, res) => {
     const { uuid } = req.query;
 
+    if (typeof uuid !== "string") {
+        return res.status(400).json({ error: "uuid is required." });
+    }
+
     const game = await prisma.game.findUnique({
         where: {
             game_id: uuid,
         },
     });
+
+    if (!game) {
+        return res.status(404).json({ error: "Game data not found" });
+    }
 
     const { data } = req.body;
 
@@ -172,7 +166,7 @@ app.post("/battle", async (req, res) => {
             LIMIT 1;
         `;
 
-        const enemy_data: CharacterInitData = randomCharacter?.data ?? {
+        const enemy_data: CharacterInitData = randomCharacter?.data ? randomCharacter.data as unknown as CharacterInitData : {
             character_id: "DrugGuy",
             curses: [],
             equipmets: []
