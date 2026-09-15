@@ -49,5 +49,124 @@
             "Common"
         ],
         "tags": ["weapon"]
+    },
+    {
+        "id": "charged_axe",
+        "icon_name": "charged_axe",
+        "english_name": "Charge Blade",
+        "chinese_name": "充能斧",
+        "english_description": "While {hp} is above 50% of {maxHp}, gain +20% {weaponRes}. While {hp} is at or below 50% of {maxHp}, this weapon has -50% {attackSpeed} and +200% {atk}.",
+        "chinese_description": "當{hp}高於{maxHp}的 50% 時，自身{weaponRes} +20%。當{hp}低於或等於{maxHp}的 50% 時，此武器的{attackSpeed} -50%、{atk} +200%。",
+        "stamina_cost": 3,
+        "attack_interval": 3,
+        "damage": 15,
+        "price": 10,
+        "grade": "mid",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
+    },
+    {
+        "id": "dueling_spear",
+        "icon_name": "dueling_spear",
+        "english_name": "Dueling Spear",
+        "chinese_name": "決鬥長矛",
+        "english_description": "Whenever this weapon attacks, the opponent also attacks you once with a Dueling Spear. Your Dueling Spear attacks restore {hp} equal to 75% of the damage they deal.",
+        "chinese_description": "每次使用此武器攻擊時，對手也會使用決鬥長矛反擊你一次。你的決鬥長矛攻擊會回復相當於該次造成傷害 75% 的{hp}。",
+        "stamina_cost": 3,
+        "attack_interval": 3,
+        "damage": 20,
+        "price": 10,
+        "grade": "mid",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
+    },
+    {
+        "id": "gungnir",
+        "icon_name": "gungnir",
+        "english_name": "Gungnir",
+        "chinese_name": "必中神槍",
+        "english_description": "This weapon's {hitRate} is fixed at 95%. If it misses, the wielder suffers Ultimate Humiliation, pausing all attacks for 3 seconds.",
+        "chinese_description": "此武器的{hitRate}固定為 95%。若此武器攻擊未命中，使用者受到「終極羞辱」，暫停所有攻擊 3 秒。",
+        "stamina_cost": 3,
+        "attack_interval": 2.5,
+        "damage": 14,
+        "price": 10,
+        "grade": "mid",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
+    },
+    {
+        "id": "explosive_warhammer",
+        "icon_name": "explosive_warhammer",
+        "english_name": "Explosive Warhammer",
+        "chinese_name": "爆炸重錘",
+        "english_description": "After each attack, gain 1 stack of Charge, up to 4. Attacking with 4 stacks consumes all Charge, makes that attack deal 2.5 times damage, and guarantees a hit. You also take damage equal to half of that attack's damage.",
+        "chinese_description": "每次攻擊後獲得 1 層蓄能，最多 4 層。擁有 4 層蓄能時發動攻擊，消耗全部蓄能，使該次攻擊造成 2.5 倍傷害且必定命中；自己同時承受該次攻擊傷害的一半。",
+        "stamina_cost": 3,
+        "attack_interval": 3.5,
+        "damage": 15,
+        "price": 10,
+        "grade": "mid",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
+    },
+    {
+        "id": "heavy_anchor",
+        "icon_name": "heavy_anchor",
+        "english_name": "Heavy Anchor",
+        "chinese_name": "沉重大錨",
+        "english_description": "On hit, reduce the opponent's attack damage by 25% for 3 seconds. Refreshes the duration but does not stack. Whenever a single damage event deals more than 25% of your {maxHp} to you, reduce the stacks of your most-stacked negative status by 50%.",
+        "chinese_description": "攻擊命中時，使對手的攻擊傷害降低 25%，持續 3 秒，可刷新但不疊加。單次傷害事件中受到超過自身{maxHp} 25% 的傷害時，使自身層數最多的一種負面狀態減少 50% 層數。",
+        "stamina_cost": 3,
+        "attack_interval": 3,
+        "damage": 16,
+        "price": 10,
+        "grade": "mid",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
+    },
+    {
+        "id": "vengeance_greataxe",
+        "icon_name": "vengeance_greataxe",
+        "english_name": "Vengeance Greataxe",
+        "chinese_name": "復仇巨斧",
+        "english_description": "Whenever you are attacked, this weapon has a 25% chance to make an additional attack that costs no {stamina} and ignores all resistances.",
+        "chinese_description": "每次受到攻擊時，有 25% 機率使此武器額外發動一次攻擊，不消耗{stamina}，且無視所有抗性。",
+        "stamina_cost": 3,
+        "attack_interval": 4,
+        "damage": 12,
+        "price": 10,
+        "grade": "mid",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
+    },
+    {
+        "id": "gatling_gun",
+        "icon_name": "gatling_gun",
+        "english_name": "Gatling Gun",
+        "chinese_name": "加特林機槍",
+        "english_description": "Each attack grants 1 stack of Spin. Each stack multiplies this weapon's attack interval by 0.9. If you have insufficient {stamina} when attempting to attack, clear all Spin stacks.",
+        "chinese_description": "每次攻擊獲得 1 層轉速。每層轉速使此武器的攻擊間隔乘以 0.9。攻擊時若{stamina}不足，清空所有轉速層數。",
+        "stamina_cost": 1,
+        "attack_interval": 1.5,
+        "damage": 6,
+        "price": 10,
+        "grade": "mid",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
     }
 ]
