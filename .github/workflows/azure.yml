@@ -23,11 +23,22 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Log in to ACR
+        run: az acr login --name hdwghregistry
 
-      - name: Build and deploy to Azure Container Apps
+      - name: Build Docker image
+        run: |
+          docker build -t hdwghregistry.azurecr.io/gh-action/container-app:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push hdwghregistry.azurecr.io/gh-action/container-app:${{ github.sha }}
+
+
+      - name: Deploy to Azure Container Apps
         uses: azure/container-apps-deploy-action@v2
         with:
-          appSourcePath: ${{ github.workspace }}
-          acrName: hdwghregistry
           containerAppName: hdwgh-api
           resourceGroup: HDWGH_API
+          imageToDeploy: hdwghregistry.azurecr.io/gh-action/container-app:${{ github.sha }}
