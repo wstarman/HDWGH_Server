@@ -120,14 +120,25 @@ const passiveDefs: Record<string, PassiveDef> = {
 
     /**逆勢賠率 / Against the Odds
      * 命中率越低，爆擊率越高。
+     * 初始命中率是60%，命中減少命中率10%，miss增加命中率10%
     */
     "against_the_odds": {
+        beforeStart() {
+            this.owner.hitRate -= 0.4;
+        },
+        onAttackHit() {
+            this.owner.hitRate -= 0.1;
+        },
+        onAttackMiss() {
+            this.owner.hitRate += 0.1;
+        },
         onStatChange(stat, value) {
             if (stat == "hitRate") {
                 this.owner.critRate += this.temp1 - this.owner.hitRate;
                 this.temp1 = this.owner.hitRate;
             }
         },
+
     },
     /**賭徒悖論 / Gambler's Paradox
      * 每次攻擊未命中，增加下一次命中攻擊的爆擊機率。

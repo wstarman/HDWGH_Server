@@ -872,14 +872,128 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         // 效果寫在baseEffect.attack中
     },
     /**名字：賭場金庫
-     * 效果：戰鬥開始時獲得相當於最大生命50%的護盾。15秒後或護盾第一次歸零時，； */
-    // "ge17": {
-    //     onStart() {
-    //         this.owner.shield += this.owner.maxHp * 0.5;
-    //     },
-    //     onStatChange(stat, value) {
-    //     },
-    // },
+     * 效果：每次攻擊命中時存入 1 枚籌碼，未命中時存入 2 枚。
+            最多儲存 12 枚。
+            當 {hp} 低於 30% 時，自動打開金庫，消耗所有籌碼：
+            每枚籌碼得到等價 2% {maxHp} 的護盾，並使 {critRate} +2%，持續至戰鬥結束。
+            每場戰鬥只能開啟一次。
+    */
+    // TODO: 改ID
+    "ge17": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackHit() {
+            if (this.stack == -1) return;
+            this.stack = Math.min(12, this.stack + 1);
+        },
+        onAttackMiss() {
+            if (this.stack == -1) return;
+            this.stack = Math.min(12, this.stack + 1);
+        },
+        onStatChange(stat, value) {
+            if (stat == "hp" || stat == "maxHp") {
+                if (this.owner.hp / this.owner.maxHp < 0.3) {
+                    this.togglePassive();
+                    this.owner.shield += this.owner.maxHp * 0.02 * this.stack;
+                    this.owner.critRate += 0.02 * this.stack;
+                    this.stack = -1;
+                }
+            }
+        }
+    },
+    /**low tier boring equip(idk how to do)
+     *  每次攻擊未命中後，下一次攻擊 {hitRate} +10%。
+        效果最多疊加 3 次。
+        攻擊命中後清空。
+     */
+    "ge18": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            if (this.invalid) return;
+            this.stack += 1;
+            this.owner.hitRate += 0.1;
+        },
+        onAttackHit() {
+            if (this.invalid) return;
+            this.owner.hitRate -= 0.1 * this.stack;
+            this.stack = 0;
+        }
+    },
+    /**
+     * 每次未命中時，下一次攻擊：
+        {hitRate} +15%
+        {stamina} 消耗 +25%
+        效果可疊加。
+        命中後清空。
+     */
+    "ge19": {
+        beforeStart() {
+            this.stack = 0;
+        },
+        onAttackMiss() {
+            if (this.invalid) return;
+            this.stack += 1;
+            this.owner.hitRate += 0.15;
+            this.owner.staminaCostMultiplier += 0.25;
+        },
+        onAttackHit() {
+            if (this.invalid) return;
+            this.owner.hitRate -= 0.15 * this.stack;
+            this.owner.staminaCostMultiplier -= 0.25 * this.stack;
+            this.stack = 0;
+        }
+    },
+    /**
+     * 若獲得此裝備 : {hitRate}相關的裝備只有此裝備生效 。
+        每次未命中後，下次攻擊的實際命中率提高 50%。
+        每次命中後，下次攻擊的實際命中率降低 25%。
+        修正後命中率最低 10%，最高 90%。
+     */
+    "rigged_game": {
+        beforeStart() {
+            for (const equip of this.owner.allEffects) {
+                if (["ge18", "ge19", "all_in"].includes(equip.id)) {
+                    equip.invalid = true;
+                }
+            }
+        },
+        onAttackMiss() {
+            this.owner.hitRate += 0.5;
+        },
+        onAttackHit() {
+            this.owner.hitRate -= 0.25;
+        }
+    },
+    /**
+     * 每次攻擊前，若目前 {hitRate} 低於 50%，可以將該次攻擊的 {hitRate} 提升至 80%。
+        但若該次攻擊仍然未命中：
+        消耗雙倍 {stamina}，並使下一次攻擊 {hitRate} -20%。
+        3 秒冷卻。
+     */
+    "all_in": {
+        beforeStart() {
+            this.mainTimer = 3000;
+            this.stack = 0;
+        },
+        beforeAttack(event) {
+            if (this.invalid || this.mainTimer <= 3000) return;
+            if (this.stack = 1) {
+                this.stack = 0;
+                event.hitRate -= 0.2;
+                event.staminaCost *= 2;
+            }
+            if (event.hitRate < 0.5) {
+                if (Math.random() < 0.8) {
+                    event.hitRate = Infinity;
+                } else {
+                    this.stack = 1;
+                }
+            }
+        },
+    },
     /**名字：護腕
      * 效果：最大HP增加10%，每秒回復0.5HP。
      */

@@ -95,7 +95,10 @@ export class BattleCharacter extends BattleCharacterData {
             hit: true,
         }
         this.allEffects.forEach(effect => effect.beforeAttack?.(event));
-        if (weapon.id == "cw6") {
+        if (weapon.id == "rigged_game") {
+            event.hitRate = Math.max(0.1, Math.min(0.9, event.hitRate));
+        }
+        if (weapon.id == "gungnir") {
             event.hitRate = 0.95;
         }
         let hit = Math.random() < event.hitRate;

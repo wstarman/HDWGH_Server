@@ -104,7 +104,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
     /**名字：長得像盾又像斧頭還是劍之類的不知道三小東西問翁世乘(你是說可以使出超高輸出屬性解放斬的充能斧嗎)
      * 效果：血量高於50%時，此武器提供+20%武器抗性，血量小於等於50%時，此武器攻速-50%，然而攻擊力+200%。
      */
-    "cw4": {
+    "charged_axe": {
         persistent: true,
         beforeStart() {
             this.owner.weaponDamageTakenMultiplier *= 0.8;
@@ -133,7 +133,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
     /**名字：決鬥長矛
      * 效果：每次攻擊，對手也同樣會使用決鬥長矛攻擊一次自己，然而自己的攻擊長矛會造成75%傷害量的回血。
      */
-    "cw5": {
+    "dueling_spear": {
         onTrigger() {
             if (this.owner.attackProhibited) return;
             const result = this.attack();
@@ -141,7 +141,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
                 if (result.hit) {
                     this.owner.hp += result.event!.amount * 0.75;
                 }
-                const opponentSpear = new Weapon(this.owner.opponent, "cw5", -1);
+                const opponentSpear = new Weapon(this.owner.opponent, "dueling_spear", -1);
                 opponentSpear.attack();
             }
         }
@@ -149,7 +149,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
     /**名字：必中神槍
      * 效果：此武器的攻擊命中率固定為95%，然而若此武器Miss了則對使用者造成終極羞辱，暫停所有攻擊3秒
      */
-    "cw6": {
+    "gungnir": {
         // 「必中」效果寫在character.attack中
         onTrigger() {
             if (this.owner.attackProhibited) return;
@@ -169,7 +169,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
     /**名字：爆炸重錘
      * 效果：每次攻擊後獲得1層蓄能，最多4層。擁有4層蓄能時發動攻擊，消耗全部蓄能並使該次攻擊的傷害倍率變為2.5倍且必中。然而，自己同樣會遭受此攻擊傷害的一半
      */
-    "cw7": {
+    "explosive_warhammer": {
         beforeStart() {
             this.stack = 0;
         },
@@ -200,15 +200,15 @@ export const weaponDefs: Record<string, WeaponDef> = {
      * 效果：攻擊命中時，減少對手的攻擊傷害25%三秒(可刷新，不疊加)，此外，一次傷害事件內受到超過25%maxHP的傷害時，腳色最多的負面stack-50%
      * (這效果...好樣的一個通用裝給我加了兩個新機制)
     */
-    "cw8": {
+    "heavy_anchor": {
         onTrigger() {
             if (this.owner.attackProhibited) return;
             const result = this.attack();
             if (result.hit) {
-                if (!this.owner.opponent.hasBuff("cw8")) {
+                if (!this.owner.opponent.hasBuff("heavy_anchor")) {
                     this.owner.opponent.attackPower -= 0.25;
                 }
-                this.owner.opponent.addBuff("cw8", 3, () => {
+                this.owner.opponent.addBuff("heavy_anchor", 3, () => {
                     this.owner.opponent.attackPower += 0.25;
                 })
             }
@@ -233,7 +233,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
     /**名字：復仇巨斧
      * 效果：每次受到攻擊有25%機會，此武器發動一次無耐耗攻擊，此次攻擊無視抗性
      */
-    "cw9": {
+    "vengeance_greataxe": {
         onTrigger() {
             if (this.owner.attackProhibited) return;
             this.attack();
@@ -248,7 +248,7 @@ export const weaponDefs: Record<string, WeaponDef> = {
     /**名字：加特林機槍
      * 效果：每次攻擊獲得1層轉速。每層轉速使此武器的攻擊間隔縮短10%，攻擊時耐力不足則清空所有層數。 
      */
-    "cw10": {
+    "gatling_gun": {
         beforeStart() {
             this.stack = 0;
         },
