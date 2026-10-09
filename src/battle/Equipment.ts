@@ -879,7 +879,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
             每場戰鬥只能開啟一次。
     */
     // TODO: 改ID
-    "ge17": {
+    "casino_vault": {
         beforeStart() {
             this.stack = 0;
         },
@@ -907,7 +907,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         效果最多疊加 3 次。
         攻擊命中後清空。
      */
-    "ge18": {
+    "rabbits_foot": {
         beforeStart() {
             this.stack = 0;
         },
@@ -929,7 +929,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
         效果可疊加。
         命中後清空。
      */
-    "ge19": {
+    "casino_iou": {
         beforeStart() {
             this.stack = 0;
         },
@@ -955,7 +955,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
     "rigged_game": {
         beforeStart() {
             for (const equip of this.owner.allEffects) {
-                if (["ge18", "ge19", "all_in"].includes(equip.id)) {
+                if (["rabbits_foot", "casino_iou", "all_in"].includes(equip.id)) {
                     equip.invalid = true;
                 }
             }

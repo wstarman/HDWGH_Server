@@ -134,12 +134,12 @@ export class BattleCharacter extends BattleCharacterData {
             if (Math.random() < event.critRate) {
                 event.isCritHit = true;
                 if (event.isCritHit) {
+                    event.amount *= event.critDamage;
                 }
                 this.allEffects.forEach(effect => effect.onAttackCrit?.(event));
             } else {
                 this.allEffects.forEach(effect => effect.onAttackNotCrit?.(event));
             }
-            event.amount *= event.critDamage;
             receiver.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
             if (event.isCritHit) {
                 this.allEffects.forEach(effect => effect.afterAttakCrit?.(event));

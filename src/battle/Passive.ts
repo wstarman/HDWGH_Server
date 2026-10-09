@@ -124,6 +124,7 @@ const passiveDefs: Record<string, PassiveDef> = {
     */
     "against_the_odds": {
         beforeStart() {
+            this.temp1 = 1;
             this.owner.hitRate -= 0.4;
         },
         onAttackHit() {
