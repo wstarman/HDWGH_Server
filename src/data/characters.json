@@ -1,20 +1,20 @@
 [
 	{
 		"id": "DrugGuy",
-		"icon_name": "walter",
-		"english_name": "",
+		"icon_name": "drugguy",
+		"english_name": "Drug Guy",
 		"chinese_name": "爪格‧蓋",
-		"english_description": "",
-		"chinese_description": "(O-O)",
+		"english_description": "An experimental subject caught between intoxication and sobriety. Drugs grant powerful effects but continuously build Poison. When all Poison is cleared, he enters Sober, gaining faster attacks, a higher critical chance, and steadily regenerating Shield.",
+		"chinese_description": "一名在藥效與清醒之間反覆拉扯的實驗體。藥物能帶來強力效果，卻會讓中毒持續累積；當中毒完全代謝，他將進入清醒狀態，獲得更快的攻擊、更高的爆擊率與持續恢復的護盾。",
 		"passive_skills": ["drug_residue", "drug_tolerance", "sobriety"]
 	},
 	{
-		"id": "GGG",
-		"icon_name": "pinkman",
-		"english_name": "",
-		"chinese_name": "Test",
-		"english_description": "",
-		"chinese_description": "placeholder",
-		"passive_skills": ["drug_residue", "drug_residue", "drug_residue"]
+		"id": "Gambler",
+		"icon_name": "gambler",
+		"english_name": "Gambler",
+		"chinese_name": "賭徒",
+		"english_description": "A high-stakes gunslinger who turns bad odds into deadly momentum. Lower accuracy raises his critical chance; every miss improves the odds of the next hit becoming critical, while each critical hit feeds a Hot Streak that lasts for the rest of the battle.",
+		"chinese_description": "一名把劣勢賠率化為致命攻勢的亡命賭徒。命中率越低，爆擊率越高；每次未命中都會提高下一次命中攻擊的爆擊機率，而每次爆擊又會讓手氣持續升溫，直到戰鬥結束。",
+		"passive_skills": ["against_the_odds", "gamblers_paradox", "hot_streak"]
 	}
 ]

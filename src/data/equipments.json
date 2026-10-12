@@ -214,8 +214,8 @@
 		"icon_name": "deadman_protocol",
 		"english_name": "Deadman Protocol",
 		"chinese_name": "死人協議",
-		"english_description": "Passive effect. Automatically triggers when the character takes fatal damage. Can trigger only once per battle.\n\nOn trigger, gain 150 {poision} stacks and gain an effect that reduces {poision} by 50 stacks per second. The character cannot die until {poision} returns to 0. All attacks deal additional damage.\n\nWhen the drug effect ends, if the enemy is still checkAlive(), the character dies immediately.",
-		"chinese_description": "被動效果。角色受到致命傷害時自動觸發。每場戰鬥只能觸發一次。\n\n觸發時，獲得 150 層{poision}，獲得每秒降低 50 層{poision}的效果。接下來角色無法死亡，直到{poision}回到 0 結束。所有攻擊附帶4點額外傷害。\n\n藥效結束時，如果敵人仍然存活，角色直接死亡。",
+		"english_description": "Passive effect. Automatically triggers when the character takes fatal damage. Can trigger only once per battle.\n\nOn trigger, gain 150 {poision} stacks and gain an effect that reduces {poision} by 50 stacks per second. The character cannot die ({hp} is at least 1) until {poision} returns to 0. All attacks deal additional damage.\n\nWhen the drug effect ends, if the enemy is still alive, the character dies immediately.",
+		"chinese_description": "被動效果。角色受到致命傷害時自動觸發。每場戰鬥只能觸發一次。\n\n觸發時，獲得 150 層{poision}，獲得每秒降低 50 層{poision}的效果。接下來角色不會死亡({hp}最少為1)，直到{poision}回到 0 結束。所有攻擊附帶4點額外傷害。\n\n藥效結束時，如果敵人仍然存活，角色直接死亡。",
 		"price": 25,
 		"grade": "high",
 		"characters": [
@@ -308,6 +308,34 @@
 		"tags": []
 	},
 	{
+		"id": "rabbits_foot",
+		"icon_name": "rabbits_foot",
+		"english_name": "Rabbit's Foot",
+		"chinese_name": "兔腳護符",
+		"english_description": "After each missed attack, the next attack gains {hitRate} +10%. Stacks up to 3 times. Clear all stacks after an attack hits.",
+		"chinese_description": "每次攻擊未命中後，下一次攻擊{hitRate} +10%。\n效果最多疊加 3 次。\n攻擊命中後清空。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "casino_iou",
+		"icon_name": "casino_iou",
+		"english_name": "Casino IOU",
+		"chinese_name": "賭場借據",
+		"english_description": "After each miss, the next attack gains:\n\t{hitRate} +15%\n\t{stamina} cost +25%\nThis effect stacks. Clear all stacks after an attack hits.",
+		"chinese_description": "每次未命中時，下一次攻擊：\n\t{hitRate} +15%\n\t{stamina}消耗 +25%\n效果可疊加。\n命中後清空。",
+		"price": 5,
+		"grade": "low",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
 		"id": "martingale_strategy",
 		"icon_name": "martingale_strategy",
 		"english_name": "Martingale Strategy",
@@ -354,8 +382,8 @@
 		"icon_name": "free_game",
 		"english_name": "Free Game",
 		"chinese_name": "Free game",
-		"english_description": "After 3 consecutive attacks hit, repeat the last attack 10 times. Each repeated attack deals 10% damage and consumes no {stamina}. The repeated attack primarily refers to the equipped weapon's attack.",
-		"chinese_description": "連續命中 3 次攻擊時，連續觸發 10 次最後一次攻擊（主要指使用的武器）；每次造成 10% 傷害，且不消耗{stamina}。",
+		"english_description": "After 3 consecutive attacks hit, repeat the last attack 10 times. Each repeated attack deals 10% damage and consumes no {stamina}. The repeated attack primarily refers to the equipped weapon's attack. Attacks triggered by free games will not be recorded.",
+		"chinese_description": "連續命中 3 次攻擊時，連續觸發 10 次最後一次攻擊（主要指使用的武器）；每次造成 10% 傷害，且不消耗{stamina}。free game觸發的攻擊不會被記入",
 		"price": 15,
 		"grade": "mid",
 		"characters": [
@@ -396,8 +424,22 @@
 		"icon_name": "lucky_coin",
 		"english_name": "Lucky Coin",
 		"chinese_name": "幸運硬幣",
-		"english_description": "When taking damage, there is a 50% chance to halve that damage.",
-		"chinese_description": "受到傷害時，有 50% 機率使該次傷害減半。",
+		"english_description": "When taking damage, there is a 50% chance to reduce 25% of that damage.",
+		"chinese_description": "受到傷害時，有 50% 機率使該次傷害減少25%。",
+		"price": 15,
+		"grade": "mid",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "casino_vault",
+		"icon_name": "casino_vault",
+		"english_name": "Casino Vault",
+		"chinese_name": "賭場金庫",
+		"english_description": "Deposit 1 Chip whenever an attack hits, or 2 Chips whenever an attack misses. Store up to 12 Chips.\n\nWhen {hp} falls below 30%, automatically open the vault and consume all Chips. Each Chip grants {shield} equal to 2% of {maxHp} and {critRate} +2%, lasting until the end of battle. The vault can open only once per battle.",
+		"chinese_description": "每次攻擊命中時存入 1 枚籌碼，未命中時存入 2 枚。\n最多儲存 12 枚。\n\n當{hp}低於 30% 時，自動打開金庫，消耗所有籌碼：\n每枚籌碼得到等價 2% {maxHp}的{shield}，並使{critRate} +2%，持續至戰鬥結束。\n每場戰鬥只能開啟一次。",
 		"price": 15,
 		"grade": "mid",
 		"characters": [
@@ -438,8 +480,8 @@
 		"icon_name": "cash_and_dash",
 		"english_name": "Cash and Dash",
 		"chinese_name": "捲錢跑路",
-		"english_description": "When {hp} reaches 0, do not die immediately. Clear all {critRate} (X) accumulated by Hot Hand (Passive 3) during this battle, then perform an attack with 200% lifesteal. This attack is guaranteed to hit and its damage is multiplied by X. Can trigger only once per battle.",
-		"chinese_description": "{hp}降至 0 時不直接死亡。清除「手氣正旺」（被動 3）在本場戰鬥累積的所有{critRate}（X），並發動一次具有 200% 吸血的攻擊；該次攻擊必定命中，且傷害乘以 X。每場戰鬥只能觸發一次。",
+		"english_description": "When {hp} reaches 0, do not die immediately. Clear all {critRate} (X) accumulated by Hot Hand (Passive 3) during this battle, then perform an attack with 200% lifesteal. This attack is guaranteed to hit and its damage is increased by X. Can trigger only once per battle.",
+		"chinese_description": "{hp}降至 0 時不直接死亡。清除「手氣正旺」（被動 3）在本場戰鬥累積的所有{critRate}（X），並發動一次具有 200% 吸血的攻擊；該次攻擊必定命中，且傷害增加 X 倍。每場戰鬥只能觸發一次。",
 		"price": 25,
 		"grade": "high",
 		"characters": [
@@ -466,8 +508,36 @@
 		"icon_name": "pawn_it_all",
 		"english_name": "Pawn It All",
 		"chinese_name": "砸鍋賣鐵",
-		"english_description": "Attacks can still be performed without enough {stamina}. For every 0.5 missing {stamina}, lose 5% of {maxHp} and add base damage equal to the {hp} lost to that attack.",
-		"chinese_description": "{stamina}不足時仍可發動攻擊。每缺少 0.5 點{stamina}，便失去 5% {maxHp}，並使該次攻擊增加等同於所失去{hp}的基礎傷害。",
+		"english_description": "Attacks can still be performed without enough {stamina}. For every 0.5 missing {stamina}, lose {hp} by 5% of {maxHp} and add base damage equal to the {hp} lost to that attack.",
+		"chinese_description": "{stamina}不足時仍可發動攻擊。每缺少 0.5 點{stamina}，便失去 5% {maxHp}的{hp}，並使該次攻擊增加等同於所失去{hp}的基礎傷害。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "rigged_game",
+		"icon_name": "rigged_game",
+		"english_name": "Rigged Game",
+		"chinese_name": "Rigged Game",
+		"english_description": "While you own this equipment, it is the only equipment related to {hitRate} that takes effect.\nAfter each miss, the next attack's actual hit chance increases by 50%.\nAfter each hit, the next attack's actual hit chance decreases by 25%.\nThe adjusted hit chance is capped between 10% and 90%.",
+		"chinese_description": "若獲得此裝備，{hitRate}相關的裝備只有此裝備生效。\n每次未命中後，下次攻擊的實際命中率提高 50%。\n每次命中後，下次攻擊的實際命中率降低 25%。\n修正後命中率最低 10%，最高 90%。",
+		"price": 25,
+		"grade": "high",
+		"characters": [
+			"Gambler"
+		],
+		"tags": []
+	},
+	{
+		"id": "all_in",
+		"icon_name": "all_in",
+		"english_name": "All In",
+		"chinese_name": "All In",
+		"english_description": "Before each attack, if current {hitRate} is below 50%, you may raise that attack's {hitRate} to 80%.\nIf that attack still misses, it consumes double {stamina} and the next attack suffers {hitRate} -20%.\n3-second cooldown.",
+		"chinese_description": "每次攻擊前，若目前{hitRate}低於 50%，可以將該次攻擊的{hitRate}提升至 80%。\n但若該次攻擊仍然未命中：\n消耗雙倍{stamina}，並使下一次攻擊{hitRate} -20%。\n3 秒冷卻。",
 		"price": 25,
 		"grade": "high",
 		"characters": [
@@ -522,8 +592,8 @@
 		"icon_name": "backup_battery",
 		"english_name": "Backup Battery",
 		"chinese_name": "備用電池",
-		"english_description": "The first time {stamina} reaches 0 in each battle, immediately recover 2 {stamina}.",
-		"chinese_description": "每場戰鬥第一次{stamina}降至 0 時，立即回復 2 點{stamina}。",
+		"english_description": "The first time {stamina} insufficient in each battle, immediately recover 2 {stamina}.",
+		"chinese_description": "每場戰鬥第一次{stamina}不足時，立即回復 2 點{stamina}。",
 		"price": 5,
 		"grade": "low",
 		"characters": [
@@ -550,8 +620,8 @@
 		"icon_name": "perfect_timing",
 		"english_name": "Perfect Timing",
 		"chinese_name": "完美對拍",
-		"english_description": "Every third attack consumes no {stamina}.",
-		"chinese_description": "每第 3 次攻擊不消耗{stamina}。",
+		"english_description": "Battle-wide passive. Every third attack consumes no {stamina}.",
+		"chinese_description": "全場被動。每第 3 次攻擊不消耗{stamina}。",
 		"price": 15,
 		"grade": "mid",
 		"characters": [
@@ -564,8 +634,8 @@
 		"icon_name": "nuclear_core",
 		"english_name": "Nuclear Core",
 		"chinese_name": "核動力核心",
-		"english_description": "When {stamina} reaches 0, immediately recover all {stamina}. 12-second cooldown.",
-		"chinese_description": "{stamina}降至 0 時，立即回復全部{stamina}。冷卻時間 12 秒。",
+		"english_description": "When {stamina} insufficient, immediately recover all {stamina}. 12-second cooldown.",
+		"chinese_description": "{stamina}不足時，立即回復全部{stamina}。冷卻時間 12 秒。",
 		"price": 25,
 		"grade": "high",
 		"characters": [
@@ -578,8 +648,8 @@
 		"icon_name": "overdrive_engine",
 		"english_name": "Overdrive Engine",
 		"chinese_name": "超載引擎",
-		"english_description": "While {hp} is below 50%, recover 5 additional {stamina} per second.",
-		"chinese_description": "{hp}低於 50% 時，{stamina}回復速度每秒 +5。",
+		"english_description": "While {hp} is below 50%, recover 2.5 additional {stamina} per second.",
+		"chinese_description": "{hp}低於 50% 時，{stamina}回復速度每秒 +2.5。",
 		"price": 25,
 		"grade": "high",
 		"characters": [
@@ -620,8 +690,8 @@
 		"icon_name": "dragon_heart",
 		"english_name": "Dragon Heart",
 		"chinese_name": "龍心",
-		"english_description": "Recover 2.5% of {maxHp} per second. This effect becomes stronger as {hp} decreases, up to 5% of {maxHp} per second.",
-		"chinese_description": "每秒回復 2.5% {maxHp}。{hp}越低時效果越強，最高每秒回復 5% {maxHp}。",
+		"english_description": "Recover {hp} by 2.5% of {maxHp} per second. This effect becomes stronger as {hp} decreases, up to 5% of {maxHp} per second.",
+		"chinese_description": "每秒回復 2.5% {maxHp}的{hp}。{hp}越低時效果越強，最高每秒回復 5% {maxHp}的{hp}。",
 		"price": 25,
 		"grade": "high",
 		"characters": [

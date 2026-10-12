@@ -182,24 +182,23 @@ app.post("/battle", async (req, res) => {
         let result = "continue";
 
         if (bm.result == "win" || bm.result == "draw") {
-            await prisma.character.create({
-                data: {
-                    game_id: game.game_id,
-                    round: game.round,
-                    data: {
-                        character_id: game.character_id,
-                        curses: data.curses,
-                        equipmets: data.equipmets
-                    }
-                }
-            });
-
             finalMoney += 20;
         }
         else if (bm.result == "lose") {
             finalHp -= 1;
             finalMoney += 25;
         }
+        await prisma.character.create({
+            data: {
+                game_id: game.game_id,
+                round: game.round,
+                data: {
+                    character_id: game.character_id,
+                    curses: data.curses,
+                    equipmets: data.equipmets
+                }
+            }
+        });
 
         await prisma.game.update({
             where: {

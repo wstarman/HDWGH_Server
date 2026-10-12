@@ -95,7 +95,10 @@ export class BattleCharacter extends BattleCharacterData {
             hit: true,
         }
         this.allEffects.forEach(effect => effect.beforeAttack?.(event));
-        if (weapon.id == "cw6") {
+        if (weapon.id == "rigged_game") {
+            event.hitRate = Math.max(0.1, Math.min(0.9, event.hitRate));
+        }
+        if (weapon.id == "gungnir") {
             event.hitRate = 0.95;
         }
         let hit = Math.random() < event.hitRate;
@@ -131,12 +134,12 @@ export class BattleCharacter extends BattleCharacterData {
             if (Math.random() < event.critRate) {
                 event.isCritHit = true;
                 if (event.isCritHit) {
+                    event.amount *= event.critDamage;
                 }
                 this.allEffects.forEach(effect => effect.onAttackCrit?.(event));
             } else {
                 this.allEffects.forEach(effect => effect.onAttackNotCrit?.(event));
             }
-            event.amount *= event.critDamage;
             receiver.calculateDamage(this, event.amount, damageType, weapon, event.isCritHit, event.isTrueDamage, event.modifier);
             if (event.isCritHit) {
                 this.allEffects.forEach(effect => effect.afterAttakCrit?.(event));
