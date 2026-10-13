@@ -1,5 +1,22 @@
 [
     {
+        "id": "wooden_sword",
+        "icon_name": "wooden_sword",
+        "english_name": "Wooden Sword",
+        "chinese_name": "木劍",
+        "english_description": "Each duelist's starting equipment deals average damage and has no special effects, but it's better than nothing.",
+        "chinese_description": "每個決鬥者的初始裝備，傷害一般，也沒有特殊效果，但總比沒有好",
+        "stamina_cost": 3,
+        "attack_interval": 1.5,
+        "damage": 5,
+        "price": 3,
+        "grade": "low",
+        "characters": [
+            "Common"
+        ],
+        "tags": ["weapon"]
+    },
+    {
         "id": "loaded_fate",
         "icon_name": "loaded_fate",
         "english_name": "Loaded Fate",

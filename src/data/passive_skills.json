@@ -28,8 +28,8 @@
 		"icon_name": "against_the_odds",
 		"english_name": "Against the Odds",
 		"chinese_name": "逆勢賠率",
-		"english_description": "The lower the character's {hitRate}, the higher their {critRate}.",
-		"chinese_description": "{hitRate}越低，{critRate}越高。"
+		"english_description": "Based on 100%, for every 1% shortfall in {hitRate}, {critRate} is increased by 1%. The initial {hitRate} is 60%, decreasing by 10% upon a successful hit and increasing by 10% upon a miss.",
+		"chinese_description": "以100%為基準，每缺少1%{hitRate}，便增加1%{critRate}。初始{hitRate}為60%，攻擊命中時減少10%{hitRate}，miss增加10%{hitRate}"
 	},
 	{
 		"id": "gamblers_paradox",
