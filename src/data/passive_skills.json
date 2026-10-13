@@ -4,24 +4,24 @@
 		"icon_name": "drug_residue",
 		"english_name": "Drug Residue",
 		"chinese_name": "藥物殘留",
-		"english_description": "Start the battle with 5 stacks of {poision}.",
-		"chinese_description": "開場自帶5層{poision}在身上"
+		"english_description": "Start the battle with 5 stacks of {poison}.",
+		"chinese_description": "開場自帶5層{poison}在身上"
 	},
 	{
 		"id": "drug_tolerance",
 		"icon_name": "drug_tolerance",
 		"english_name": "Drug Tolerance",
 		"chinese_name": "抗藥性",
-		"english_description": "Naturally gain 20% {toxicRes}. Lose 2 stacks of {poision} every second.",
-		"chinese_description": "自然獲得20%{toxicRes}，每秒減少兩層{poision}"
+		"english_description": "Naturally gain 20% {toxicRes}. Lose 2 stacks of {poison} every second.",
+		"chinese_description": "自然獲得20%{toxicRes}，每秒減少兩層{poison}"
 	},
 	{
 		"id": "sobriety",
 		"icon_name": "sobriety",
 		"english_name": "Sobriety",
 		"chinese_name": "清醒",
-		"english_description": "Whenever the character's {poision} stacks reach 0 during battle, immediately enter Sober. After gaining any {poision} stacks, Sober remains for 1 second before ending.\nSober effects:\n\t{attackSpeed} +30%\n\t{critRate} +20%\n\tGain 5 {shield} per second.",
-		"chinese_description": "戰鬥途中每次身上{poision}層數歸零立刻進入清醒模式，有任何{poision}層數後滯留一秒消失。\n清醒效果:\n\t{attackSpeed}+30%\n\t{critRate}+20%\n\t每秒獲得5{shield}"
+		"english_description": "Whenever the character's {poison} stacks reach 0 during battle, immediately enter Sober. After gaining any {poison} stacks, Sober remains for 1 second before ending.\nSober effects:\n\t{attackSpeed} +30%\n\t{critRate} +20%\n\tGain 5 {shield} per second.",
+		"chinese_description": "戰鬥途中每次身上{poison}層數歸零立刻進入清醒模式，有任何{poison}層數後滯留一秒消失。\n清醒效果:\n\t{attackSpeed}+30%\n\t{critRate}+20%\n\t每秒獲得5{shield}"
 	},
 	{
 		"id": "against_the_odds",
