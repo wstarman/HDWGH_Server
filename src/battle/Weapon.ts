@@ -39,6 +39,12 @@ export class Weapon extends Equipment {
 
 let weaponDataLoaded = false;
 export const weaponDefs: Record<string, WeaponDef> = {
+    "wooden_sword": {
+        onTrigger() {
+            if (this.owner.attackProhibited) return;
+            this.attack();
+        },
+    },
     /**命在弦上
      * 每 1 秒射擊一次，跟俄羅斯輪盤一樣有機會空槍，一直到射中為止。
      * 空槍算正常攻擊，並被標註為 miss。

@@ -21,6 +21,17 @@ export class Curse extends BaseEffect {
 }
 
 const curseDefs: Record<string, CurseDef> = {
+    /** 幻毒
+     *  每當{poison}層數歸零時，使{poison}層數變為5，且自身的{toxicRes}降低10%。
+     */
+    "phantom_dose": {
+        afterStatusChange(event) {
+            if (event.status.id == StatusName.poison && event.status.stack == 0) {
+                this.owner.addStatus(StatusName.poison, 5);
+                this.owner.toxicDamageTakenMultiplier *= 1.1;
+            }
+        },
+    },
     /**
      * Overbright Eyes
         每次使用藥物時，獲得 1 層感官過載。
@@ -136,7 +147,7 @@ const curseDefs: Record<string, CurseDef> = {
         onStart() {
             this.toggle();
             this.enabled = true;
-            const equipmentAddedPoision: Record<string, number> = {
+            const equipmentAddedPoison: Record<string, number> = {
                 "pills": 1,
                 "bitter_syrup": 1,
                 "night_pill": 1,
@@ -150,8 +161,8 @@ const curseDefs: Record<string, CurseDef> = {
                 "deadman_protocol": 0 // grok is this true?
             }
             for (let item of this.owner.allEffects) {
-                if (equipmentAddedPoision[item.id] !== undefined) {
-                    this.owner.addStatus(StatusName.poison, equipmentAddedPoision[item.id]!);
+                if (equipmentAddedPoison[item.id] !== undefined) {
+                    this.owner.addStatus(StatusName.poison, equipmentAddedPoison[item.id]!);
                 }
                 if (item.hasTag("drug")) {
                     item.triggerProhibited = true;
