@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { PrismaClient } from '@prisma/client';
 import type { Character } from "@prisma/client";
 import { BattleManager } from "./battle/BattleManager.js";
@@ -31,6 +32,14 @@ interface SimulationResult {
     battle_log: BattleLog[]
 }
 
+app.use(cors({
+    origin: [
+        "https://html-classic.itch.zone",
+        "http://localhost:8000"
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 app.use(express.json());
 
