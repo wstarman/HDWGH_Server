@@ -171,6 +171,7 @@ export const equipmentDefs: Record<string, EquipmentDef> = {
                 this.owner.getEffect("drug_tolerance")!.speed += 0.2;
             } else if (event.status.stack < 5 && this.enabled2) {
                 this.togglePassive(false);
+                this.enabled2 = false;
                 this.owner.getEffect("drug_tolerance")!.speed -= 0.2;
             }
         },
