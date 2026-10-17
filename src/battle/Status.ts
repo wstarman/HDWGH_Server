@@ -94,7 +94,12 @@ const StatusDefs: Record<string, StatusDef> = {
         triggerInterval: 1,
         damageType: DamageType.Toxic,
         onTrigger() {
-            const damage = 1 * this.stack
+            let damage: number;
+            if (this.owner.getEffect("drug_tolerance")) {
+                damage = 1 * Math.min(15, this.stack);
+            } else {
+                damage = 1 * this.stack
+            }
             this.dealDamageToSelf(damage);
         },
         natureDecrease() { }

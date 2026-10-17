@@ -112,7 +112,11 @@ const passiveDefs: Record<string, PassiveDef> = {
         onTrigger() {
             if (!this.enabled) return;
             this.toggle();
-            this.owner.shield += 5;
+            if (this.owner.getEffect("life_monitor_bracelet")) {
+                this.owner.shield += 3;
+            } else {
+                this.owner.shield += 1;
+            }
         }
     },
 
