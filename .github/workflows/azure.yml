@@ -3,6 +3,8 @@ name: Deploy Docker Image to Azure Container Apps
 on:
   push:
     branches: ["azure"]
+    paths-ignore:
+      - 'Dockerfile.studio'
   workflow_dispatch:
 
 permissions:
