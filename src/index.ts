@@ -197,17 +197,31 @@ app.post("/battle", async (req, res) => {
             finalHp -= 1;
             finalMoney += 25;
         }
-        await prisma.character.create({
-            data: {
-                game_id: game.game_id,
+
+        const saveCharacterData = {
+            character_id: game.character_id,
+            curses: data.curses,
+            equipmets: data.equipmets
+        };
+        
+        const existing = await prisma.character.findFirst({
+            where: {
                 round: game.round,
                 data: {
-                    character_id: game.character_id,
-                    curses: data.curses,
-                    equipmets: data.equipmets
+                    equals: saveCharacterData
                 }
             }
         });
+
+        if(!existing){
+            await prisma.character.create({
+                data: {
+                    round: game.round,
+                data: saveCharacterData
+                }
+            });
+        }
+        
 
         await prisma.game.update({
             where: {
