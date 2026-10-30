@@ -187,7 +187,7 @@ export class BattleCharacter extends BattleCharacterData {
         const originalDamage = event.amount;
         this.allEffects.forEach(p => p.beforeDamageTaken?.(event));
         this.applyDamageTakenMultiplier(event);
-        const final = isTrueDamage ? originalDamage : (event.amount * this.attackPower + event.modifier.flat) * event.modifier.multiplier + event.modifier.finalFlat;
+        const final = isTrueDamage ? originalDamage : (event.amount * attacker.attackPower + event.modifier.flat) * event.modifier.multiplier + event.modifier.finalFlat;
         event.amount = final
         this.logger.recordDamageEvent(event, final);
         this.takeDamage(final);
