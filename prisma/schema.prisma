@@ -19,16 +19,10 @@ model Game {
   round Int
   hp Int
   money Int @default(0)
-
-  characters   Character[]
 }
 
 model Character {
-  game_id   String
+  character_id String @id @default(uuid())
   round Int
   data Json
-
-  game Game @relation(fields: [game_id], references: [game_id])
-
-  @@id([game_id, round])
 }
